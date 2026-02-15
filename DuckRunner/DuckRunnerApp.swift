@@ -25,7 +25,7 @@ struct DuckRunnerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            BaseMapView(trackService: TrackService(), locationService: LocationService())
         }
         .modelContainer(sharedModelContainer)
     }

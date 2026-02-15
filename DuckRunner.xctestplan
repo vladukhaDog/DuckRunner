@@ -1,0 +1,41 @@
+{
+  "configurations" : [
+    {
+      "id" : "142110FE-DB03-44C8-A5A6-58E8EA203104",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:DuckRunner.xcodeproj",
+      "identifier" : "61399C612F41223F008A0F49",
+      "name" : "DuckRunner"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:DuckRunner.xcodeproj",
+        "identifier" : "61399C702F412241008A0F49",
+        "name" : "DuckRunnerTests"
+      }
+    },
+    {
+      "skippedTests" : [
+        "DuckRunnerUITests",
+        "DuckRunnerUITestsLaunchTests"
+      ],
+      "target" : {
+        "containerPath" : "container:DuckRunner.xcodeproj",
+        "identifier" : "61399C7A2F412241008A0F49",
+        "name" : "DuckRunnerUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
