@@ -1,3 +1,159 @@
-<svg width="159" height="156" viewBox="0 0 159 156" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M148.538 108.018C149.338 88.418 135.204 74.8513 128.038 70.5179C132.038 66.5188 145.538 66.5188 147.538 65.0188C148.338 64.4188 146.538 60.5188 149.038 58.5188C152.038 57.5188 153.871 55.5188 155.538 54.0188C161.038 47.5188 159.038 44.5188 155.538 42.5188C149.538 40.5188 135.538 48.0188 135.038 41.0179C135.038 10.0196 107.538 -0.497236 90.5377 0.0179239C57.5377 1.01792 51.0377 27.5179 51.0377 39.5179C51.0377 51.4511 54.8711 64.0179 58.5377 69.0179C52.7044 69.5179 39.8377 70.2179 35.0377 69.0179C30.2377 67.8179 25.0377 64.8513 23.0377 63.5179C16.0377 55.5178 9.45349 49.1155 1.45349 64.5C-0.357178 67.982 -0.96228 97.1846 2.53772 108.018C5.20439 114.851 12.4377 130.118 20.0377 136.518C29.5377 144.518 47.5377 154.518 80.0377 155.518C106.038 156.318 122.871 148.185 128.038 144.018C134.538 140.185 147.738 127.618 148.538 108.018Z" fill="black"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="140" y1="120" x2="900" y2="940" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1220"/>
+      <stop offset="1" stop-color="#0A2A3A"/>
+    </linearGradient>
+
+    <linearGradient id="duckBody" x1="210" y1="410" x2="820" y2="740" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFE66D"/>
+      <stop offset="1" stop-color="#FFC93A"/>
+    </linearGradient>
+
+    <linearGradient id="beak" x1="650" y1="450" x2="870" y2="540" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB14A"/>
+      <stop offset="1" stop-color="#FF7A1A"/>
+    </linearGradient>
+
+    <radialGradient id="wheelGloss" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(0.35 0.3) rotate(45) scale(1.1)">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.25 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect x="96" y="96" width="832" height="832" rx="188" fill="url(#bg)"/>
+  <path d="M210 340 C300 250, 450 210, 610 235" stroke="#34D399" stroke-width="18" stroke-linecap="round" opacity="0.25"/>
+  <path d="M190 420 C290 330, 460 290, 640 320" stroke="#60A5FA" stroke-width="14" stroke-linecap="round" opacity="0.18"/>
+
+  <!-- Speed lines -->
+  <g opacity="0.9" filter="url(#softGlow)">
+    <path d="M180 590 H410" stroke="#66E3FF" stroke-width="20" stroke-linecap="round" opacity="0.55"/>
+    <path d="M160 650 H380" stroke="#66E3FF" stroke-width="14" stroke-linecap="round" opacity="0.35"/>
+    <path d="M200 710 H430" stroke="#66E3FF" stroke-width="16" stroke-linecap="round" opacity="0.45"/>
+  </g>
+
+  <!-- Duck + wheels group -->
+  <g filter="url(#shadow)">
+    <!-- Wheels -->
+    <g>
+      <!-- rear wheel -->
+      <g transform="translate(350 770)">
+        <circle cx="0" cy="0" r="86" fill="#0B0F16"/>
+        <circle cx="0" cy="0" r="56" fill="#1B2433"/>
+        <circle cx="0" cy="0" r="18" fill="#0B0F16"/>
+        <path d="M-52 -8 L52 -8" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <path d="M-38 34 L38 -34" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <path d="M-38 -34 L38 34" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="-26" cy="-26" r="70" fill="url(#wheelGloss)"/>
+      </g>
+
+      <!-- front wheel -->
+      <g transform="translate(690 770)">
+        <circle cx="0" cy="0" r="92" fill="#0B0F16"/>
+        <circle cx="0" cy="0" r="60" fill="#1B2433"/>
+        <circle cx="0" cy="0" r="20" fill="#0B0F16"/>
+        <path d="M-58 -9 L58 -9" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <path d="M-44 38 L44 -38" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <path d="M-44 -38 L44 38" stroke="#2E3A4F" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="-30" cy="-28" r="76" fill="url(#wheelGloss)"/>
+      </g>
+
+      <!-- wheel axle bar -->
+      <path d="M410 744 C495 710, 610 710, 650 744" stroke="#0B0F16" stroke-width="26" stroke-linecap="round"/>
+      <path d="M420 738 C500 708, 600 708, 640 738" stroke="#273247" stroke-width="12" stroke-linecap="round" opacity="0.55"/>
+    </g>
+
+    <!-- Duck body -->
+    <path d="M300 720
+             C260 700, 240 660, 252 620
+             C270 560, 340 540, 410 542
+             C432 495, 486 450, 560 440
+             C660 426, 742 472, 772 540
+             C842 570, 868 642, 842 700
+             C816 760, 748 792, 650 792
+             C530 792, 400 770, 300 720 Z"
+          fill="url(#duckBody)"/>
+
+    <!-- Belly highlight -->
+    <path d="M325 708
+             C300 690, 292 660, 304 634
+             C330 576, 412 572, 470 586
+             C520 598, 560 626, 560 656
+             C560 716, 420 742, 325 708 Z"
+          fill="#FFFFFF" opacity="0.20"/>
+
+    <!-- Head -->
+    <path d="M470 520
+             C470 442, 530 382, 610 382
+             C700 382, 770 440, 770 518
+             C770 586, 720 630, 650 646
+             C580 662, 520 628, 492 590
+             C478 570, 470 548, 470 520 Z"
+          fill="url(#duckBody)"/>
+
+    <!-- Beak -->
+    <path d="M740 502
+             C820 492, 876 520, 886 556
+             C898 600, 842 634, 756 624
+             C728 620, 708 610, 700 596
+             C692 582, 698 564, 714 548
+             C726 536, 736 520, 740 502 Z"
+          fill="url(#beak)"/>
+
+    <!-- Beak split line -->
+    <path d="M720 574 C770 592, 824 596, 862 584"
+          stroke="#B44A00" stroke-width="10" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- Sunglasses (badass) -->
+    <g>
+      <rect x="540" y="460" width="110" height="72" rx="22" fill="#0B0F16"/>
+      <rect x="660" y="460" width="110" height="72" rx="22" fill="#0B0F16"/>
+      <path d="M650 496 H660" stroke="#273247" stroke-width="14" stroke-linecap="round"/>
+      <path d="M535 494 C520 492, 508 490, 494 486" stroke="#0B0F16" stroke-width="14" stroke-linecap="round"/>
+      <path d="M775 494 C795 492, 812 492, 828 496" stroke="#0B0F16" stroke-width="14" stroke-linecap="round"/>
+      <path d="M550 476 C585 468, 616 470, 642 478" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.15"/>
+      <path d="M670 476 C705 468, 736 470, 762 478" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.12"/>
+    </g>
+
+    <!-- Eye/cheek detail -->
+    <path d="M520 560 C548 586, 592 602, 640 602"
+          stroke="#000000" stroke-width="14" stroke-linecap="round" opacity="0.12"/>
+
+    <!-- Wing -->
+    <path d="M420 620
+             C460 590, 520 592, 560 624
+             C592 650, 590 686, 556 708
+             C512 736, 448 730, 412 694
+             C388 670, 392 640, 420 620 Z"
+          fill="#FFDB57" opacity="0.9"/>
+    <path d="M430 644 C470 620, 520 628, 548 652"
+          stroke="#000000" stroke-width="10" stroke-linecap="round" opacity="0.12"/>
+
+    <!-- Little “speedometer needle” accent on body -->
+    <path d="M610 708 L670 662"
+          stroke="#66E3FF" stroke-width="16" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="610" cy="708" r="14" fill="#66E3FF" opacity="0.9"/>
+  </g>
+
+  <!-- Subtle border -->
+  <rect x="96" y="96" width="832" height="832" rx="188" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="10"/>
 </svg>
