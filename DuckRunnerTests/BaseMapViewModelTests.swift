@@ -7,7 +7,29 @@ import MapKit
 
 // MARK: - Mocks
 
+final class MockStorage: TrackStorageProtocol {
+    func getTracks(for date: Date) async -> [DuckRunner.Track] {
+        return []
+    }
+    
+    func getAllTracks() async -> [DuckRunner.Track] {
+        return []
+    }
+    
+    func addTrack(_ track: DuckRunner.Track) async throws {
+    }
+    
+    func deleteTrack(_ track: DuckRunner.Track) async {
+    }
+    
+    func updateTrack(_ track: DuckRunner.Track) async throws {
+    }
+    
+    var actionPublisher: PassthroughSubject<DuckRunner.StorageAction, Never> = .init()
+}
+
 final class MockTrackService: TrackServiceProtocol {
+    
     
     var currentTrack: CurrentValueSubject<DuckRunner.Track?, Never> = .init(nil)
     
@@ -19,7 +41,7 @@ final class MockTrackService: TrackServiceProtocol {
         currentTrack.send(new)
     }
 
-    func stopTrack(at date: Date) throws(TrackServiceError) {
+    func stopTrack(at date: Date) throws(TrackServiceError) -> Track {
         if currentTrack.value == nil {
             throw TrackServiceError.noCurrentTrack
         } else if isActive == false {
@@ -29,6 +51,7 @@ final class MockTrackService: TrackServiceProtocol {
             var updatedTrack = currentTrack.value
             updatedTrack?.stopDate = date
             currentTrack.send(updatedTrack)
+            return updatedTrack!
         }
     }
 
@@ -76,7 +99,7 @@ struct BaseMapViewModelTests {
     func testProvidingLocationUpdatesTrackInfo() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         // Start a track to allow appending
         await vm.startTrack()
@@ -92,7 +115,7 @@ struct BaseMapViewModelTests {
     func testProvidingLocationUpdatesCurrentSpeed() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         await vm.startTrack()
         await locationService.location.send(makeLocation(speed: 5.5))
@@ -106,7 +129,7 @@ struct BaseMapViewModelTests {
     func testUpdatingTrackServiceCurrentTrackPropagates() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         let start = Date()
         await trackService.startTrack(at: start)
@@ -121,7 +144,7 @@ struct BaseMapViewModelTests {
     func testStartTrackStartsTrackBothClearAndAfterAnother() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         await vm.startTrack()
         let firstOpt = await awaitNextValue(vm.$currentTrack.eraseToAnyPublisher())
@@ -145,7 +168,7 @@ struct BaseMapViewModelTests {
     func testStart() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         // Start then stop
         await vm.startTrack()
@@ -158,7 +181,7 @@ struct BaseMapViewModelTests {
     func testStopNonStartedError() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         // Stopping without starting should throw
         do {
@@ -177,7 +200,7 @@ struct BaseMapViewModelTests {
     func testStartWorksAfterBadStart() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         // Stopping without starting should throw
         do {
@@ -204,7 +227,7 @@ struct BaseMapViewModelTests {
     func testSecondStopThrowsError() async throws {
         let trackService = MockTrackService()
         let locationService = MockLocationService()
-        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService)
+        let vm = await BaseMapViewModel(trackService: trackService, locationService: locationService, storageService: MockStorage())
 
         // Start then stop
         await vm.startTrack()
