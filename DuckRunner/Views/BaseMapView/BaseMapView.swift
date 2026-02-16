@@ -31,33 +31,25 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
     
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        Map(position: $vm.currentPosition) {
-            UserAnnotation()
-            if let points = vm.currentTrack?.points {
-                MapLine(points: points).line()
-            }
-        }
-        .mapControls {
-            // Optional: Add a built-in button for the user to re-center the map
-            MapUserLocationButton()
-        }
-        .safeAreaInset(edge: .top, content: {
-            if let currentSpeed = vm.currentSpeed {
-                SpeedometerView(currentSpeed, displayUnit: unitSpeed)
-                    .transition(.opacity)
-            }
-        })
-        .overlay(alignment: .bottom, content: {
-            VStack {
-                if let track = vm.currentTrack {
-                    TrackInfoView(track: track, unit: unitSpeed)
+        TrackingMapView(track: vm.currentTrack, trackUser: true)
+            .ignoresSafeArea(.all)
+            .overlay(alignment: .top) {
+                if let currentSpeed = vm.currentSpeed {
+                    SpeedometerView(currentSpeed, displayUnit: unitSpeed)
+                        .transition(.opacity)
                 }
-                TrackControlButton(vm: vm)
             }
-            .padding(10)
-            
-        })
-        .animation(.bouncy, value: vm.currentSpeed != nil)
+            .overlay(alignment: .bottom, content: {
+                VStack {
+                    if let track = vm.currentTrack {
+                        TrackInfoView(track: track, unit: unitSpeed)
+                    }
+                    TrackControlButton(vm: vm)
+                }
+                .padding(10)
+                
+            })
+            .animation(.bouncy, value: vm.currentSpeed != nil)
     }
 }
 
