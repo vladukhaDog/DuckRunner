@@ -25,15 +25,7 @@ struct TrackTimeView: View {
         self.stopDate = .distantFuture
     }
     
-    private let formatter: DateComponentsFormatter = {
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .abbreviated // e.g., "1 minute, 10 seconds"
-        // Or use .positional for "1:10" (minutes:seconds) or "1:11:10" (hours:minutes:seconds)
-//         formatter.unitsSty/le = .positional
-        formatter.allowedUnits = [.minute, .second]
-        formatter.zeroFormattingBehavior = .dropAll
-        return formatter
-    }()
+   
     
     var body: some View {
         TimelineView(.periodic(from: startDate, by: 1)) { context in
@@ -41,7 +33,7 @@ struct TrackTimeView: View {
             (stopDate ?? context.date)
                 .timeIntervalSince(startDate)
             VStack(spacing: 0) {
-                Text(formatter.string(from: interval) ?? "_")
+                Text(TimeIntervalFormatter.string(from: interval) ?? "_")
                     .font(.largeTitle)
                     .lineLimit(1)
                     .monospacedDigit()

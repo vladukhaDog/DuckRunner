@@ -9,6 +9,7 @@ import Combine
 
 final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
     @Published private(set) var tracks: [Track] = []
+    @Published var selectedDate: Date = .now
     private let storage: any TrackStorageProtocol
     private var cancellables: Set<AnyCancellable> = []
     
@@ -16,18 +17,23 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
         self.storage = storage
         self.storage.actionPublisher
             .sink { [weak self] action in
-                print("updated", action)
                 self?.receiveAction(action)
             }
             .store(in: &cancellables)
-        Task {
-            let tracks = await storage.getAllTracks()
-            await MainActor.run {
-                withAnimation {
-                    self.tracks = tracks
+        
+        self.$selectedDate
+            .sink { date in
+                Task {
+                    let tracks = await storage.getTracks(for: date)
+                    await MainActor.run {
+                        withAnimation {
+                            self.tracks = tracks
+                        }
+                    }
                 }
             }
-        }
+            .store(in: &cancellables)
+        
     }
     
     private func receiveAction(_ action: StorageAction) {
@@ -42,18 +48,6 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
                 if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                     self.tracks[index] = track
                 }
-            }
-        }
-    }
-    
-    func deleteDestinations(_ indexSet: IndexSet) {
-        for index in indexSet {
-            let track = tracks[index]
-            Task {
-                await self.storage.deleteTrack(track)
-            }
-            withAnimation {
-                let _ = self.tracks.remove(at: index)
             }
         }
     }

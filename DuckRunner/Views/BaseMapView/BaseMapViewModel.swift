@@ -15,7 +15,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     @Published var currentPosition: MapCameraPosition = .userLocation(followsHeading: true,
                                                                       fallback: .automatic)
 
-    @Published var currentSpeed: CLLocationSpeed? = nil
+    @Published var currentSpeed: CLLocationSpeed? = 0
     
     func startTrack() {
         self.trackService.startTrack(at: .now)
@@ -47,8 +47,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         
         self.locationPublisher = self.locationService.location
             .sink { [weak self] location in
-                try? self?.trackService.appendTrackPosition(.init(position: location.coordinate, speed: location.speed))
-                self?.currentSpeed = location.speed
+                try? self?.trackService.appendTrackPosition(.init(position: location.coordinate, speed: location.speed, date: .now))
+                self?.currentSpeed = max(0,location.speed)
             }
     }
     

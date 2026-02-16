@@ -17,7 +17,7 @@ struct TrackServiceTests {
     @Test("append point throws .noCurrentTrack if no track started")
     func appendTrackPosition_noCurrentTrack_throws() async throws {
         let service = await TrackService()
-        let pt = TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0)
+        let pt = await TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0, date: .now)
         do {
             try await service.appendTrackPosition(pt)
             Issue.record("Should have thrown")
@@ -31,7 +31,7 @@ struct TrackServiceTests {
         let service = await TrackService()
         await service.startTrack(at: Date())
         _ = try await service.stopTrack(at: Date())
-        let pt = TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0)
+        let pt = await TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0, date: .now)
         do {
             try await service.appendTrackPosition(pt)
             Issue.record("Should have thrown")
@@ -44,7 +44,7 @@ struct TrackServiceTests {
     func appendTrackPosition_activeTrack_succeeds() async throws {
         let service = await TrackService()
         await service.startTrack(at: Date())
-        let pt = TrackPoint(position: .init(latitude: 10, longitude: 20), speed: 5)
+        let pt = await TrackPoint(position: .init(latitude: 10, longitude: 20), speed: 5, date: .now)
         try await service.appendTrackPosition(pt)
         await #expect(service.currentTrack.value?.points.count == 1)
         await #expect(service.currentTrack.value?.points.first?.position.latitude == 10)

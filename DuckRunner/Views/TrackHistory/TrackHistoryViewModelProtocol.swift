@@ -11,5 +11,5 @@ import Combine
 
 protocol TrackHistoryViewModelProtocol: ObservableObject {
     var tracks: [Track] { get }
-    func deleteDestinations(_ indexSet: IndexSet)
+    var selectedDate: Date { get set }
 }

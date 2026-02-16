@@ -10,67 +10,66 @@ import Combine
 
 struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     @StateObject private var vm: ViewModel
-    
+    @AppStorage("speedunit") var speedUnit: String = "km/h"
     init(vm: ViewModel) {
         self._vm = .init(wrappedValue: vm)
     }
     
     var body: some View {
-        List {
-            Section("History") {
-                ForEach(vm.tracks, id: \.startDate) { track in
-                    Text(track.startDate.description)
+        NavigationView {
+            ScrollView {
+                dateSelector
+                Divider()
+                LazyVStack(spacing: 5) {
+                    if vm.tracks.isEmpty {
+                        Text("Empty history")
+                            .font(.largeTitle)
+                            .opacity(0.6)
+                            .transition(.opacity)
+                    }
+                    ForEach(vm.tracks, id: \.startDate) { track in
+                        NavigationLink {
+                            TrackDetailView(track: track)
+                        } label: {
+                            TrackHistoryCellView(track: track,
+                                                 unit: UnitSpeed.byName(speedUnit))
+                        }
+                    }
                 }
-                .onDelete(perform: vm.deleteDestinations)
+                
             }
+            .frame(maxWidth: .infinity)
+            .animation(.default, value: vm.tracks.isEmpty)
+            .navigationTitle("History")
+            .background(Color.cyan.gradient.opacity(0.05))
+        }
+        
+    }
+    
+    private var dateSelector: some View {
+        DatePicker("Date",
+                   selection: $vm.selectedDate,
+                   displayedComponents: [.date])
+        .datePickerStyle(.graphical)
             
-        }
-        .frame(maxWidth: .infinity)
-        .overlay {
-            if vm.tracks.isEmpty {
-                Text("Empty history")
-                    .font(.largeTitle)
-                    .opacity(0.6)
-                    .transition(.opacity)
-            }
-        }
-        .animation(.default, value: vm.tracks.isEmpty)
     }
 }
 
-//private struct PreviewView: View {
-//    @Environment(\.modelContext) var modelContext
-//    var body: some View {
-//        VStack {
-//            Button("Add Test") {
-//                modelContext.insert(TrackDTO(track: Track(startDate: .now)))
-//            }
-//            TrackHistoryView()
-//        }
-//    }
-//}
-//
-//#Preview("List with data") {
-//    do {
-//        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//        let container = try ModelContainer(for: TrackDTO.self, configurations: config)
-//
-//        let example = TrackDTO(track: Track(startDate: .now))
-//        container.mainContext.insert(example)
-//        return TrackHistoryView()
-//            .modelContainer(container)
-//    } catch {
-//        fatalError("Failed to create model container.")
-//    }
-//}
-//
-//#Preview("List without data") {
-//    do {
-//        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//        let container = try ModelContainer(for: TrackDTO.self, configurations: config)
-//        return TrackHistoryView()
-//            .modelContainer(container)
-//    } catch {
-//        fatalError("Failed to create model container.")
-//    }
-//}
+fileprivate final class PreviewModel: TrackHistoryViewModelProtocol {
+    @Published var selectedDate: Date = .now
+    
+    @Published var tracks: [Track] = []
+    
+    func deleteDestinations(_ indexSet: IndexSet) {
+        
+    }
+    init() {
+        self.tracks.append(.filledTrack)
+    }
+    
+}
+
+
+#Preview {
+    TrackHistoryView(vm: PreviewModel())
+}

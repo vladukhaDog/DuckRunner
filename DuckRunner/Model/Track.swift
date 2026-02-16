@@ -32,6 +32,7 @@ extension Track {
             }
         }) ?? []
         self.points = points
+            .sorted(by: {$0.date < $1.date})
         self.startDate = track.startDate ?? .now
         self.stopDate = track.stopDate
         self.id = track.id ?? UUID().uuidString
@@ -45,6 +46,7 @@ extension TrackPointDTO {
         self.latitude = trackPoint.position.latitude
         self.longitude = trackPoint.position.longitude
         self.speed = trackPoint.speed
+        self.date = trackPoint.date
     }
 }
 
@@ -62,9 +64,11 @@ extension TrackDTO {
 struct TrackPoint: Codable {
     private(set) var position: CLLocationCoordinate2D
     private(set) var speed: CLLocationSpeed
-    init(position: CLLocationCoordinate2D, speed: CLLocationSpeed) {
+    private(set) var date: Date
+    init(position: CLLocationCoordinate2D, speed: CLLocationSpeed, date: Date) {
         self.position = position
         self.speed = speed
+        self.date = date
     }
 }
 
@@ -72,6 +76,7 @@ extension TrackPoint {
     init(_ trackPoint: TrackPointDTO) {
         self.position = .init(latitude: trackPoint.latitude, longitude: trackPoint.longitude)
         self.speed = trackPoint.speed
+        self.date = trackPoint.date ?? Date()
     }
 }
 

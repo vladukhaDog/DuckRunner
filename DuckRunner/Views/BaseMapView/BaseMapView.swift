@@ -19,26 +19,22 @@ extension BaseMapView where ViewModel == BaseMapViewModel {
     }
 }
 
+
+
 struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
     @StateObject private var vm: ViewModel
+    @AppStorage("speedunit") var speedUnit: String = "km/h"
     
     init(vm: ViewModel) {
         self._vm = .init(wrappedValue: vm)
     }
     
     var body: some View {
+        let unitSpeed = UnitSpeed.byName(speedUnit)
         Map(position: $vm.currentPosition) {
             UserAnnotation()
             if let points = vm.currentTrack?.points {
-                MapPolyline(points: points.map({ point in
-                    MKMapPoint(point.position)
-                }), contourStyle: .straight)
-                .stroke(Color.cyan,
-                        style: StrokeStyle(
-                            lineWidth: 5,
-                            lineCap: .round,
-                            lineJoin: .round
-                        ))
+                MapLine(points: points).line()
             }
         }
         .mapControls {
@@ -47,12 +43,19 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         }
         .safeAreaInset(edge: .top, content: {
             if let currentSpeed = vm.currentSpeed {
-                SpeedometerView(currentSpeed, displayUnit: .kilometersPerHour)
+                SpeedometerView(currentSpeed, displayUnit: unitSpeed)
                     .transition(.opacity)
             }
         })
         .overlay(alignment: .bottom, content: {
-            TrackInfoView(vm: vm, unit: .kilometersPerHour)
+            VStack {
+                if let track = vm.currentTrack {
+                    TrackInfoView(track: track, unit: unitSpeed)
+                }
+                TrackControlButton(vm: vm)
+            }
+            .padding(10)
+            
         })
         .animation(.bouncy, value: vm.currentSpeed != nil)
     }
@@ -64,7 +67,7 @@ private final class PreviewModel: BaseMapViewModelProtocol {
     
     @Published var currentPosition: MapCameraPosition = .userLocation(fallback: .automatic)
     
-    @Published var currentSpeed: CLLocationSpeed? = nil
+    @Published var currentSpeed: CLLocationSpeed? = 0
     
     func startTrack() {
         self.currentSpeed = 35.553

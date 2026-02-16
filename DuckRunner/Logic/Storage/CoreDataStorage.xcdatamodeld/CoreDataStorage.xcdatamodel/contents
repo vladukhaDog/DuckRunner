@@ -7,6 +7,7 @@
         <relationship name="points" toMany="YES" deletionRule="Nullify" destinationEntity="TrackPointDTO"/>
     </entity>
     <entity name="TrackPointDTO" representedClassName="TrackPointDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="speed" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
