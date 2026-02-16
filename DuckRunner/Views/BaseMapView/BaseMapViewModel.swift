@@ -47,7 +47,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         
         self.locationPublisher = self.locationService.location
             .sink { [weak self] location in
-                try? self?.trackService.appendTrackPosition(.init(position: location.coordinate, speed: location.speed, date: .now))
+                try? self?.trackService.appendTrackPosition(.init(position: location.coordinate, speed: max(0,location.speed), date: .now))
                 self?.currentSpeed = max(0,location.speed)
             }
     }
