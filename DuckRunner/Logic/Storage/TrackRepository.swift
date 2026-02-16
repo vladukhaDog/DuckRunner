@@ -21,25 +21,33 @@ let publicContainer = {
     return container
 }()
 
+/// Repository for persistent storage and retrieval of tracks using Core Data.
+/// Implements TrackStorageProtocol for CRUD operations and action publishing.
 final class TrackRepository: TrackStorageProtocol {
+    /// Publishes storage actions (creation, deletion, update) to notify observers of changes.
     var actionPublisher: PassthroughSubject<StorageAction, Never> = .init()
     
-    /// send an action that was made with our object
+    /// Sends a storage action event through the publisher.
     internal func sendAction(_ action: StorageAction) {
         actionPublisher.send(action)
     }
     
+    /// Initializes the repository with a Core Data container.
     init() {
         self.container = publicContainer
     }
     
+    /// The NSPersistentContainer managing Core Data storage.
     private var container: NSPersistentContainer
+    
+    /// Background context for performing storage operations.
     lazy var backgroundContext: NSManagedObjectContext = {
         let newbackgroundContext = container.newBackgroundContext()
         newbackgroundContext.automaticallyMergesChangesFromParent = true
         return newbackgroundContext
     }()
     
+    /// Adds a new track to persistent storage if it does not already exist.
     func addTrack(_ track: Track) async {
         
         let context = self.backgroundContext
@@ -66,7 +74,7 @@ final class TrackRepository: TrackStorageProtocol {
         }
     }
 
-    // Prefer deleting by id (Sendable) instead of passing NSManagedObject across actors
+    /// Deletes a track from persistent storage by its identifier.
     func deleteTrack(_ track: Track) async {
         let context = self.backgroundContext
         await withCheckedContinuation { [context, track] continuation in
@@ -89,6 +97,7 @@ final class TrackRepository: TrackStorageProtocol {
         }
     }
     
+    /// Updates an existing track in persistent storage.
     func updateTrack(_ track: Track) async throws {
         let context = self.backgroundContext
         await withCheckedContinuation { [context, track] continuation in
@@ -113,6 +122,7 @@ final class TrackRepository: TrackStorageProtocol {
         }
     }
     
+    /// Retrieves all tracks from storage, sorted by start date.
     func getAllTracks() async -> [Track] {
         let context = self.backgroundContext
         return await withCheckedContinuation { [context] continuation in
@@ -134,6 +144,7 @@ final class TrackRepository: TrackStorageProtocol {
         }
     }
     
+    /// Retrieves tracks that start on a specific date.
     func getTracks(for date: Date) async -> [Track] {
         let context = self.backgroundContext
         return await withCheckedContinuation { [context] continuation in

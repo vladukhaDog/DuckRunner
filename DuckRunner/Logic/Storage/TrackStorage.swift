@@ -7,19 +7,29 @@
 
 import Foundation
 import Combine
-/// Action that was made on respected object with said object
+/// Enumerates the storage operations that can occur to a track (creation, deletion, update).
 enum StorageAction {
+    /// Indicates a track was created.
     case created(Track)
+    /// Indicates a track was deleted.
     case deleted(Track)
+    /// Indicates a track was updated.
     case updated(Track)
 }
 
+/// Abstraction for components that provide persistent storage and retrieval of tracks.
+/// Defines CRUD methods and a publisher for storage action events.
 protocol TrackStorageProtocol {
+    /// Retrieves all tracks that start on the given date.
     func getTracks(for date: Date) async -> [Track]
+    /// Retrieves all tracks in storage.
     func getAllTracks() async -> [Track]
+    /// Adds a new track to storage.
     func addTrack(_ track: Track) async throws
+    /// Deletes the specified track from storage.
     func deleteTrack(_ track: Track) async
+    /// Updates the specified track in storage.
     func updateTrack(_ track: Track) async throws
-    /// Ge a combine publisher that notifies us that something happened with an object related to this class
+    /// Publisher that notifies about storage actions performed on tracks.
     var actionPublisher: PassthroughSubject<StorageAction, Never> { get }
 }

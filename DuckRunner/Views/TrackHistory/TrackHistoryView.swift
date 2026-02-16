@@ -8,13 +8,18 @@
 import SwiftUI
 import Combine
 
+/// Root view for displaying the user's track history with date-based navigation and detail view links.
 struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
+    /// The view model managing and providing track history data and selection.
     @StateObject private var vm: ViewModel
+    /// User's preferred unit for speed display, persisted locally.
     @AppStorage("speedunit") var speedUnit: String = "km/h"
+    /// Initializes the history view with the given view model.
     init(vm: ViewModel) {
         self._vm = .init(wrappedValue: vm)
     }
     
+    /// The main UI displaying history list, navigation links, and date selector.
     var body: some View {
         NavigationView {
             ScrollView {
@@ -46,6 +51,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
         
     }
     
+    /// UI component for selecting the date whose tracks are shown.
     private var dateSelector: some View {
         DatePicker("Date",
                    selection: $vm.selectedDate,

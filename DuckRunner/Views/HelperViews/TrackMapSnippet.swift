@@ -7,6 +7,7 @@
 import SwiftUI
 import MapKit
 
+/// Map to be used in showing a completed track
 struct TrackMapSnippet: View {
     let track: Track
     init(track: Track) {

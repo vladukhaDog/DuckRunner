@@ -4,15 +4,26 @@
 //
 //  Created by vladukha on 16.02.2026.
 //
+
 import SwiftUI
 import Combine
 
+/// View model responsible for providing track history data and managing user selection of dates.
+/// Tracks updates from the storage and exposes the current list of tracks and selected date for the UI.
 final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
+    /// The list of tracks for the selected date, published for UI updates.
     @Published private(set) var tracks: [Track] = []
+    
+    /// The date currently selected by the user in the UI.
     @Published var selectedDate: Date = .now
+    
+    /// Reference to the underlying storage mechanism for tracks.
     private let storage: any TrackStorageProtocol
+    
+    /// Holds Combine cancellables for subscriptions.
     private var cancellables: Set<AnyCancellable> = []
     
+    /// Creates a new view model instance and subscribes to storage actions and date selection changes.
     init(storage: any TrackStorageProtocol) {
         self.storage = storage
         self.storage.actionPublisher
@@ -36,6 +47,7 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
         
     }
     
+    /// Handles updates from the storage (track creation, deletion, or update) to maintain the correct tracks list.
     private func receiveAction(_ action: StorageAction) {
         withAnimation {
             switch action {

@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreLocation
 
+/// UI element which shows current Top speed
 struct TrackTopSpeedView: View {
     private let speedConverter: SpeedConverter
     private let displayUnit: UnitSpeed

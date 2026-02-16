@@ -8,6 +8,7 @@ import MapKit
 import SwiftUI
 import UIKit
 
+/// UIKit bridged MapView with track rendering and user location following
 struct TrackingMapView: UIViewRepresentable {
 
     let track: Track?

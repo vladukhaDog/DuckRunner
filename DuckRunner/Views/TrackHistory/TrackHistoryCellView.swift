@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// View Cell of a Track in history list
 struct TrackHistoryCellView: View {
     let track: Track
     let distanceAmount: Double

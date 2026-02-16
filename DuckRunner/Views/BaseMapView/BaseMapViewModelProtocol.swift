@@ -8,11 +8,18 @@ import Foundation
 import SwiftUI
 import MapKit
 
+/// Protocol defining the required interface for map-based track recording view models.
+/// Provides access to current track, position, speed, and track control actions.
 protocol BaseMapViewModelProtocol: ObservableObject, TrackControllerProtocol {
+    /// The currently active (or most recent) track, if any.
     var currentTrack: Track? { get }
+    /// The map camera's current position.
     var currentPosition: MapCameraPosition { get set }
+    /// The user's current measured speed, if available.
     var currentSpeed: CLLocationSpeed? { get set }
+    /// Begins a new track recording session.
     func startTrack()
+    /// Ends the current track recording session, throwing if there is no active track.
     func stopTrack() throws
 }
 

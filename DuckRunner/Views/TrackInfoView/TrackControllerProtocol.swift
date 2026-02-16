@@ -6,6 +6,7 @@
 //
 import Foundation
 
+/// Protocol describing ViewModel to connect UI controlling the Track
 protocol TrackControllerProtocol: ObservableObject {
     var currentTrack: Track? { get }
     func startTrack()

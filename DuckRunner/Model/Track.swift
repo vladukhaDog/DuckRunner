@@ -9,11 +9,17 @@ import CoreLocation
 import CoreData
 
 
+/// Represents a recorded track consisting of multiple location points and timing information.
 struct Track: Codable {
+    /// Unique identifier for the track.
     let id: String
+    /// The sequence of recorded location points that form this track.
     var points: [TrackPoint]
+    /// The starting date and time of the track.
     private(set) var startDate: Date
+    /// The end date and time of the track, if stopped.
     var stopDate: Date?
+    /// Initializes a new Track with provided points and time range.
     init(points: [TrackPoint] = [], startDate: Date, stopDate: Date? = nil) {
         self.points = points
         self.startDate = startDate
@@ -23,6 +29,7 @@ struct Track: Codable {
 }
 
 extension Track {
+    /// Conversion initializer for building Track from a Core Data entity.
     init(_ track: TrackDTO) {
         let points: [TrackPoint] = track.points?.allObjects.compactMap({
             if let point = ($0 as? TrackPointDTO) {
@@ -40,6 +47,7 @@ extension Track {
 }
 
 extension TrackPointDTO {
+    /// Conversion initializer for creating a Core Data TrackPointDTO from a TrackPoint.
     convenience init(context: NSManagedObjectContext,
                      _ trackPoint: TrackPoint) {
         self.init(context: context)
@@ -51,6 +59,7 @@ extension TrackPointDTO {
 }
 
 extension TrackDTO {
+    /// Conversion initializer for creating a Core Data TrackDTO from a Track.
     convenience init(context: NSManagedObjectContext,
                      _ track: Track) {
         self.init(context: context)
@@ -61,10 +70,15 @@ extension TrackDTO {
     }
 }
 
+/// Represents a single recorded point on a track, including location, speed, and timestamp.
 struct TrackPoint: Codable {
+    /// The geographic coordinate for this track point.
     private(set) var position: CLLocationCoordinate2D
+    /// The speed measured at this point.
     private(set) var speed: CLLocationSpeed
+    /// The date and time this point was recorded.
     private(set) var date: Date
+    /// Initializes a new TrackPoint with the given location, speed, and timestamp.
     init(position: CLLocationCoordinate2D, speed: CLLocationSpeed, date: Date) {
         self.position = position
         self.speed = speed
@@ -73,6 +87,7 @@ struct TrackPoint: Codable {
 }
 
 extension TrackPoint {
+    /// Conversion initializer for building TrackPoint from a Core Data entity.
     init(_ trackPoint: TrackPointDTO) {
         self.position = .init(latitude: trackPoint.latitude, longitude: trackPoint.longitude)
         self.speed = trackPoint.speed
@@ -82,6 +97,7 @@ extension TrackPoint {
 
 
 extension CLLocationCoordinate2D: @retroactive Codable {
+    /// Codable conformance for CLLocationCoordinate2D enabling serialization.
     enum CodingKeys: String, CodingKey {
         case longitude
         case latitude
@@ -106,7 +122,9 @@ extension CLLocationCoordinate2D: @retroactive Codable {
 
 
 extension Array where Element == TrackPoint {
-    /// Calculates the total distance of the path in meters.
+    /// Convenience extensions for arrays of TrackPoint, providing total distance and top speed calculation.
+    
+    /// Calculates the total distance covered by the sequence of track points, in meters.
     func totalDistance() -> CLLocationDistance {
         guard self.count > 1 else {
             return 0.0
@@ -130,7 +148,7 @@ extension Array where Element == TrackPoint {
         return totalDistance
     }
     
-    /// returns top speed in the array
+    /// Finds the highest recorded speed among all track points in the array.
     func topSpeed() -> CLLocationSpeed? {
         let topSpeed = self
             .max { ls, rs in
@@ -139,3 +157,4 @@ extension Array where Element == TrackPoint {
         return topSpeed?.speed
     }
 }
+

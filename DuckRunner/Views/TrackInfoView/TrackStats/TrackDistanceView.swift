@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreLocation
 
+/// UI element displaying current track distance info
 struct TrackDistanceView: View {
     private let distance: Double
     private let unit: UnitLength

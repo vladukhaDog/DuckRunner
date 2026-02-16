@@ -6,6 +6,7 @@
 //
 import SwiftUI
 
+/// Custom layout that fills horizontal space and gives each element the same space 
 struct EqualFillHStack: Layout {
     func sizeThatFits(
         proposal: ProposedViewSize,

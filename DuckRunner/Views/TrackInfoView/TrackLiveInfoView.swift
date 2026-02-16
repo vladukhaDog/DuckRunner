@@ -9,7 +9,8 @@ import SwiftUI
 import Combine
 internal import _LocationEssentials
 
-struct TrackInfoView: View {
+/// Widget that displays Track info which is being recorded
+struct TrackLiveInfoView: View {
     let track: Track
     private let unitSpeed: UnitSpeed
     init(track: Track, unit: UnitSpeed) {
@@ -41,6 +42,6 @@ struct TrackInfoView: View {
     ZStack {
         Color.cyan.opacity(0.4)
 //        BaseMapView(trackService: TrackService(), locationService: LocationService())
-        TrackInfoView(track: .filledTrack, unit: .kilometersPerHour)
+        TrackLiveInfoView(track: .filledTrack, unit: .kilometersPerHour)
     }
 }

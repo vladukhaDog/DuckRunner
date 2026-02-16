@@ -15,6 +15,7 @@ import MapKit
 */
 
 
+/// Overlay which controls how to draw a line of a Track
 final class SpeedTrackRenderer: MKOverlayRenderer {
     enum SpeedBucket {
         case slow, regular, speedy, dangerous, extreme

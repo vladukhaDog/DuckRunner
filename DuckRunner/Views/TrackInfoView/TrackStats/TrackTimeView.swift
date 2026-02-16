@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// UI element whch shows current Track duration time
 struct TrackTimeView: View {
     
     let startDate: Date
