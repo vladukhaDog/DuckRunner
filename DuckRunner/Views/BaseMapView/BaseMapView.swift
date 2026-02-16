@@ -11,8 +11,11 @@ import MapKit
 
 extension BaseMapView where ViewModel == BaseMapViewModel {
     init(trackService: any TrackServiceProtocol,
-         locationService: any LocationServiceProtocol) {
-        self.init(vm: BaseMapViewModel(trackService: trackService, locationService: locationService))
+         locationService: any LocationServiceProtocol,
+         storageService: any TrackStorageProtocol) {
+        self.init(vm: BaseMapViewModel(trackService: trackService,
+                                       locationService: locationService,
+                                       storageService: storageService))
     }
 }
 
@@ -30,12 +33,11 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
                 MapPolyline(points: points.map({ point in
                     MKMapPoint(point.position)
                 }), contourStyle: .straight)
-                .stroke(Color.red,
+                .stroke(Color.cyan,
                         style: StrokeStyle(
                             lineWidth: 5,
                             lineCap: .round,
-                            lineJoin: .round,
-                            dash: [10, 5] // A dash pattern
+                            lineJoin: .round
                         ))
             }
         }
@@ -43,18 +45,15 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
             // Optional: Add a built-in button for the user to re-center the map
             MapUserLocationButton()
         }
-        .overlay {
-            VStack {
-                if let currentSpeed = vm.currentSpeed {
-                    SpeedometerView(currentSpeed, displayUnit: .kilometersPerHour)
-                        .transition(.opacity)
-                }
-                Spacer()
-                VStack {
-                    TrackInfoView(vm: vm, unit: .kilometersPerHour)
-                }
+        .safeAreaInset(edge: .top, content: {
+            if let currentSpeed = vm.currentSpeed {
+                SpeedometerView(currentSpeed, displayUnit: .kilometersPerHour)
+                    .transition(.opacity)
             }
-        }
+        })
+        .overlay(alignment: .bottom, content: {
+            TrackInfoView(vm: vm, unit: .kilometersPerHour)
+        })
         .animation(.bouncy, value: vm.currentSpeed != nil)
     }
 }

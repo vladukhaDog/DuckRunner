@@ -32,12 +32,14 @@ final class TrackService: TrackServiceProtocol {
         self._currentTrack = .init(points: [], startDate: date)
     }
     
-    func stopTrack(at date: Date) throws(TrackServiceError) {
+    @discardableResult
+    func stopTrack(at date: Date) throws(TrackServiceError) -> Track {
         guard var currentTrack = _currentTrack else {
             throw .noCurrentTrack
         }
         currentTrack.stopDate = date
         self._currentTrack = currentTrack
+        return currentTrack
     }
     
     

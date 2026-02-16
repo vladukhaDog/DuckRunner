@@ -10,23 +10,22 @@ import SwiftData
 
 @main
 struct DuckRunnerApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    let trackService: any TrackServiceProtocol = TrackService()
+    let locationService: any LocationServiceProtocol = LocationService()
+    let storageService: any TrackStorageProtocol = TrackRepository()
 
     var body: some Scene {
         WindowGroup {
-            BaseMapView(trackService: TrackService(), locationService: LocationService())
+            TabView {
+                Tab("Map", systemImage: "map") {
+                    BaseMapView(trackService: trackService,
+                                locationService: locationService,
+                                storageService: storageService)
+                }
+                Tab("History", systemImage: "book.pages") {
+                    TrackHistoryView(vm: TrackHistoryViewModel(storage: storageService))
+                }
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

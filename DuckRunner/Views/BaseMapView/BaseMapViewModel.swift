@@ -22,19 +22,24 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     }
     
     func stopTrack() throws {
-        try self.trackService.stopTrack(at: .now)
+        let track = try self.trackService.stopTrack(at: .now)
+        Task.detached { [weak self] in
+            try? await self?.storageService.addTrack(track)
+        }
     }
-    
     
     let trackService: any TrackServiceProtocol
     let locationService: any LocationServiceProtocol
+    let storageService: any TrackStorageProtocol
     
     private var locationPublisher: AnyCancellable?
     
     init(trackService: any TrackServiceProtocol,
-         locationService: any LocationServiceProtocol) {
+         locationService: any LocationServiceProtocol,
+         storageService: any TrackStorageProtocol) {
         self.trackService = trackService
         self.locationService = locationService
+        self.storageService = storageService
         
         self.trackService
             .currentTrack

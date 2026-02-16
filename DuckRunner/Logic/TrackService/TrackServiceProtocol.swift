@@ -13,5 +13,6 @@ protocol TrackServiceProtocol: ObservableObject {
     var currentTrack: CurrentValueSubject<Track?, Never> { get }
     func appendTrackPosition(_ point: TrackPoint) throws(TrackServiceError)
     func startTrack(at date: Date)
-    func stopTrack(at date: Date) throws(TrackServiceError)
+    @discardableResult
+    func stopTrack(at date: Date) throws(TrackServiceError) -> Track
 }
