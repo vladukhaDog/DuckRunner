@@ -19,6 +19,9 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     
     func startTrack() {
         self.trackService.startTrack(at: .now)
+        
+        // Prevent the device from sleeping during track recording
+        UIApplication.shared.isIdleTimerDisabled = true
     }
     
     func stopTrack() throws {
@@ -26,6 +29,9 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         Task.detached { [weak self] in
             try? await self?.storageService.addTrack(track)
         }
+        
+        // Re-enable the idle timer after stopping the track
+        UIApplication.shared.isIdleTimerDisabled = false
     }
     
     let trackService: any TrackServiceProtocol
@@ -53,3 +59,4 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     }
     
 }
+
