@@ -74,41 +74,50 @@ struct TrackDetailView: View {
     init(track: Track) {
         self._vm = .init(wrappedValue: .init(track: track))
     }
-    
-    /// The main UI body of the detail view.
-    /// It is composed of:
-    /// - A horizontally filling stack displaying time, top speed, and distance metrics.
-    /// - A map snippet showing the route of the track with styling.
-    
+
     var body: some View {
-        VStack(spacing: 15) {
-            
-            
-            // Map snippet showing the recorded track route.
-            TrackMapSnippet(track: vm.track)
-                .frame(height: 300)
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-            mainStat
-            topSpeed
-            Spacer()
+        List {
+            Section (header: Text("Track Details")){
+                baseTrackInfo
+            }
+            Section {
+                topSpeed
+            }
             
         }
-        .padding()
+        
         .onAppear(perform: {
             self.vm.calculateAverageSpeed()
         })
-        .navigationTitle("Track")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("\(vm.track.startDate.toString(style: .medium)) Track")
+        .navigationBarTitleDisplayMode(.large)
+    }
+    
+    private var baseTrackInfo: some View {
+        VStack {
+            TrackMapSnippet(track: vm.track)
+                .frame(height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+            mainStat
+        }
     }
     
     @ViewBuilder
     private var topSpeed: some View {
-        if let speed = vm.track.points.topSpeed() {
+        if let speedPoint = vm.track.points.topSpeedPoint() {
             let unitSpeed = UnitSpeed.byName(speedUnit)
             HStack {
-                TrackTopSpeedView(speed,
-                                  displayUnit: unitSpeed)
-                .padding()
+                VStack {
+                    let interval = speedPoint.date.timeIntervalSince(vm.track.startDate)
+                    Text("at " + (TimeIntervalFormatter.string(from: interval) ?? "_"))
+                        .font(.caption2)
+                        .foregroundStyle(Color.primary)
+                        .opacity(0.5)
+                    TrackTopSpeedView(speedPoint.speed,
+                                      displayUnit: unitSpeed)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 5)
                 .glassEffect(.regular.tint(.cyan.opacity(0.1)), in: RoundedRectangle(cornerRadius: 10))
                 Spacer()
             }
@@ -135,5 +144,7 @@ struct TrackDetailView: View {
 }
 
 #Preview {
-    TrackDetailView(track: .filledTrack)
+    NavigationView {
+        TrackDetailView(track: .filledTrack)
+    }
 }
