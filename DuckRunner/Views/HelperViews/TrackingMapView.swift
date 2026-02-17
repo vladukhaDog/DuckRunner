@@ -55,8 +55,8 @@ struct TrackingMapView: UIViewRepresentable {
             )
 
             let span = MKCoordinateSpan(
-                latitudeDelta: (bounds.maxLat - bounds.minLat) * 1.1,
-                longitudeDelta: (bounds.maxLon - bounds.minLon) * 1.1
+                latitudeDelta: (bounds.maxLat - bounds.minLat) * 2,
+                longitudeDelta: (bounds.maxLon - bounds.minLon) * 2
             )
 
             let region = MKCoordinateRegion(center: center, span: span)
