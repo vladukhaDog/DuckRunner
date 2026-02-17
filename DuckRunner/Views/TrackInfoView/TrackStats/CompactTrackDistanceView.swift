@@ -8,6 +8,13 @@
 import SwiftUI
 import CoreLocation
 
+/**
+ A view that displays the distance of a track in a compact format.
+
+ - Parameters:
+   - distance: The current distance value to be displayed, converted from CLLocationDistance.
+   - unit: The unit of speed measurement (e.g., kilometers per hour or miles per hour).
+ */
 struct CompactTrackDistanceView: View {
     let distanceAmount: Double
     let unit: UnitSpeed
@@ -37,3 +44,4 @@ struct CompactTrackDistanceView: View {
 #Preview {
     CompactTrackDistanceView(distance: 80.33, unit: .kilometersPerHour)
 }
+
