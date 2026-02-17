@@ -20,11 +20,42 @@ final class TrackDetailViewModel: ObservableObject {
     /// The track instance whose details are displayed.
     let track: Track
     
+    
+    /// Average speed of CLLocationSpeed
+    @Published var averageSpeed: CLLocationSpeed?
+    
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
     init(track: Track) {
         self.track = track
     }
+    
+    func calculateAverageSpeed() {
+        let points = track.points
+        guard !points.isEmpty,
+        let stopDate = track.stopDate else {
+            return
+        }
+
+        // Calculate total distance traveled
+        let totalDistance = points.totalDistance()
+        
+        // Calculate total time (in seconds)
+        let totalTime = (stopDate.timeIntervalSince(track.startDate))
+        
+        // Guard against zero or near-zero time
+        guard totalTime > 0 else {
+            return
+        }
+
+        // Average speed in m/s
+        let averageSpeedInMetersPerSecond = totalDistance / totalTime
+        
+        // Set the average speed (m/s)
+        self.averageSpeed = CLLocationSpeed(averageSpeedInMetersPerSecond)
+    }
+    
+    
 }
 
 /// A detailed view presenting comprehensive information about a finished track.
@@ -48,44 +79,61 @@ struct TrackDetailView: View {
     /// It is composed of:
     /// - A horizontally filling stack displaying time, top speed, and distance metrics.
     /// - A map snippet showing the route of the track with styling.
+    
     var body: some View {
-        VStack {
-            // Horizontal stack filling width with key track metrics:
-            // time, top speed, and distance.
-            EqualFillHStack {
-                // Obtain the speed unit for display from user preference.
-                let unitSpeed = UnitSpeed.byName(speedUnit)
-                
-                // Display the start and stop times of the track.
-                TrackTimeView(startDate: vm.track.startDate,
-                              stopDate: vm.track.stopDate)
-                
-                // Calculate the top speed from the track's points for display.
-                let speed = vm.track.points.topSpeed() ?? 0
-                
-                // Display the top speed with the proper unit.
-                TrackTopSpeedView(speed,
-                                  displayUnit: unitSpeed)
-                
-                // Calculate the total distance of the track.
-                let distance = vm.track.points.totalDistance()
-                
-                // Display the distance with the unit corresponding to the speed unit.
-                TrackDistanceView(distance: distance,
-                                  unit: unitSpeed.unitLength)
-            }
+        VStack(spacing: 15) {
+            
+            
             // Map snippet showing the recorded track route.
             TrackMapSnippet(track: vm.track)
                 .frame(height: 300)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding()
+            mainStat
+            topSpeed
+            Spacer()
+            
         }
+        .padding()
+        .onAppear(perform: {
+            self.vm.calculateAverageSpeed()
+        })
         .navigationTitle("Track")
         .navigationBarTitleDisplayMode(.inline)
     }
+    
+    @ViewBuilder
+    private var topSpeed: some View {
+        if let speed = vm.track.points.topSpeed() {
+            let unitSpeed = UnitSpeed.byName(speedUnit)
+            HStack {
+                TrackTopSpeedView(speed,
+                                  displayUnit: unitSpeed)
+                .padding()
+                .glassEffect(.regular.tint(.cyan.opacity(0.1)), in: RoundedRectangle(cornerRadius: 10))
+                Spacer()
+            }
+        }
+    }
+    
+    private var mainStat: some View {
+        HStack {
+            let unitSpeed = UnitSpeed.byName(speedUnit)
+            CompactTrackDistanceView(distance: vm.track.points.totalDistance(),
+                                     unit: unitSpeed)
+            Spacer()
+            if let stopDate = vm.track.stopDate {
+                CompactTrackDurationView(startDate: vm.track.startDate,
+                                         stopDate: stopDate)
+            }
+            Spacer()
+           if let averageSpeed = vm.averageSpeed {
+               CompactTrackAvgSpeedView(speed: averageSpeed,
+                                        unit: unitSpeed)
+            }
+        }
+    }
 }
 
-/// Preview provider demonstrating the TrackDetailView with a sample filled track.
 #Preview {
     TrackDetailView(track: .filledTrack)
 }
