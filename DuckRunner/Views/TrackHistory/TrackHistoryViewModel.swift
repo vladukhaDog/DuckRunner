@@ -34,7 +34,7 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
         
         self.$selectedDate
             .sink { date in
-                Task {
+                Task.detached {
                     let tracks = await storage.getTracks(for: date)
                     await MainActor.run {
                         withAnimation {
