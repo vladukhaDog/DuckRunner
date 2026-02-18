@@ -13,7 +13,8 @@ struct DuckRunnerApp: App {
     let trackService: any TrackServiceProtocol = TrackService()
     let locationService: any LocationServiceProtocol = LocationService()
     let storageService: any TrackStorageProtocol = TrackRepository()
-
+    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol = MapSnapshotGenerator()
+    let mapSnippetCache: any TrackMapSnippetCacheProtocol = TrackMapSnippetCache(fileManager: CacheFileManager())
     var body: some Scene {
         WindowGroup {
             TabView {
@@ -23,9 +24,12 @@ struct DuckRunnerApp: App {
                                 storageService: storageService)
                 }
                 Tab("History", systemImage: "book.pages") {
-                    TrackHistoryView(vm: TrackHistoryViewModel(storage: storageService))
+                    TrackHistoryView(storage: storageService,
+                                     mapSnapshotGenerator: mapSnapshotGenerator,
+                                     mapSnippetCache: mapSnippetCache)
                 }
             }
+            
         }
     }
 }

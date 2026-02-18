@@ -2,7 +2,6 @@ import Testing
 internal import Foundation
 internal import Combine
 import CoreLocation
-import MapKit
 @testable import DuckRunner
 
 // MARK: - Mocks
