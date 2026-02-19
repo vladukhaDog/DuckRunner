@@ -9,11 +9,10 @@ import Testing
 @testable import DuckRunner
 internal import Foundation
 
-typealias TestData = (input: Double, mph: Int, kmh: Int)
-
 
 @Suite("SpeedConverter Tests")
 struct SpeedConverterTests {
+    typealias TestData = (input: Double, mph: Int, kmh: Int)
 
     @Test("Test Convertion to MPH and kmh", arguments: [
         (31, 69, 112),

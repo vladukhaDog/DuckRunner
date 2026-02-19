@@ -7,7 +7,7 @@
 import Foundation
 import CoreLocation
 
-extension CLLocationCoordinate2D: @retroactive Codable {
+extension CLLocationCoordinate2D: @retroactive nonisolated Codable {
     /// Codable conformance for CLLocationCoordinate2D enabling serialization.
     enum CodingKeys: String, CodingKey {
         case longitude
@@ -28,4 +28,15 @@ extension CLLocationCoordinate2D: @retroactive Codable {
     }
     
     
+}
+
+
+extension CLLocationCoordinate2D: @retroactive nonisolated Hashable {
+    public static func == (lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+    }
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(longitude)
+        hasher.combine(latitude)
+    }
 }

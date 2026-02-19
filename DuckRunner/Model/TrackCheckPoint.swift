@@ -1,0 +1,41 @@
+//
+//  TrackCheckPoint.swift
+//  DuckRunner
+//
+//  Created by vladukha on 19.02.2026.
+//
+import Foundation
+import CoreLocation
+
+/// Checkpoint which can be used to check if we passed it or not
+nonisolated
+struct TrackCheckPoint {
+    let id: UUID = .init()
+    
+    /// Distance threshold to confirm checkpoint passing
+    private let distanceThreshold: CLLocationDistance
+    private let checkpointLocation: CLLocation
+    let point: TrackPoint
+    
+    private(set) var checkPointPassed: Bool = false
+    
+    init(point: TrackPoint, distanceThreshold: CLLocationDistance = 50) {
+        self.distanceThreshold = distanceThreshold
+        self.point = point
+        self.checkpointLocation = CLLocation(latitude: point.position.latitude, longitude: point.position.longitude)
+    }
+    
+    nonisolated
+    func isPointInCheckpoint(_ location: CLLocationCoordinate2D) -> Bool {
+        let receivedLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        let distanceToCheckpoint = receivedLocation.distance(from: checkpointLocation)
+        let passed = distanceToCheckpoint < distanceThreshold
+        print("Distance from point to point is \(distanceToCheckpoint)")
+        return passed
+    }
+    
+    mutating func setCheckpointPassing(to value: Bool) {
+        self.checkPointPassed = value
+    }
+    
+}
