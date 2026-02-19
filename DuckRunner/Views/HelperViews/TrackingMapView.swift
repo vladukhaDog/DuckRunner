@@ -145,13 +145,7 @@ extension TrackingMapView {
             _ mapView: MKMapView,
             rendererFor overlay: MKOverlay
         ) -> MKOverlayRenderer {
-            if overlay is SpeedTrackOverlay {
-                return SpeedTrackRenderer(overlay: overlay)
-            }
-            if overlay is ReplayTrackOverlay {
-                return ReplayTrackRenderer(overlay: overlay)
-            }
-            return MKOverlayRenderer(overlay: overlay)
+            return overlay.renderer()
         }
     }
 }
