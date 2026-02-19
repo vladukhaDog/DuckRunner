@@ -27,7 +27,7 @@ final class MockStorage: TrackStorageProtocol {
     var actionPublisher: PassthroughSubject<DuckRunner.StorageAction, Never> = .init()
 }
 
-final class MockTrackService: TrackServiceProtocol {
+final class MockTrackService: LiveTrackServiceProtocol {
     
     
     var currentTrack: CurrentValueSubject<DuckRunner.Track?, Never> = .init(nil)

@@ -100,7 +100,6 @@ final actor TrackReplayValidator {
                 self.checkpoints[checkpoint.id]?.setCheckpointPassing(to: isPassed)
             }
         }
-        print("aa \(isPassed)")
     }
     
     /// Returns overall completion based on passed checkpoints.

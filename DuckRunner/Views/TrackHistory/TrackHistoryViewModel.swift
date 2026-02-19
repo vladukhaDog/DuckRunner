@@ -23,6 +23,8 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
     /// Holds Combine cancellables for subscriptions.
     private var cancellables: Set<AnyCancellable> = []
     
+    
+    
     /// Creates a new view model instance and subscribes to storage actions and date selection changes.
     init(storage: any TrackStorageProtocol) {
         self.storage = storage

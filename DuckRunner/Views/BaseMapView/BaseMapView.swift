@@ -11,12 +11,14 @@ import MapKit
 
 /// Convenience initializer for standard setup with required services.
 extension BaseMapView where ViewModel == BaseMapViewModel {
-    init(trackService: any TrackServiceProtocol,
+    init(trackService: any LiveTrackServiceProtocol,
          locationService: any LocationServiceProtocol,
-         storageService: any TrackStorageProtocol) {
+         storageService: any TrackStorageProtocol,
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
         self.init(vm: BaseMapViewModel(trackService: trackService,
                                        locationService: locationService,
-                                       storageService: storageService))
+                                       storageService: storageService,
+                                       trackReplayCoordinator: trackReplayCoordinator))
     }
 }
 
@@ -34,10 +36,26 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         self._vm = .init(wrappedValue: vm)
     }
     
+    func createOverlays(currentTrack: Track?,
+                        replayTrack: Track?) -> [any MKOverlay] {
+        var array: [any MKOverlay] = []
+        // Order will stay for the rendering
+        if let track = replayTrack {
+            array.append(ReplayTrackOverlay(track: track.points))
+        }
+        if let track = currentTrack {
+            array.append(SpeedTrackOverlay(track: track.points))
+        }
+        return array
+    }
+    
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        TrackingMapView(track: vm.currentTrack, trackUser: true)
+        let overlays = createOverlays(currentTrack: vm.currentTrack,
+                                        replayTrack: vm.replayTrack)
+        TrackingMapView(overlays: overlays,
+                        trackUser: true)
             .ignoresSafeArea(.all)
             .overlay(alignment: .top) {
                 if let currentSpeed = vm.currentSpeed {
@@ -61,6 +79,8 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
 
 import Combine
 private final class PreviewModel: BaseMapViewModelProtocol {
+    var replayTrack: Track?
+    
     @Published var currentTrack: Track?
     
     @Published var currentPosition: MapCameraPosition = .userLocation(fallback: .automatic)

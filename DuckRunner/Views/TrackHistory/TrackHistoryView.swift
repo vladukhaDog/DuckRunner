@@ -11,10 +11,12 @@ import Combine
 extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
     init(storage: any TrackStorageProtocol,
          mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+         mapSnippetCache: any TrackMapSnippetCacheProtocol,
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
         self.init(vm: .init(storage: storage),
                   mapSnapshotGenerator: mapSnapshotGenerator,
-                  mapSnippetCache: mapSnippetCache)
+                  mapSnippetCache: mapSnippetCache,
+                  trackReplayCoordinator: trackReplayCoordinator)
     }
 }
 
@@ -25,16 +27,19 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     /// User's preferred unit for speed display, persisted locally.
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol
-    
+    private let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
+    private let mapSnippetCache: any TrackMapSnippetCacheProtocol
+    private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
          mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+         mapSnippetCache: any TrackMapSnippetCacheProtocol,
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol
+    ) {
         self._vm = .init(wrappedValue: vm)
         self.mapSnippetCache = mapSnippetCache
         self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.trackReplayCoordinator = trackReplayCoordinator
     }
     
     /// The main UI displaying history list, navigation links, and date selector.
@@ -52,7 +57,8 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                     }
                     ForEach(vm.tracks, id: \.startDate) { track in
                         NavigationLink {
-                            TrackDetailView(track: track)
+                            TrackDetailView(track: track,
+                                            trackReplayCoordinator: trackReplayCoordinator)
                         } label: {
                             TrackHistoryCellView(track: track,
                                                  unit: UnitSpeed.byName(speedUnit),
@@ -76,7 +82,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
         DatePicker("Date",
                    selection: $vm.selectedDate,
                    displayedComponents: [.date])
-        .datePickerStyle(.graphical)
+        .datePickerStyle(.compact)
             
     }
 }
@@ -110,6 +116,7 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
 #Preview {
     TrackHistoryView(vm: PreviewModel(),
                      mapSnapshotGenerator: MapSnapshotGenerator(),
-                     mapSnippetCache: TestCache()
+                     mapSnippetCache: TestCache(),
+                     trackReplayCoordinator: TrackReplayCoordinator()
     )
 }

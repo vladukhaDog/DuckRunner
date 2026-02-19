@@ -10,7 +10,7 @@ import Foundation
 /// Service that manages the in-memory state and mutation of a live track during a session.
 /// Provides methods for starting, stopping, and updating a track as the user moves.
 @MainActor
-final class TrackService: TrackServiceProtocol {
+final class LiveTrackService: LiveTrackServiceProtocol {
     /// Publishes the current active track or nil if there is no ongoing session.
     let currentTrack: CurrentValueSubject<Track?, Never> = .init(nil)
     

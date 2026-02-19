@@ -13,6 +13,8 @@ import MapKit
 protocol BaseMapViewModelProtocol: ObservableObject, TrackControllerProtocol {
     /// The currently active (or most recent) track, if any.
     var currentTrack: Track? { get }
+    /// The currently being replayed track
+    var replayTrack: Track? { get }
     /// The map camera's current position.
     var currentPosition: MapCameraPosition { get set }
     /// The user's current measured speed, if available.

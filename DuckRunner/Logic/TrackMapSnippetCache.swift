@@ -89,7 +89,6 @@ actor TrackMapSnippetCache: TrackMapSnippetCacheProtocol {
         guard await fileManager.fileExists(atPath: filePath) else {
             return nil
         }
-        print("Returning cached image for \(trackID)")
         guard let data = await fileManager.contents(atPath: filePath) else {
             return nil
         }
@@ -101,7 +100,6 @@ actor TrackMapSnippetCache: TrackMapSnippetCacheProtocol {
         let filePath = path(for: trackID, size: size)
         guard let data = snippet.pngData() else { return }
         await fileManager.createFile(atPath: filePath, contents: data, attributes: [.atomic])
-        print("Cached image for \(trackID)")
     }
 }
 

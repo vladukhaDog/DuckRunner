@@ -30,7 +30,6 @@ struct TrackCheckPoint {
         let receivedLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
         let distanceToCheckpoint = receivedLocation.distance(from: checkpointLocation)
         let passed = distanceToCheckpoint < distanceThreshold
-        print("Distance from point to point is \(distanceToCheckpoint)")
         return passed
     }
     

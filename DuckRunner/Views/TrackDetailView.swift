@@ -69,10 +69,14 @@ struct TrackDetailView: View {
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
+    private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
+    
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
-    init(track: Track) {
+    init(track: Track,
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
         self._vm = .init(wrappedValue: .init(track: track))
+        self.trackReplayCoordinator = trackReplayCoordinator
     }
 
     var body: some View {
@@ -82,6 +86,11 @@ struct TrackDetailView: View {
             }
             Section {
                 topSpeed
+            }
+            Button("Replay Track") {
+                Task {
+                    await trackReplayCoordinator.selectTrackToReplay(vm.track)
+                }
             }
             
         }
@@ -145,6 +154,6 @@ struct TrackDetailView: View {
 
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack)
+        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator())
     }
 }
