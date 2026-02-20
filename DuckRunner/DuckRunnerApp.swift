@@ -16,22 +16,29 @@ struct DuckRunnerApp: App {
     let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol = MapSnapshotGenerator()
     let mapSnippetCache: any TrackMapSnippetCacheProtocol = TrackMapSnippetCache(fileManager: CacheFileManager())
     let trackReplayCoordinator: any TrackReplayCoordinatorProtocol = TrackReplayCoordinator()
+    @State var tabRouter: TabRouter = TabRouter()
     
     var body: some Scene {
         WindowGroup {
-            TabView {
-                Tab("Map", systemImage: "map") {
-                    BaseMapView(trackService: trackService,
-                                locationService: locationService,
-                                storageService: storageService,
-                                trackReplayCoordinator: trackReplayCoordinator)
+            TabView(selection: $tabRouter.selectedTab) {
+                
+                BaseMapView(trackService: trackService,
+                            locationService: locationService,
+                            storageService: storageService,
+                            trackReplayCoordinator: trackReplayCoordinator)
+                .tabItem {
+                    Label("Map", systemImage: "map")
                 }
-                Tab("History", systemImage: "book.pages") {
-                    TrackHistoryView(storage: storageService,
-                                     mapSnapshotGenerator: mapSnapshotGenerator,
-                                     mapSnippetCache: mapSnippetCache,
-                                     trackReplayCoordinator: trackReplayCoordinator)
+                .tag("Map")
+                TrackHistoryView(storage: storageService,
+                                 mapSnapshotGenerator: mapSnapshotGenerator,
+                                 mapSnippetCache: mapSnippetCache,
+                                 trackReplayCoordinator: trackReplayCoordinator,
+                                 tabRouter: tabRouter)
+                .tabItem {
+                    Label("History", systemImage: "book.pages")
                 }
+                .tag("History")
             }
             
         }

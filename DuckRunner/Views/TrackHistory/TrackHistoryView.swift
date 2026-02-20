@@ -12,11 +12,13 @@ extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
     init(storage: any TrackStorageProtocol,
          mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
          mapSnippetCache: any TrackMapSnippetCacheProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
+         tabRouter: any TabRouterProtocol) {
         self.init(vm: .init(storage: storage),
                   mapSnapshotGenerator: mapSnapshotGenerator,
                   mapSnippetCache: mapSnippetCache,
-                  trackReplayCoordinator: trackReplayCoordinator)
+                  trackReplayCoordinator: trackReplayCoordinator,
+                  tabRouter: tabRouter)
     }
 }
 
@@ -30,16 +32,19 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     private let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
     private let mapSnippetCache: any TrackMapSnippetCacheProtocol
     private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
+    private let tabRouter: any TabRouterProtocol
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
          mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
          mapSnippetCache: any TrackMapSnippetCacheProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
+         tabRouter: any TabRouterProtocol
     ) {
         self._vm = .init(wrappedValue: vm)
         self.mapSnippetCache = mapSnippetCache
         self.mapSnapshotGenerator = mapSnapshotGenerator
         self.trackReplayCoordinator = trackReplayCoordinator
+        self.tabRouter = tabRouter
     }
     
     /// The main UI displaying history list, navigation links, and date selector.
@@ -58,7 +63,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                     ForEach(vm.tracks, id: \.startDate) { track in
                         NavigationLink {
                             TrackDetailView(track: track,
-                                            trackReplayCoordinator: trackReplayCoordinator)
+                                            trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter)
                         } label: {
                             TrackHistoryCellView(track: track,
                                                  unit: UnitSpeed.byName(speedUnit),
@@ -117,6 +122,6 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
     TrackHistoryView(vm: PreviewModel(),
                      mapSnapshotGenerator: MapSnapshotGenerator(),
                      mapSnippetCache: TestCache(),
-                     trackReplayCoordinator: TrackReplayCoordinator()
+                     trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter()
     )
 }

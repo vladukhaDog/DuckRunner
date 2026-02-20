@@ -70,13 +70,16 @@ struct TrackDetailView: View {
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
     private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
+    private let tabRouter: any TabRouterProtocol
     
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
     init(track: Track,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
+         tabRouter: any TabRouterProtocol) {
         self._vm = .init(wrappedValue: .init(track: track))
         self.trackReplayCoordinator = trackReplayCoordinator
+        self.tabRouter = tabRouter
     }
 
     var body: some View {
@@ -91,6 +94,7 @@ struct TrackDetailView: View {
                 Task {
                     await trackReplayCoordinator.selectTrackToReplay(vm.track)
                 }
+                tabRouter.selectedTab = "map"
             }
             
         }
@@ -154,6 +158,6 @@ struct TrackDetailView: View {
 
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator())
+        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter())
     }
 }
