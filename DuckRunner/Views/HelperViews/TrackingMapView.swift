@@ -10,20 +10,25 @@ import UIKit
 
 /// UIKit bridged MapView with track rendering and user location following
 struct TrackingMapView: UIViewRepresentable {
+    
+    enum MapViewMode {
+        case trackUser
+        case bounds(Track)
+    }
 
     let overlays: [any MKOverlay]
-    let trackUser: Bool
+    let mapMode: MapViewMode
     
     init(overlays: [any MKOverlay],
-         trackUser: Bool = true) {
+         mapMode: MapViewMode = .trackUser) {
         self.overlays = overlays
-        self.trackUser = trackUser
+        self.mapMode = mapMode
     }
     
     init(track: Track,
-         trackUser: Bool = true) {
+         mapMode: MapViewMode = .trackUser) {
         self.overlays = [SpeedTrackOverlay(track: track.points)]
-        self.trackUser = trackUser
+        self.mapMode = mapMode
     }
 
     func makeUIView(context: Context) -> MKMapView {
@@ -35,6 +40,22 @@ struct TrackingMapView: UIViewRepresentable {
         mapView.isRotateEnabled = false
         mapView.isScrollEnabled = false
         mapView.isZoomEnabled = true
+        switch mapMode {
+        case .trackUser:
+            let camera = MKMapCamera()
+            camera.pitch = 80
+            camera.altitude = 80
+            camera.heading = 0
+
+            mapView.camera = camera
+            mapView.showsUserLocation = true
+            mapView.setUserTrackingMode(.followWithHeading, animated: false)
+        case .bounds(let track):
+            mapView.showsUserLocation = false
+            if let region = getRegion(for: track) {
+                mapView.setRegion(region, animated: true)
+            }
+        }
 
 //        if trackUser == false,
 //           let points = track?.points,
@@ -42,31 +63,7 @@ struct TrackingMapView: UIViewRepresentable {
 //            mapView.showsUserLocation = false
 //            // ---- Static bounds mode ----
 //
-//            let bounds = points.reduce(
-//                into: (
-//                    minLat: first.latitude,
-//                    maxLat: first.latitude,
-//                    minLon: first.longitude,
-//                    maxLon: first.longitude
-//                )
-//            ) { result, point in
-//                result.minLat = min(result.minLat, point.position.latitude)
-//                result.maxLat = max(result.maxLat, point.position.latitude)
-//                result.minLon = min(result.minLon, point.position.longitude)
-//                result.maxLon = max(result.maxLon, point.position.longitude)
-//            }
-//
-//            let center = CLLocationCoordinate2D(
-//                latitude: (bounds.minLat + bounds.maxLat) / 2,
-//                longitude: (bounds.minLon + bounds.maxLon) / 2
-//            )
-//
-//            let span = MKCoordinateSpan(
-//                latitudeDelta: (bounds.maxLat - bounds.minLat) * 2,
-//                longitudeDelta: (bounds.maxLon - bounds.minLon) * 2
-//            )
-//
-//            let region = MKCoordinateRegion(center: center, span: span)
+
 //            mapView.setRegion(region, animated: false)
 //
 //            // Add start and stop annotations
@@ -76,15 +73,9 @@ struct TrackingMapView: UIViewRepresentable {
 //
 //
 //        }
-        mapView.showsUserLocation = true
+        
 
-        let camera = MKMapCamera()
-        camera.pitch = 80
-        camera.altitude = 80
-        camera.heading = 0
-
-        mapView.camera = camera
-        mapView.setUserTrackingMode(.followWithHeading, animated: false)
+        
         return mapView
     }
 
@@ -134,6 +125,39 @@ struct TrackingMapView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
+    
+    
+    private func getRegion(for track: Track) -> MKCoordinateRegion? {
+        let points = track.points
+        guard points.count > 1,
+              let first = points.first?.position else { return nil }
+        let bounds = points.reduce(
+            into: (
+                minLat: first.latitude,
+                maxLat: first.latitude,
+                minLon: first.longitude,
+                maxLon: first.longitude
+            )
+        ) { result, point in
+            result.minLat = min(result.minLat, point.position.latitude)
+            result.maxLat = max(result.maxLat, point.position.latitude)
+            result.minLon = min(result.minLon, point.position.longitude)
+            result.maxLon = max(result.maxLon, point.position.longitude)
+        }
+        
+        let center = CLLocationCoordinate2D(
+            latitude: (bounds.minLat + bounds.maxLat) / 2,
+            longitude: (bounds.minLon + bounds.maxLon) / 2
+        )
+        
+        let span = MKCoordinateSpan(
+            latitudeDelta: (bounds.maxLat - bounds.minLat) * 2,
+            longitudeDelta: (bounds.maxLon - bounds.minLon) * 2
+        )
+        
+        let region = MKCoordinateRegion(center: center, span: span)
+        return region
+    }
 }
 
 
@@ -155,7 +179,7 @@ extension TrackingMapView {
 
 
 #Preview {
-    TrackingMapView(track: Track.filledTrack, trackUser: false)
+    TrackingMapView(track: Track.filledTrack, mapMode: .trackUser)
                 .ignoresSafeArea()
 }
 

@@ -55,7 +55,7 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         let overlays = createOverlays(currentTrack: vm.currentTrack,
                                         replayTrack: vm.replayTrack)
         TrackingMapView(overlays: overlays,
-                        trackUser: true)
+                        mapMode: .trackUser)
             .ignoresSafeArea(.all)
             .overlay(alignment: .top) {
                 if let currentSpeed = vm.currentSpeed {
