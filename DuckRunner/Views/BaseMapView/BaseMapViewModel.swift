@@ -12,8 +12,6 @@ import MapKit
 final class BaseMapViewModel: BaseMapViewModelProtocol {
     @Published var currentTrack: Track? = nil
     
-    @Published var currentPosition: MapCameraPosition = .userLocation(followsHeading: true,
-                                                                      fallback: .automatic)
 
     @Published var currentSpeed: CLLocationSpeed? = 0
     

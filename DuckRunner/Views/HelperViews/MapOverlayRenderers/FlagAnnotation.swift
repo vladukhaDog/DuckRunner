@@ -138,59 +138,7 @@ extension FlagAnnotation {
             ctx.fillPath()
 
             ctx.restoreGState()
-//
-//            // draw text
-//            let textOrigin = CGPoint(
-//                x: centerX - textSize.width / 2,
-//                y: 0
-//            )
-//
-//            let attributed = NSAttributedString(string: text, attributes: [
-//                .font: font
-//            ])
-//
-//            let line = CTLineCreateWithAttributedString(attributed)
-//            let runs = CTLineGetGlyphRuns(line) as! [CTRun]
-//
-//            ctx.saveGState()
-//            ctx.translateBy(x: 0, y: imageSize.height)
-//            ctx.scaleBy(x: 1, y: -1)
-//            ctx.translateBy(x: textOrigin.x,
-//                            y: imageSize.height - textOrigin.y - textSize.height)
-//
-//            let textPath = CGMutablePath()
-//
-//            for run in runs {
-//                let attributes = CTRunGetAttributes(run) as NSDictionary
-//                let ctFont = attributes[kCTFontAttributeName as NSAttributedString.Key] as! CTFont
-//
-//                for i in 0..<CTRunGetGlyphCount(run) {
-//                    var glyph = CGGlyph()
-//                    var position = CGPoint.zero
-//
-//                    CTRunGetGlyphs(run, CFRangeMake(i, 1), &glyph)
-//                    CTRunGetPositions(run, CFRangeMake(i, 1), &position)
-//
-//                    if let path = CTFontCreatePathForGlyph(ctFont, glyph, nil) {
-//                        let transform = CGAffineTransform(translationX: position.x, y: position.y)
-//                        textPath.addPath(path, transform: transform)
-//                    }
-//                }
-//            }
-//
-//            // Stroke (white outline)
-//            ctx.addPath(textPath)
-//            ctx.setLineWidth(outlineWidth)
-//            ctx.setLineJoin(.round)
-//            ctx.setStrokeColor(UIColor.black.cgColor)
-//            ctx.strokePath()
-//
-//            // Fill (black interior)
-//            ctx.addPath(textPath)
-//            ctx.setFillColor(UIColor.white.cgColor)
-//            ctx.fillPath()
-//
-//            ctx.restoreGState()
+
         }
     }
 }

@@ -55,6 +55,9 @@ struct TrackingMapView: UIViewRepresentable {
             mapView.camera = camera
             mapView.showsUserLocation = true
             mapView.setUserTrackingMode(.followWithHeading, animated: false)
+            for marker in markers {
+                mapView.addAnnotation(marker)
+            }
         case .bounds(let track):
             mapView.showsUserLocation = false
             if let region = getRegion(for: track) {
@@ -64,72 +67,24 @@ struct TrackingMapView: UIViewRepresentable {
                 mapView.addAnnotation(marker)
             }
         }
-
-//        if trackUser == false,
-//           let points = track?.points,
-//           let first = points.first?.position {
-//            mapView.showsUserLocation = false
-//            // ---- Static bounds mode ----
-//
-
-//            mapView.setRegion(region, animated: false)
-//
-//            // Add start and stop annotations
-//            addStartStopAnnotations(to: mapView, from: points)
-//        } else {
-//            // ---- User tracking mode ----
-//
-//
-//        }
-        
-
         
         return mapView
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.removeOverlays(mapView.overlays)
-//        mapView.removeAnnotations(mapView.annotations)
-//        guard let trackPoints = track?.points else { return }
-//        guard trackPoints.count > 1 else {
-//            // If we have only one point or none, add start annotation if available
-//            if trackPoints.count == 1 {
-//                addStartStopAnnotations(to: mapView, from: trackPoints)
-//            }
-//            return
-//        }
-
-//        addStartStopAnnotations(to: mapView, from: trackPoints)
-
-//        let overlay = SpeedTrackOverlay(track: trackPoints)
+        mapView.removeAnnotations(mapView.annotations)
+        
         overlays.forEach { overlay in
             mapView.addOverlay(overlay)
         }
         
+        markers.forEach { marker in
+            mapView.addAnnotation(marker)
+        }
+        
     }
     
-//    private func addStartStopAnnotations(to mapView: MKMapView, startPoint: TrackPoint,
-//                                         stopPoint: TrackPoint) {
-//        guard !points.isEmpty else { return }
-//        let firstPos = points.first!.position
-//        let lastPos = points.last!.position
-//        
-//        let startAnnotation = MKPointAnnotation()
-//        startAnnotation.coordinate = firstPos
-//        startAnnotation.title = "Start"
-//        
-//        // Add start annotation
-//        mapView.addAnnotation(startAnnotation)
-//        
-//        // Add stop annotation only if it's different from start and track is finished
-//        if self.track?.stopDate != nil,
-//           (firstPos.latitude != lastPos.latitude || firstPos.longitude != lastPos.longitude) {
-//            let stopAnnotation = MKPointAnnotation()
-//            stopAnnotation.coordinate = lastPos
-//            stopAnnotation.title = "Stop"
-//            mapView.addAnnotation(stopAnnotation)
-//        }
-//    }
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -200,8 +155,6 @@ extension TrackingMapView {
                 view.centerOffset = CGPoint(x: 0, y: 0)
                 return view
             }
-            
-            // Default: use a standard pin/marker for other annotations
             return nil
         }
     }

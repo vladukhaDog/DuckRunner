@@ -36,6 +36,17 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         self._vm = .init(wrappedValue: vm)
     }
     
+    func createMarkers(currentTrack: Track?,
+                        replayTrack: Track?) -> [any MKAnnotation] {
+        var array: [any MKAnnotation] = []
+        if let finish = replayTrack?.points.last {
+            array.append(StopPointAnnotation(coordinate: finish.position))
+
+        }
+        
+        return array
+    }
+    
     func createOverlays(currentTrack: Track?,
                         replayTrack: Track?) -> [any MKOverlay] {
         var array: [any MKOverlay] = []
@@ -54,7 +65,10 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
         let overlays = createOverlays(currentTrack: vm.currentTrack,
                                         replayTrack: vm.replayTrack)
+        let markers = createMarkers(currentTrack: vm.currentTrack,
+                                     replayTrack: vm.replayTrack)
         TrackingMapView(overlays: overlays,
+                        markers: markers,
                         mapMode: .trackUser)
             .ignoresSafeArea(.all)
             .overlay(alignment: .top) {
@@ -79,11 +93,9 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
 
 import Combine
 private final class PreviewModel: BaseMapViewModelProtocol {
-    var replayTrack: Track?
+    var replayTrack: Track? = .filledTrack
     
     @Published var currentTrack: Track?
-    
-    @Published var currentPosition: MapCameraPosition = .userLocation(fallback: .automatic)
     
     @Published var currentSpeed: CLLocationSpeed? = 0
     
