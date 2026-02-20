@@ -17,18 +17,23 @@ struct TrackingMapView: UIViewRepresentable {
     }
 
     let overlays: [any MKOverlay]
+    let markers: [any MKAnnotation]
     let mapMode: MapViewMode
     
     init(overlays: [any MKOverlay],
+         markers: [any MKAnnotation] = [],
          mapMode: MapViewMode = .trackUser) {
         self.overlays = overlays
         self.mapMode = mapMode
+        self.markers = markers
     }
     
     init(track: Track,
+         markers: [any MKAnnotation] = [],
          mapMode: MapViewMode = .trackUser) {
         self.overlays = [SpeedTrackOverlay(track: track.points)]
         self.mapMode = mapMode
+        self.markers = markers
     }
 
     func makeUIView(context: Context) -> MKMapView {
@@ -54,6 +59,9 @@ struct TrackingMapView: UIViewRepresentable {
             mapView.showsUserLocation = false
             if let region = getRegion(for: track) {
                 mapView.setRegion(region, animated: true)
+            }
+            for marker in markers {
+                mapView.addAnnotation(marker)
             }
         }
 
@@ -81,7 +89,7 @@ struct TrackingMapView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.removeOverlays(mapView.overlays)
-        mapView.removeAnnotations(mapView.annotations)
+//        mapView.removeAnnotations(mapView.annotations)
 //        guard let trackPoints = track?.points else { return }
 //        guard trackPoints.count > 1 else {
 //            // If we have only one point or none, add start annotation if available
@@ -100,7 +108,8 @@ struct TrackingMapView: UIViewRepresentable {
         
     }
     
-//    private func addStartStopAnnotations(to mapView: MKMapView, from points: [TrackPoint]) {
+//    private func addStartStopAnnotations(to mapView: MKMapView, startPoint: TrackPoint,
+//                                         stopPoint: TrackPoint) {
 //        guard !points.isEmpty else { return }
 //        let firstPos = points.first!.position
 //        let lastPos = points.last!.position
@@ -164,12 +173,36 @@ struct TrackingMapView: UIViewRepresentable {
 extension TrackingMapView {
 
     final class Coordinator: NSObject, MKMapViewDelegate {
-
         func mapView(
             _ mapView: MKMapView,
             rendererFor overlay: MKOverlay
         ) -> MKOverlayRenderer {
             return overlay.renderer()
+        }
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            // Don't customize user location
+            guard !annotation.isKind(of: MKUserLocation.self) else { return nil }
+            
+            // Provide a custom view for StartPointAnnotation
+            if let annotation = annotation as? FlagAnnotation {
+                let identifier = "StartPointAnnotationView"
+                let view: MKAnnotationView
+                if let dequeued = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) {
+                    view = dequeued
+                    view.annotation = annotation
+                } else {
+                    view = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                }
+                let image = annotation.makeImage()
+                view.image = image
+                view.canShowCallout = true
+                view.centerOffset = CGPoint(x: 0, y: 0)
+                return view
+            }
+            
+            // Default: use a standard pin/marker for other annotations
+            return nil
         }
     }
 }
@@ -179,7 +212,10 @@ extension TrackingMapView {
 
 
 #Preview {
-    TrackingMapView(track: Track.filledTrack, mapMode: .trackUser)
+    TrackingMapView(overlays: [ReplayTrackOverlay(track: .roadInSPB)],
+                    markers: [StartPointAnnotation(coordinate: Track.filledTrack.points.first!.position),
+                              StopPointAnnotation(coordinate: Track.filledTrack.points.last!.position)],
+                    mapMode: .bounds(.filledTrack))
                 .ignoresSafeArea()
 }
 

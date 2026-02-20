@@ -15,6 +15,7 @@ struct TrackMapSnippet: View {
     }
     var body: some View {
         TrackingMapView(overlays: [SpeedTrackOverlay(track: track.points)],
+                        markers: [StartPointAnnotation(coordinate: track.points.first!.position)],
                         mapMode: .bounds(track))
     }
 }
