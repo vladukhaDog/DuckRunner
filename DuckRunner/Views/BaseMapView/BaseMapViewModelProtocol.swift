@@ -13,8 +13,16 @@ import MapKit
 protocol BaseMapViewModelProtocol: ObservableObject, TrackControllerProtocol {
     /// The currently active (or most recent) track, if any.
     var currentTrack: Track? { get }
+    
+    /// Is TrackControl button available
+    var isTrackControlAvailable: Bool { get }
     /// The currently being replayed track
     var replayTrack: Track? { get }
+    /// Checkpoints to display
+    var checkpoints: [TrackCheckPoint] { get }
+    
+    var mapMode: TrackingMapView.MapViewMode { get }
+    
     /// The user's current measured speed, if available.
     var currentSpeed: CLLocationSpeed? { get set }
     /// Begins a new track recording session.

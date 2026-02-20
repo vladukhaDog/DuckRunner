@@ -10,12 +10,18 @@ import MapKit
 
 
 final class BaseMapViewModel: BaseMapViewModelProtocol {
+    let mapMode: TrackingMapView.MapViewMode = .trackUser
+    @Published var isTrackControlAvailable: Bool = true
+    
     @Published var currentTrack: Track? = nil
     
-
     @Published var currentSpeed: CLLocationSpeed? = 0
     
     @Published var replayTrack: Track? = nil
+    @Published var checkpoints: [TrackCheckPoint] = []
+    
+    private var startReplayCheckpoint: TrackCheckPoint?
+    private var stopReplayCheckpoint: TrackCheckPoint?
     
     func startTrack() {
         self.trackService.startTrack(at: .now)
@@ -52,8 +58,67 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         try? self.trackService.appendTrackPosition(trackPoint)
         Task.detached {
             await self.replayValidator?.passedPoint(trackPoint)
+            guard var checkpoints = await self.replayValidator?.checkpoints.map({$0.value})
+                .sorted(by: {$0.point.date < $1.point.date}) else { return }
+            if let start = await self.startReplayCheckpoint {
+                checkpoints.insert(start, at: 0)
+            }
+            let lockedCheckpoints = checkpoints
+            await MainActor.run {
+                self.checkpoints = lockedCheckpoints
+            }
         }
         self.currentSpeed = max(0,location.speed)
+        
+        checkIfInReplayCheckpoint(location)
+    }
+    
+    private func checkIfInReplayCheckpoint(_ location: CLLocation) {
+        // Track is not started yet
+        if currentTrack == nil {
+            if self.startReplayCheckpoint?.checkPointPassed == false,
+                startReplayCheckpoint?.isPointInCheckpoint(location.coordinate) == true {
+                self.startReplayCheckpoint?.setCheckpointPassing(to: true)
+                if location.speed > 15 {
+                    self.startTrack()
+                    self.isTrackControlAvailable = true
+                } else {
+                    self.isTrackControlAvailable = true
+                }
+            }
+        } else {
+            // Track is being recorded already
+            if  self.stopReplayCheckpoint?.checkPointPassed == false,
+                stopReplayCheckpoint?.isPointInCheckpoint(location.coordinate) == true {
+                self.stopReplayCheckpoint?.setCheckpointPassing(to: true)
+                self.isTrackControlAvailable = true
+                try? self.stopTrack()
+            }
+        }
+        
+    }
+    
+    func receiveReplayTrackAction(_ action: TrackReplayAction) {
+        switch action {
+        case .select(let track):
+            self.replayTrack = track
+            self.replayValidator = .init(replayingTrack: track)
+            self.isTrackControlAvailable = false
+            if let firstPoint = replayTrack?.points.first {
+                let checkpoint = TrackCheckPoint(point: firstPoint, distanceThreshold: 50)
+                self.startReplayCheckpoint = checkpoint
+            }
+            if let lastPoint = replayTrack?.points.last {
+                let checkpoint = TrackCheckPoint(point: lastPoint, distanceThreshold: 50)
+                self.stopReplayCheckpoint = checkpoint
+            }
+        case .deselect:
+            self.replayTrack = nil
+            self.replayValidator = nil
+            self.isTrackControlAvailable = true
+            self.stopReplayCheckpoint = nil
+            self.startReplayCheckpoint = nil
+        }
     }
     
     init(trackService: any LiveTrackServiceProtocol,
@@ -68,15 +133,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         self.trackReplayCoordinator
             .selectedTrackPublisher
             .receive(on: RunLoop.main)
-            .sink { action in
-                switch action {
-                case .select(let track):
-                    self.replayTrack = track
-                    self.replayValidator = .init(replayingTrack: track)
-                case .deselect:
-                    self.replayTrack = nil
-                    self.replayValidator = nil
-                }
+            .sink {[weak self] action in
+                self?.receiveReplayTrackAction(action)
             }
             .store(in: &cancellables)
         

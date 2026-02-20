@@ -22,7 +22,6 @@ extension BaseMapView where ViewModel == BaseMapViewModel {
     }
 }
 
-
 /// View for displaying an interactive map and current tracking information, including speed and live track data.
 /// Hosts overlays for live speed and track info, and manages user tracking controls.
 struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
@@ -36,40 +35,15 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
         self._vm = .init(wrappedValue: vm)
     }
     
-    func createMarkers(currentTrack: Track?,
-                        replayTrack: Track?) -> [any MKAnnotation] {
-        var array: [any MKAnnotation] = []
-        if let finish = replayTrack?.points.last {
-            array.append(StopPointAnnotation(coordinate: finish.position))
-
-        }
-        
-        return array
-    }
-    
-    func createOverlays(currentTrack: Track?,
-                        replayTrack: Track?) -> [any MKOverlay] {
-        var array: [any MKOverlay] = []
-        // Order will stay for the rendering
-        if let track = replayTrack {
-            array.append(ReplayTrackOverlay(track: track.points))
-        }
-        if let track = currentTrack {
-            array.append(SpeedTrackOverlay(track: track.points))
-        }
-        return array
-    }
     
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        let overlays = createOverlays(currentTrack: vm.currentTrack,
-                                        replayTrack: vm.replayTrack)
-        let markers = createMarkers(currentTrack: vm.currentTrack,
-                                     replayTrack: vm.replayTrack)
-        TrackingMapView(overlays: overlays,
-                        markers: markers,
-                        mapMode: .trackUser)
+        
+        MapWithRenderedTrackInfo(currentTrack:  vm.currentTrack,
+                                 replayTrack:   vm.replayTrack,
+                                 checkpoints:   vm.checkpoints,
+                                 mapMode: vm.mapMode)
             .ignoresSafeArea(.all)
             .overlay(alignment: .top) {
                 if let currentSpeed = vm.currentSpeed {
@@ -83,6 +57,8 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
                         TrackLiveInfoView(track: track, unit: unitSpeed)
                     }
                     TrackControlButton(vm: vm)
+                        .disabled(vm.isTrackControlAvailable == false)
+                        .opacity(vm.isTrackControlAvailable ? 1 : 0.6)
                 }
                 .padding(10)
                 
@@ -93,6 +69,20 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
 
 import Combine
 private final class PreviewModel: BaseMapViewModelProtocol {
+    var mapMode: TrackingMapView.MapViewMode = .bounds(.filledTrack)
+    
+    var checkpoints: [TrackCheckPoint] = {
+        let points = Track.filledTrack.points
+        let array = [
+            points[29],
+            points[58],
+            points[78]
+        ]
+        return array.map({TrackCheckPoint(point: $0)})
+    }()
+    
+    var isTrackControlAvailable: Bool = true
+    
     var replayTrack: Track? = .filledTrack
     
     @Published var currentTrack: Track?

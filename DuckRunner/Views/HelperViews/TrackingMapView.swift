@@ -72,17 +72,49 @@ struct TrackingMapView: UIViewRepresentable {
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        mapView.removeOverlays(mapView.overlays)
-        mapView.removeAnnotations(mapView.annotations)
-        
-        overlays.forEach { overlay in
-            mapView.addOverlay(overlay)
+        // Helper for overlays (value equality)
+        func overlaysEqual(_ lhs: MKOverlay, _ rhs: MKOverlay) -> Bool {
+            return lhs.boundingMapRect.origin.x == rhs.boundingMapRect.origin.x &&
+                   lhs.boundingMapRect.origin.y == rhs.boundingMapRect.origin.y &&
+                   lhs.boundingMapRect.size.width == rhs.boundingMapRect.size.width &&
+                   lhs.boundingMapRect.size.height == rhs.boundingMapRect.size.height
         }
-        
-        markers.forEach { marker in
-            mapView.addAnnotation(marker)
+        // Helper for markers (value equality)
+        func markersEqual(_ lhs: MKAnnotation, _ rhs: MKAnnotation) -> Bool {
+            // Compare coordinate, title, and type name
+            lhs.coordinate.latitude == rhs.coordinate.latitude &&
+            lhs.coordinate.longitude == rhs.coordinate.longitude &&
+            String(describing: type(of: lhs)) == String(describing: type(of: rhs)) &&
+            ((lhs.title ?? "") == (rhs.title ?? ""))
         }
-        
+        // --- Overlays (by value) ---
+        let currentOverlays = mapView.overlays
+        // Remove overlays not present in new set
+        for overlay in currentOverlays {
+            if !overlays.contains(where: { overlaysEqual($0, overlay) }) {
+                mapView.removeOverlay(overlay)
+            }
+        }
+        // Add overlays not present in current set
+        for overlay in overlays {
+            if !currentOverlays.contains(where: { overlaysEqual($0, overlay) }) {
+                mapView.addOverlay(overlay)
+            }
+        }
+        // --- Markers (by value) ---
+        let nonUserAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
+        // Remove markers not present in new set
+        for annotation in nonUserAnnotations {
+            if !markers.contains(where: { markersEqual($0, annotation) }) {
+                mapView.removeAnnotation(annotation)
+            }
+        }
+        // Add markers not present in current set
+        for marker in markers {
+            if !nonUserAnnotations.contains(where: { markersEqual($0, marker) }) {
+                mapView.addAnnotation(marker)
+            }
+        }
     }
     
 

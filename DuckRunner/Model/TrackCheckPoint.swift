@@ -9,7 +9,11 @@ import CoreLocation
 
 /// Checkpoint which can be used to check if we passed it or not
 nonisolated
-struct TrackCheckPoint {
+struct TrackCheckPoint: Equatable {
+    static func == (lhs: TrackCheckPoint, rhs: TrackCheckPoint) -> Bool {
+        lhs.id == rhs.id && lhs.checkPointPassed == rhs.checkPointPassed
+    }
+    
     let id: UUID = .init()
     
     /// Distance threshold to confirm checkpoint passing
