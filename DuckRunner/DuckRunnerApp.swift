@@ -39,6 +39,11 @@ struct DuckRunnerApp: App {
                     Label("History", systemImage: "book.pages")
                 }
                 .tag("History")
+                SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+                .tag("Settings")
             }
             
         }

@@ -44,7 +44,7 @@ final actor TrackReplayValidator {
     /// - Parameters:
     ///   - replayingTrack: The original track to validate against.
     ///   - checkPointInterval: Distance in meters between checkpoints along the track.
-    init(replayingTrack: Track, checkPointInterval: CLLocationDistance = 500) {
+    init(replayingTrack: Track, checkPointInterval: CLLocationDistance) {
         self.track = replayingTrack
 
         // Build checkpoints every 500 meters starting at the first point
@@ -75,7 +75,8 @@ final actor TrackReplayValidator {
             accumulated += distance(lastCoord, coord)
             // Place as many checkpoints as thresholds crossed since last point
             if accumulated >= nextThreshold {
-                let cp = TrackCheckPoint(point: p)
+                let cp = TrackCheckPoint(point: p,
+                                         distanceThreshold: SettingsService.shared.checkpointDistanceActivateThreshold)
                 checkpoints[cp.id] = cp
                 nextThreshold += interval
             }

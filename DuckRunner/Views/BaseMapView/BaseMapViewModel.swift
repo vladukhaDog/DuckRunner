@@ -35,7 +35,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
        
         Task.detached { [weak self] in
             if let completion = await self?.replayValidator?.trackCompletionByCheckpoints(),
-               completion >= 0.7{
+               completion >= SettingsService.shared.replayCompletionThreshold {
                 track.parentID = await self?.replayTrack?.id
             }
             try? await self?.storageService.addTrack(track)
@@ -84,7 +84,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
             if self.startReplayCheckpoint?.checkPointPassed == false,
                 startReplayCheckpoint?.isPointInCheckpoint(location.coordinate) == true {
                 self.startReplayCheckpoint?.setCheckpointPassing(to: true)
-                if location.speed > 15 {
+                if location.speed > SettingsService.shared.speedToAutoStartReplay {
                     self.startTrack()
                     self.isTrackControlAvailable = true
                 } else {
@@ -106,15 +106,19 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     func receiveReplayTrackAction(_ action: TrackReplayAction) {
         switch action {
         case .select(let track):
+            self.currentTrack = nil
             self.replayTrack = track
-            self.replayValidator = .init(replayingTrack: track)
+            self.replayValidator = .init(replayingTrack: track,
+                                         checkPointInterval: SettingsService.shared.checkpointDistanceInterval)
             self.isTrackControlAvailable = false
             if let firstPoint = replayTrack?.points.first {
-                let checkpoint = TrackCheckPoint(point: firstPoint, distanceThreshold: 50)
+                let checkpoint = TrackCheckPoint(point: firstPoint,
+                                                 distanceThreshold: SettingsService.shared.checkpointDistanceActivateThreshold)
                 self.startReplayCheckpoint = checkpoint
             }
             if let lastPoint = replayTrack?.points.last {
-                let checkpoint = TrackCheckPoint(point: lastPoint, distanceThreshold: 50)
+                let checkpoint = TrackCheckPoint(point: lastPoint,
+                                                 distanceThreshold: SettingsService.shared.checkpointDistanceActivateThreshold)
                 self.stopReplayCheckpoint = checkpoint
             }
         case .deselect:

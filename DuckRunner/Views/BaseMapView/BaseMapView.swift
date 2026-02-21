@@ -78,7 +78,7 @@ private final class PreviewModel: BaseMapViewModelProtocol {
             points[58],
             points[78]
         ]
-        return array.map({TrackCheckPoint(point: $0)})
+        return array.map({TrackCheckPoint(point: $0, distanceThreshold: 50)})
     }()
     
     var isTrackControlAvailable: Bool = true

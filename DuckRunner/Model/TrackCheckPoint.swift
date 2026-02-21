@@ -23,7 +23,7 @@ struct TrackCheckPoint: Equatable {
     
     private(set) var checkPointPassed: Bool = false
     
-    init(point: TrackPoint, distanceThreshold: CLLocationDistance = 50) {
+    init(point: TrackPoint, distanceThreshold: CLLocationDistance) {
         self.distanceThreshold = distanceThreshold
         self.point = point
         self.checkpointLocation = CLLocation(latitude: point.position.latitude, longitude: point.position.longitude)
