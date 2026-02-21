@@ -54,7 +54,6 @@ struct TrackHistoryCellView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .glassEffect(in: RoundedRectangle(cornerRadius: 15))
-        .padding()
     }
     
     private var time: some View {

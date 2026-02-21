@@ -32,4 +32,6 @@ protocol TrackStorageProtocol {
     func updateTrack(_ track: Track) async throws
     /// Publisher that notifies about storage actions performed on tracks.
     var actionPublisher: PassthroughSubject<StorageAction, Never> { get }
+    func getTrack(by id: String) async -> Track?
+    func getTracks(withParentID parent: String) async -> [Track]
 }

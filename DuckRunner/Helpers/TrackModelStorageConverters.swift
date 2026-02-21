@@ -24,6 +24,7 @@ extension Track {
         self.startDate = track.startDate ?? .now
         self.stopDate = track.stopDate
         self.id = track.id ?? UUID().uuidString
+        self.parentID = track.parentID
     }
 }
 
@@ -48,6 +49,7 @@ extension TrackDTO {
         self.startDate = track.startDate
         self.stopDate = track.stopDate
         self.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
+        self.parentID = track.parentID
     }
 }
 

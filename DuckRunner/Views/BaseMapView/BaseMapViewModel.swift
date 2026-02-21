@@ -31,8 +31,13 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     }
     
     func stopTrack() throws {
-        let track = try self.trackService.stopTrack(at: .now)
+        var track = try self.trackService.stopTrack(at: .now)
+       
         Task.detached { [weak self] in
+            if let completion = await self?.replayValidator?.trackCompletionByCheckpoints(),
+               completion >= 0.7{
+                track.parentID = await self?.replayTrack?.id
+            }
             try? await self?.storageService.addTrack(track)
         }
         

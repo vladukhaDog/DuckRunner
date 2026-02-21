@@ -19,15 +19,32 @@ import Combine
 final class TrackDetailViewModel: ObservableObject {
     /// The track instance whose details are displayed.
     let track: Track
-    
+    private let storageService: any TrackStorageProtocol
     
     /// Average speed of CLLocationSpeed
     @Published var averageSpeed: CLLocationSpeed?
+    @Published var parentTrack: Track?
+    @Published var children: [Track] = []
     
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
-    init(track: Track) {
+    init(track: Track,
+         storageService: any TrackStorageProtocol) {
         self.track = track
+        self.storageService = storageService
+        Task {
+            if let parentID = track.parentID,
+               let parent = await storageService.getTrack(by: parentID){
+                await MainActor.run {
+                    self.parentTrack = parent
+                }
+            } else {
+                let children = await storageService.getTracks(withParentID: track.id)
+                await MainActor.run {
+                    self.children = children
+                }
+            }
+        }
     }
     
     func calculateAverageSpeed() {
@@ -69,17 +86,26 @@ struct TrackDetailView: View {
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
+    private let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
+    private let mapSnippetCache: any TrackMapSnippetCacheProtocol
     private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
     private let tabRouter: any TabRouterProtocol
+    private let storageService: any TrackStorageProtocol
     
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
     init(track: Track,
          trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
-         tabRouter: any TabRouterProtocol) {
-        self._vm = .init(wrappedValue: .init(track: track))
+         tabRouter: any TabRouterProtocol,
+         storageService: any TrackStorageProtocol,
+         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
+         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+        self._vm = .init(wrappedValue: .init(track: track, storageService: storageService))
+        self.storageService = storageService
         self.trackReplayCoordinator = trackReplayCoordinator
         self.tabRouter = tabRouter
+        self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.mapSnippetCache = mapSnippetCache
     }
 
     var body: some View {
@@ -90,11 +116,48 @@ struct TrackDetailView: View {
             Section {
                 topSpeed
             }
-            Button("Replay Track") {
-                Task {
-                    await trackReplayCoordinator.selectTrackToReplay(vm.track)
+            Section("Control") {
+                Button("Replay Track") {
+                    Task {
+                        await trackReplayCoordinator.selectTrackToReplay(vm.track)
+                    }
+                    tabRouter.selectedTab = "map"
                 }
-                tabRouter.selectedTab = "map"
+                
+                Button("Delete Track") {
+                    Task {
+                        await storageService.deleteTrack(vm.track)
+                    }
+                }
+            }
+            
+            if let parentTrack = vm.parentTrack {
+                NavigationLink {
+                    TrackDetailView(track: parentTrack,
+                                    trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
+                                    storageService: storageService,
+                                    mapSnapshotGenerator: mapSnapshotGenerator,
+                                    mapSnippetCache: mapSnippetCache)
+                } label: {
+                    Text("Parent track")
+                }
+            }
+            
+            if !vm.children.isEmpty  {
+                Section("Replays") {
+                    ForEach(vm.children, id: \.id) { track in
+                        NavigationLink {
+                            TrackDetailView(track: track,
+                                            trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
+                                            storageService: storageService,
+                                            mapSnapshotGenerator: mapSnapshotGenerator,
+                                            mapSnippetCache: mapSnippetCache)
+                        } label: {
+                            let date = track.startDate.toString(format: "EEE HH:mm")
+                            Text("Replay at \(date)")
+                        }
+                    }
+                }
             }
             
         }
@@ -156,8 +219,20 @@ struct TrackDetailView: View {
     }
 }
 
+private actor TestCache: TrackMapSnippetCacheProtocol {
+    func getSnippet(for track: Track, size: CGSize) async -> UIImage? {
+        return nil
+    }
+    
+    func cacheSnippet(_ snippet: UIImage, for track: Track, size: CGSize) async {
+    }
+}
+
+
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter())
+        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter(), storageService: TrackRepository(),
+                        mapSnapshotGenerator: MapSnapshotGenerator(),
+                        mapSnippetCache: TestCache())
     }
 }

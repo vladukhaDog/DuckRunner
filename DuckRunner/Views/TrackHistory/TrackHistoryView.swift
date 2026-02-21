@@ -18,7 +18,8 @@ extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
                   mapSnapshotGenerator: mapSnapshotGenerator,
                   mapSnippetCache: mapSnippetCache,
                   trackReplayCoordinator: trackReplayCoordinator,
-                  tabRouter: tabRouter)
+                  tabRouter: tabRouter,
+                  storage: storage)
     }
 }
 
@@ -33,46 +34,55 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     private let mapSnippetCache: any TrackMapSnippetCacheProtocol
     private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
     private let tabRouter: any TabRouterProtocol
+    private let storage: any TrackStorageProtocol
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
          mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
          mapSnippetCache: any TrackMapSnippetCacheProtocol,
          trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
-         tabRouter: any TabRouterProtocol
+         tabRouter: any TabRouterProtocol,
+         storage: any TrackStorageProtocol,
     ) {
         self._vm = .init(wrappedValue: vm)
         self.mapSnippetCache = mapSnippetCache
         self.mapSnapshotGenerator = mapSnapshotGenerator
         self.trackReplayCoordinator = trackReplayCoordinator
         self.tabRouter = tabRouter
+        self.storage = storage
     }
     
     /// The main UI displaying history list, navigation links, and date selector.
     var body: some View {
         NavigationView {
             ScrollView {
-                dateSelector
-                Divider()
-                LazyVStack(spacing: 5) {
-                    if vm.tracks.isEmpty {
-                        Text("Empty history")
-                            .font(.largeTitle)
-                            .opacity(0.6)
-                            .transition(.opacity)
-                    }
-                    ForEach(vm.tracks, id: \.startDate) { track in
-                        NavigationLink {
-                            TrackDetailView(track: track,
-                                            trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter)
-                        } label: {
-                            TrackHistoryCellView(track: track,
-                                                 unit: UnitSpeed.byName(speedUnit),
-                                             mapSnapshotGenerator: mapSnapshotGenerator,
-                                             mapSnippetCache: mapSnippetCache)
+                VStack {
+                    dateSelector
+                    Divider()
+                    LazyVStack(spacing: 5) {
+                        if vm.tracks.isEmpty {
+                            Text("Empty history")
+                                .font(.largeTitle)
+                                .opacity(0.6)
+                                .transition(.opacity)
+                        }
+                        ForEach(vm.tracks, id: \.startDate) { track in
+                            NavigationLink {
+                                TrackDetailView(track: track,
+                                                trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
+                                                storageService: storage,
+                                                mapSnapshotGenerator: mapSnapshotGenerator,
+                                                mapSnippetCache: mapSnippetCache)
+                            } label: {
+                                TrackHistoryCellView(track: track,
+                                                     unit: UnitSpeed.byName(speedUnit),
+                                                 mapSnapshotGenerator: mapSnapshotGenerator,
+                                                 mapSnippetCache: mapSnippetCache)
+                            }
                         }
                     }
+                    
                 }
-                
+                .padding(.horizontal)
             }
             .frame(maxWidth: .infinity)
             .animation(.default, value: vm.tracks.isEmpty)
@@ -122,6 +132,6 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
     TrackHistoryView(vm: PreviewModel(),
                      mapSnapshotGenerator: MapSnapshotGenerator(),
                      mapSnippetCache: TestCache(),
-                     trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter()
+                     trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter(), storage: TrackRepository()
     )
 }

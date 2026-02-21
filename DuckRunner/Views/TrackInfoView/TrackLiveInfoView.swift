@@ -29,19 +29,28 @@ struct TrackLiveInfoView: View {
             TrackDistanceView(distance: distance,
                               unit: unitSpeed.unitLength)
         }
-        
+        .overlay(alignment: .topTrailing, content: {
+            Image(systemName: "checkmark.circle")
+                .foregroundStyle(Color.green.opacity(0.7))
+                .opacity(track.parentID == nil ? 0 : 1)
+        })
         .padding()
         .frame(maxWidth: .infinity)
         .glassEffect(in: RoundedRectangle(cornerRadius: 30))
+        
         .animation(.bouncy, value: track.stopDate == nil)
     }
     
 }
 
 #Preview {
-    ZStack {
+    var track = Track.filledTrack
+    track.parentID = "123"
+    return ZStack {
         Color.cyan.opacity(0.4)
-//        BaseMapView(trackService: TrackService(), locationService: LocationService())
-        TrackLiveInfoView(track: .filledTrack, unit: .kilometersPerHour)
+        VStack {
+            TrackLiveInfoView(track: .filledTrack, unit: .kilometersPerHour)
+            TrackLiveInfoView(track: track, unit: .kilometersPerHour)
+        }
     }
 }

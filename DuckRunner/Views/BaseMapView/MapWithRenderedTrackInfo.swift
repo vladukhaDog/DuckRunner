@@ -52,7 +52,6 @@ struct MapWithRenderedTrackInfo: View {
     private let overlays: [any MKOverlay]
     
     var body: some View {
-        Self._printChanges()
         return TrackingMapView(overlays: overlays,
                         markers: markers,
                         mapMode: mapMode)
