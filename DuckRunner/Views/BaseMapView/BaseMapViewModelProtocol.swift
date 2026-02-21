@@ -12,7 +12,7 @@ import MapKit
 /// Provides access to current track, position, speed, and track control actions.
 protocol BaseMapViewModelProtocol: ObservableObject, TrackControllerProtocol {
     /// The currently active (or most recent) track, if any.
-    var currentTrack: Track? { get }
+    var currentTrack: Track? { get set }
     
     /// Is TrackControl button available
     var isTrackControlAvailable: Bool { get }

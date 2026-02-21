@@ -56,9 +56,19 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
                     if let track = vm.currentTrack {
                         TrackLiveInfoView(track: track, unit: unitSpeed)
                     }
-                    TrackControlButton(vm: vm)
-                        .disabled(vm.isTrackControlAvailable == false)
-                        .opacity(vm.isTrackControlAvailable ? 1 : 0.6)
+                    HStack {
+                        TrackControlButton(vm: vm)
+                            .disabled(vm.isTrackControlAvailable == false)
+                            .opacity(vm.isTrackControlAvailable ? 1 : 0.6)
+                        if vm.currentTrack?.stopDate != nil {
+                            Button {
+                                vm.currentTrack = nil
+                            } label: {
+                                Text("Clear")
+                            }
+
+                        }
+                    }
                 }
                 .padding(10)
                 
