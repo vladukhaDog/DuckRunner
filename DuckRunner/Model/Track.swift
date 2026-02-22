@@ -19,7 +19,9 @@ struct Track: Codable {
     let startDate: Date
     /// The end date and time of the track, if stopped.
     var stopDate: Date?
+    /// id of a parent track
     var parentID: String?
+    
     /// Initializes a new Track with provided points and time range.
     init(id: String = UUID().uuidString,
          points: [TrackPoint] = [], startDate: Date, stopDate: Date? = nil, parentID: String? = nil) {
