@@ -10,7 +10,7 @@ import CoreLocation
 
 struct SettingsView: View {
     var settings = SettingsService.shared
-    
+    @AppStorage("speedunit") var speedUnit: String = "km/h"
     var body: some View {
         Form {
             Section(header: Text("Replay Completion Threshold")) {
@@ -47,7 +47,12 @@ struct SettingsView: View {
                 
                 
             }
-            
+            Picker("Speed measure", selection: $speedUnit) {
+                                ForEach(["km/h", "mph", "m/s"], id: \.self) { unit in
+                                    Text(unit)
+                                        .tag(unit)
+                                }
+                            }
             
         }
     }
