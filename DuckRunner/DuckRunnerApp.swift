@@ -10,31 +10,24 @@ import SwiftData
 
 @main
 struct DuckRunnerApp: App {
-    let trackService: any LiveTrackServiceProtocol = LiveTrackService()
-    let locationService: any LocationServiceProtocol = LocationService()
-    let storageService: any TrackStorageProtocol = TrackRepository()
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol = MapSnapshotGenerator()
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol = TrackMapSnippetCache(fileManager: CacheFileManager())
-    let trackReplayCoordinator: any TrackReplayCoordinatorProtocol = TrackReplayCoordinator()
-    @State var tabRouter: TabRouter = TabRouter()
+    @State var tabRouter: any TabRouterProtocol
+    private let dependencies: DependencyManager
+    init() {
+        self.dependencies = .production
+        self.tabRouter = dependencies.tabRouter
+    }
+    
     
     var body: some Scene {
         WindowGroup {
             TabView(selection: $tabRouter.selectedTab) {
                 
-                BaseMapView(trackService: trackService,
-                            locationService: locationService,
-                            storageService: storageService,
-                            trackReplayCoordinator: trackReplayCoordinator)
+                BaseMapView(dependencies: .production)
                 .tabItem {
                     Label("Map", systemImage: "map")
                 }
                 .tag("Map")
-                TrackHistoryView(storage: storageService,
-                                 mapSnapshotGenerator: mapSnapshotGenerator,
-                                 mapSnippetCache: mapSnippetCache,
-                                 trackReplayCoordinator: trackReplayCoordinator,
-                                 tabRouter: tabRouter)
+                TrackHistoryView(dependencies: .production)
                 .tabItem {
                     Label("History", systemImage: "book.pages")
                 }

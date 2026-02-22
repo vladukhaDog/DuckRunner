@@ -11,14 +11,8 @@ import MapKit
 
 /// Convenience initializer for standard setup with required services.
 extension BaseMapView where ViewModel == BaseMapViewModel {
-    init(trackService: any LiveTrackServiceProtocol,
-         locationService: any LocationServiceProtocol,
-         storageService: any TrackStorageProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
-        self.init(vm: BaseMapViewModel(trackService: trackService,
-                                       locationService: locationService,
-                                       storageService: storageService,
-                                       trackReplayCoordinator: trackReplayCoordinator))
+    init(dependencies: DependencyManager) {
+        self.init(vm: BaseMapViewModel(dependencies: dependencies))
     }
 }
 

@@ -9,17 +9,9 @@ import SwiftUI
 import Combine
 
 extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
-    init(storage: any TrackStorageProtocol,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
-         tabRouter: any TabRouterProtocol) {
-        self.init(vm: .init(storage: storage),
-                  mapSnapshotGenerator: mapSnapshotGenerator,
-                  mapSnippetCache: mapSnippetCache,
-                  trackReplayCoordinator: trackReplayCoordinator,
-                  tabRouter: tabRouter,
-                  storage: storage)
+    init(dependencies: DependencyManager) {
+        self.init(vm: .init(dependencies: dependencies),
+                  dependencies: dependencies)
     }
 }
 
@@ -30,25 +22,13 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     /// User's preferred unit for speed display, persisted locally.
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
-    private let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    private let mapSnippetCache: any TrackMapSnippetCacheProtocol
-    private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
-    private let tabRouter: any TabRouterProtocol
-    private let storage: any TrackStorageProtocol
+    private let dependencies: DependencyManager
+    
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
-         tabRouter: any TabRouterProtocol,
-         storage: any TrackStorageProtocol,
-    ) {
+         dependencies: DependencyManager) {
         self._vm = .init(wrappedValue: vm)
-        self.mapSnippetCache = mapSnippetCache
-        self.mapSnapshotGenerator = mapSnapshotGenerator
-        self.trackReplayCoordinator = trackReplayCoordinator
-        self.tabRouter = tabRouter
-        self.storage = storage
+        self.dependencies = dependencies
     }
     
     /// The main UI displaying history list, navigation links, and date selector.
@@ -68,15 +48,11 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                         ForEach(vm.tracks, id: \.startDate) { track in
                             NavigationLink {
                                 TrackDetailView(track: track,
-                                                trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
-                                                storageService: storage,
-                                                mapSnapshotGenerator: mapSnapshotGenerator,
-                                                mapSnippetCache: mapSnippetCache)
+                                                dependencies: dependencies)
                             } label: {
                                 TrackHistoryCellView(track: track,
                                                      unit: UnitSpeed.byName(speedUnit),
-                                                 mapSnapshotGenerator: mapSnapshotGenerator,
-                                                 mapSnippetCache: mapSnippetCache)
+                                                     dependencies: dependencies)
                             }
                         }
                     }
@@ -130,8 +106,6 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
 
 #Preview {
     TrackHistoryView(vm: PreviewModel(),
-                     mapSnapshotGenerator: MapSnapshotGenerator(),
-                     mapSnippetCache: TestCache(),
-                     trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter(), storage: TrackRepository()
+                     dependencies: .production
     )
 }

@@ -26,8 +26,8 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
     
     
     /// Creates a new view model instance and subscribes to storage actions and date selection changes.
-    init(storage: any TrackStorageProtocol) {
-        self.storage = storage
+    init(dependencies: DependencyManager) {
+        self.storage = dependencies.storageService
         self.storage.actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)
@@ -36,8 +36,9 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
         
         self.$selectedDate
             .sink { date in
-                Task.detached {
-                    let tracks = await storage.getTracks(for: date)
+                Task.detached { [weak self] in
+                    guard let self else { return }
+                    let tracks = await self.storage.getTracks(for: date)
                     await MainActor.run {
                         withAnimation {
                             self.tracks = tracks

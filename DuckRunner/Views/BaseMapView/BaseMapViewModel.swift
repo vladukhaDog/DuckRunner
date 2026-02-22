@@ -130,14 +130,11 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         }
     }
     
-    init(trackService: any LiveTrackServiceProtocol,
-         locationService: any LocationServiceProtocol,
-         storageService: any TrackStorageProtocol,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol) {
-        self.trackReplayCoordinator = trackReplayCoordinator
-        self.trackService = trackService
-        self.locationService = locationService
-        self.storageService = storageService
+    init(dependencies: DependencyManager) {
+        self.trackReplayCoordinator = dependencies.trackReplayCoordinator
+        self.trackService = dependencies.trackService
+        self.locationService = dependencies.locationService
+        self.storageService = dependencies.storageService
         
         self.trackReplayCoordinator
             .selectedTrackPublisher

@@ -29,9 +29,9 @@ final class TrackDetailViewModel: ObservableObject {
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
     init(track: Track,
-         storageService: any TrackStorageProtocol) {
+         dependencies: DependencyManager) {
         self.track = track
-        self.storageService = storageService
+        self.storageService = dependencies.storageService
         Task {
             if let parentID = track.parentID,
                let parent = await storageService.getTrack(by: parentID){
@@ -86,26 +86,14 @@ struct TrackDetailView: View {
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
-    private let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    private let mapSnippetCache: any TrackMapSnippetCacheProtocol
-    private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
-    private let tabRouter: any TabRouterProtocol
-    private let storageService: any TrackStorageProtocol
+    private let dependencies: DependencyManager
     
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
     init(track: Track,
-         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
-         tabRouter: any TabRouterProtocol,
-         storageService: any TrackStorageProtocol,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
-        self._vm = .init(wrappedValue: .init(track: track, storageService: storageService))
-        self.storageService = storageService
-        self.trackReplayCoordinator = trackReplayCoordinator
-        self.tabRouter = tabRouter
-        self.mapSnapshotGenerator = mapSnapshotGenerator
-        self.mapSnippetCache = mapSnippetCache
+         dependencies: DependencyManager) {
+        self._vm = .init(wrappedValue: .init(track: track, dependencies: dependencies))
+        self.dependencies = dependencies
     }
 
     var body: some View {
@@ -119,14 +107,14 @@ struct TrackDetailView: View {
             Section("Control") {
                 Button("Replay Track") {
                     Task {
-                        await trackReplayCoordinator.selectTrackToReplay(vm.track)
+                        await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
                     }
-                    tabRouter.selectedTab = "map"
+                    dependencies.tabRouter.selectedTab = "map"
                 }
                 
                 Button("Delete Track") {
                     Task {
-                        await storageService.deleteTrack(vm.track)
+                        await dependencies.storageService.deleteTrack(vm.track)
                     }
                 }
             }
@@ -134,10 +122,7 @@ struct TrackDetailView: View {
             if let parentTrack = vm.parentTrack {
                 NavigationLink {
                     TrackDetailView(track: parentTrack,
-                                    trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
-                                    storageService: storageService,
-                                    mapSnapshotGenerator: mapSnapshotGenerator,
-                                    mapSnippetCache: mapSnippetCache)
+                                    dependencies: dependencies)
                 } label: {
                     Text("Parent track")
                 }
@@ -148,10 +133,7 @@ struct TrackDetailView: View {
                     ForEach(vm.children, id: \.id) { track in
                         NavigationLink {
                             TrackDetailView(track: track,
-                                            trackReplayCoordinator: trackReplayCoordinator, tabRouter: tabRouter,
-                                            storageService: storageService,
-                                            mapSnapshotGenerator: mapSnapshotGenerator,
-                                            mapSnippetCache: mapSnippetCache)
+                                            dependencies: dependencies)
                         } label: {
                             let date = track.startDate.toString(format: "EEE HH:mm")
                             Text("Replay at \(date)")
@@ -231,8 +213,6 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
 
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack, trackReplayCoordinator: TrackReplayCoordinator(), tabRouter: TabRouter(), storageService: TrackRepository(),
-                        mapSnapshotGenerator: MapSnapshotGenerator(),
-                        mapSnippetCache: TestCache())
+        TrackDetailView(track: .filledTrack, dependencies: .production)
     }
 }

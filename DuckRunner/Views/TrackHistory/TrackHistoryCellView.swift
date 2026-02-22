@@ -16,12 +16,11 @@ struct TrackHistoryCellView: View {
     
     /// Initializes the history view with the given view model.
     init(track: Track, unit: UnitSpeed,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+         dependencies: DependencyManager) {
         self.track = track
         self.unit = unit
-        self.mapSnippetCache = mapSnippetCache
-        self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.mapSnippetCache = dependencies.mapSnippetCache
+        self.mapSnapshotGenerator = dependencies.mapSnapshotGenerator
     }
     
     var body: some View {
@@ -135,12 +134,10 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
         VStack {
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .kilometersPerHour,
-                                 mapSnapshotGenerator: MapSnapshotGenerator(),
-                                 mapSnippetCache: TestCache())
+                                 dependencies: .production)
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .milesPerHour,
-                                 mapSnapshotGenerator: MapSnapshotGenerator(),
-                                 mapSnippetCache: TestCache())
+                                 dependencies: .production)
         }
     }
 }
