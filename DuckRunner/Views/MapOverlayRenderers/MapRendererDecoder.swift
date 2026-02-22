@@ -17,6 +17,9 @@ extension MKOverlay {
         if self is ReplayTrackOverlay {
             return ReplayTrackRenderer(overlay: self)
         }
+        if self is FantomTrackOverlay {
+            return FantomTrackRenderer(overlay: self)
+        }
         return MKOverlayRenderer(overlay: self)
     }
 }

@@ -58,6 +58,9 @@ struct TrackingMapView: UIViewRepresentable {
             for marker in markers {
                 mapView.addAnnotation(marker)
             }
+            for overlay in overlays {
+                mapView.addOverlay(overlay)
+            }
         case .bounds(let track):
             mapView.showsUserLocation = false
             if let region = getRegion(for: track) {
@@ -66,12 +69,16 @@ struct TrackingMapView: UIViewRepresentable {
             for marker in markers {
                 mapView.addAnnotation(marker)
             }
+            for overlay in overlays {
+                mapView.addOverlay(overlay)
+            }
         }
         
         return mapView
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
+        return
         // Helper for overlays (value equality)
         func overlaysEqual(_ lhs: MKOverlay, _ rhs: MKOverlay) -> Bool {
             return lhs.boundingMapRect.origin.x == rhs.boundingMapRect.origin.x &&
