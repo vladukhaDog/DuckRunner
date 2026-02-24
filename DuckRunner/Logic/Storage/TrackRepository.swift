@@ -157,7 +157,7 @@ final class TrackRepository: TrackStorageProtocol {
                 request.predicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
                                                 Calendar.current.startOfDay(for: date) as NSDate,
                                                 Calendar.current.startOfDay(for: nextDay) as NSDate)
-                
+                request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 let tracks = (try? context.fetch(request)) ?? []
                 continuation.resume(returning: tracks.map({Track($0)}))
             }
