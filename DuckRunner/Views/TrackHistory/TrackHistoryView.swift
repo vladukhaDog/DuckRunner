@@ -46,9 +46,9 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                                 .transition(.opacity)
                         }
                         ForEach(vm.tracks, id: \.startDate) { track in
-                            NavigationLink {
-                                TrackDetailView(track: track,
-                                                dependencies: dependencies)
+                            Button {
+                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                                    .trackDetail(track: track, dependencies: dependencies))
                             } label: {
                                 TrackHistoryCellView(track: track,
                                                      unit: UnitSpeed.byName(speedUnit),
@@ -106,6 +106,6 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
 
 #Preview {
     TrackHistoryView(vm: PreviewModel(),
-                     dependencies: .production
+                     dependencies: .production()
     )
 }

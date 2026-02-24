@@ -13,6 +13,7 @@
 import SwiftUI
 import MapKit
 import Combine
+import AnotherSUIRouter
 
 /// View model responsible for managing and providing detailed track data 
 /// for presentation in the TrackDetailView.
@@ -80,11 +81,39 @@ final class TrackDetailViewModel: ObservableObject {
     
 }
 
+extension Route where Self == TrackDetailView.RouteBuilder {
+    /// View of a detailed track info
+    static func trackDetail(track: Track,
+                            dependencies: DependencyManager) -> TrackDetailView.RouteBuilder {
+        TrackDetailView.RouteBuilder(track: track, dependencies: dependencies)
+    }
+}
+
+
 /// A detailed view presenting comprehensive information about a finished track.
 /// This view uses `TrackDetailViewModel` as its source of truth,
 /// and serves as a detail/history screen displaying time, speed, distance,
 /// and a map snippet of the track route.
 struct TrackDetailView: View {
+    struct RouteBuilder: Route {
+        static func == (lhs: TrackDetailView.RouteBuilder, rhs: TrackDetailView.RouteBuilder) -> Bool {
+            lhs.track == rhs.track
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(track)
+        }
+        
+        let track: Track
+        let dependencies: DependencyManager
+
+        func build() -> AnyView {
+            AnyView(TrackDetailView(track: track,
+                                    dependencies: dependencies))
+        }
+    }
+    
+    
     /// View model instance managing the track data and logic.
     @StateObject private var vm: TrackDetailViewModel
     
@@ -100,7 +129,7 @@ struct TrackDetailView: View {
         self._vm = .init(wrappedValue: .init(track: track, dependencies: dependencies))
         self.dependencies = dependencies
     }
-    @State private var mode: TrackType = .classical
+    
     var body: some View {
         List {
             Section (header: Text("Track Details")){
@@ -137,20 +166,16 @@ struct TrackDetailView: View {
             }
             
             if let parentTrack = vm.parentTrack {
-                NavigationLink {
-                    TrackDetailView(track: parentTrack,
-                                    dependencies: dependencies)
-                } label: {
-                    Text("Parent track")
+                Button("Parent track") {
+                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
                 }
             }
             
             if !vm.children.isEmpty  {
                 Section("Replays") {
                     ForEach(vm.children, id: \.id) { track in
-                        NavigationLink {
-                            TrackDetailView(track: track,
-                                            dependencies: dependencies)
+                        Button {
+                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: track, dependencies: dependencies))
                         } label: {
                             let date = track.startDate.toString(format: "EEE HH:mm")
                             Text("Replay at \(date)")

@@ -16,6 +16,8 @@ final class DependencyManager {
     let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
     let tabRouter: any TabRouterProtocol
     let cacheFileManager: any CacheFileManagerProtocol
+    /// Routers by Tab tags
+    let routers: [String: Router]
     
     init(
         trackService: any LiveTrackServiceProtocol,
@@ -25,15 +27,17 @@ final class DependencyManager {
         mapSnippetCache: any TrackMapSnippetCacheProtocol,
         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
         tabRouter: any TabRouterProtocol,
-        cacheFileManager: any CacheFileManagerProtocol
+        cacheFileManager: any CacheFileManagerProtocol,
+        routers: [String: Router],
     ) {
-            self.trackService = trackService
-            self.locationService = locationService
-            self.storageService = storageService
-            self.mapSnapshotGenerator = mapSnapshotGenerator
-            self.mapSnippetCache = mapSnippetCache
-            self.trackReplayCoordinator = trackReplayCoordinator
-            self.tabRouter = tabRouter
-            self.cacheFileManager = cacheFileManager
+        self.trackService = trackService
+        self.locationService = locationService
+        self.storageService = storageService
+        self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.mapSnippetCache = mapSnippetCache
+        self.trackReplayCoordinator = trackReplayCoordinator
+        self.tabRouter = tabRouter
+        self.cacheFileManager = cacheFileManager
+        self.routers = routers
     }
 }

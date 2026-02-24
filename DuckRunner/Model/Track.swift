@@ -9,7 +9,7 @@ import CoreLocation
 import CoreData
 
 /// Represents a recorded track consisting of multiple location points and timing information.
-struct Track: Codable {
+struct Track: Codable, Hashable {
     /// Unique identifier for the track.
     let id: String
     /// The sequence of recorded location points that form this track.
@@ -40,7 +40,7 @@ struct Track: Codable {
 }
 
 /// Represents a single recorded point on a track, including location, speed, and timestamp.
-struct TrackPoint: Codable, Equatable {
+struct TrackPoint: Codable, Equatable, Hashable {
     /// The geographic coordinate for this track point.
     let position: CLLocationCoordinate2D
     /// The speed measured at this point.

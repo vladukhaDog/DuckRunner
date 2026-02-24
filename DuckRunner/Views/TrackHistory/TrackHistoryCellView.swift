@@ -134,10 +134,10 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
         VStack {
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .kilometersPerHour,
-                                 dependencies: .production)
+                                 dependencies: .production())
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .milesPerHour,
-                                 dependencies: .production)
+                                 dependencies: .production())
         }
     }
 }

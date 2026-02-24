@@ -13,7 +13,9 @@ struct DuckRunnerApp: App {
     @State var tabRouter: any TabRouterProtocol
     private let dependencies: DependencyManager
     init() {
-        self.dependencies = .production
+        self.dependencies = .production(tabs: [
+            "History",
+                                              ])
         self.tabRouter = dependencies.tabRouter
     }
     
@@ -22,16 +24,20 @@ struct DuckRunnerApp: App {
         WindowGroup {
             TabView(selection: $tabRouter.selectedTab) {
                 
-                BaseMapView(dependencies: .production)
+                BaseMapView(dependencies: dependencies)
                 .tabItem {
                     Label("Map", systemImage: "map")
                 }
                 .tag("Map")
-                TrackHistoryView(dependencies: .production)
-                .tabItem {
-                    Label("History", systemImage: "book.pages")
+                if let router = dependencies.routers["History"] {
+                    NavigatableView(router) {
+                        TrackHistoryView(dependencies: dependencies)
+                    }
+                    .tabItem {
+                        Label("History", systemImage: "book.pages")
+                    }
+                    .tag("History")
                 }
-                .tag("History")
                 SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")

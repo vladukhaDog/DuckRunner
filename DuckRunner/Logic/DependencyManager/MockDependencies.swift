@@ -19,7 +19,8 @@ extension DependencyManager {
         mapSnippetCache: any TrackMapSnippetCacheProtocol = MockTrackMapSnippetCache(),
         trackReplayCoordinator: any TrackReplayCoordinatorProtocol = MockTrackReplayCoordinator(),
         tabRouter: any TabRouterProtocol = MockTabRouter(),
-        cacheFileManager: any CacheFileManagerProtocol = MockCacheFileManager()
+        cacheFileManager: any CacheFileManagerProtocol = MockCacheFileManager(),
+        routers: [String: Router] = [:]
     ) -> Self {
         self.init(trackService: trackService,
                   locationService: locationService,
@@ -28,7 +29,8 @@ extension DependencyManager {
                   mapSnippetCache: mapSnippetCache,
                   trackReplayCoordinator: trackReplayCoordinator,
                   tabRouter: tabRouter,
-                  cacheFileManager: cacheFileManager)
+                  cacheFileManager: cacheFileManager,
+                  routers: routers)
     }
 }
 

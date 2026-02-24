@@ -8,7 +8,7 @@
 import Foundation
 
 extension DependencyManager {
-    static public let production: DependencyManager = {
+    static public func production(tabs: [String] = []) -> DependencyManager {
         let trackService = LiveTrackService()
         let locationService = LocationService()
         let storageService = TrackRepository()
@@ -17,7 +17,7 @@ extension DependencyManager {
         let mapSnippetCache = TrackMapSnippetCache(fileManager: cacheFileManager)
         let trackReplayCoordinator = TrackReplayCoordinator()
         let tabRouter = TabRouter()
-            
+        let routers = Dictionary(uniqueKeysWithValues: tabs.map({($0, Router())}))
         
         return .init(trackService: trackService,
                      locationService: locationService,
@@ -26,6 +26,7 @@ extension DependencyManager {
                      mapSnippetCache: mapSnippetCache,
                      trackReplayCoordinator:trackReplayCoordinator,
                      tabRouter: tabRouter,
-                     cacheFileManager: cacheFileManager)
-    }()
+                     cacheFileManager: cacheFileManager,
+                     routers: routers)
+    }
 }
