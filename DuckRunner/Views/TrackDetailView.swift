@@ -234,7 +234,9 @@ struct TrackDetailView: View {
     
     private var baseTrackInfo: some View {
         VStack {
-            TrackMapSnippet(track: vm.track)
+            TrackingMapView(overlays: [SpeedTrackOverlay(track: vm.track.points)],
+                            markers: [StartPointAnnotation(coordinate: vm.track.points.first?.position ?? .init())],
+                            mapMode: .bounds(vm.track))
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
             mainStat

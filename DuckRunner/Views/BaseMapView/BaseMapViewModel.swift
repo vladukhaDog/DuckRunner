@@ -38,6 +38,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
            completion >= SettingsService.shared.replayCompletionThreshold {
             track.parentID = self.replayTrack?.id
         }
+        guard track.points.isEmpty == false else { return }
         try? await self.storageService.addTrack(track)
     }
     
