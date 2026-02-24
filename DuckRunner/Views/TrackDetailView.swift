@@ -19,7 +19,7 @@ import AnotherSUIRouter
 /// for presentation in the TrackDetailView.
 final class TrackDetailViewModel: ObservableObject {
     /// The track instance whose details are displayed.
-    private(set) var track: Track
+    @Published private(set) var track: Track
     private let storageService: any TrackStorageProtocol
     
     /// Average speed of CLLocationSpeed
@@ -27,12 +27,20 @@ final class TrackDetailViewModel: ObservableObject {
     @Published var parentTrack: Track?
     @Published var children: [Track] = []
     
+    private var cancellables: Set<AnyCancellable> = []
+    private let dependencies: DependencyManager
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
     init(track: Track,
          dependencies: DependencyManager) {
         self.track = track
         self.storageService = dependencies.storageService
+        self.dependencies = dependencies
+        self.storageService.actionPublisher
+            .sink { [weak self] action in
+                self?.receiveAction(action)
+            }
+            .store(in: &cancellables)
         Task {
             if let parentID = track.parentID,
                let parent = await storageService.getTrack(by: parentID){
@@ -44,6 +52,25 @@ final class TrackDetailViewModel: ObservableObject {
                 await MainActor.run {
                     self.children = children
                 }
+            }
+        }
+    }
+    
+    /// Handles updates from the storage (track creation, deletion, or update) to maintain the correct tracks list.
+    private func receiveAction(_ action: StorageAction) {
+        withAnimation {
+            switch action {
+            case .deleted(let track):
+                if track.id == self.track.id {
+                    dependencies.routers[dependencies.tabRouter.selectedTab]?
+                        .pop()
+                }
+            case .updated(let track):
+                if track.id == self.track.id {
+                    self.track = track
+                }
+            default:
+                break
             }
         }
     }
@@ -158,6 +185,19 @@ struct TrackDetailView: View {
                     dependencies.tabRouter.selectedTab = "map"
                 }
                 
+                if vm.track.parentID == nil,
+                   vm.children.isEmpty,
+                   let start = vm.track.points.first,
+                   let stop = vm.track.points.last {
+                    Button("Edit Track") {
+                        dependencies.routers[dependencies.tabRouter.selectedTab]?
+                            .push(.trackTrim(track: vm.track,
+                                             first: start,
+                                             last: stop,
+                                             dependencies: dependencies))
+                    }
+                }
+                
                 Button("Delete Track") {
                     Task {
                         await dependencies.storageService.deleteTrack(vm.track)
@@ -185,7 +225,6 @@ struct TrackDetailView: View {
             }
             
         }
-        
         .onAppear(perform: {
             self.vm.calculateAverageSpeed()
         })

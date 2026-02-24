@@ -14,6 +14,8 @@ struct TrackingMapView: UIViewRepresentable {
     enum MapViewMode {
         case trackUser
         case bounds(Track)
+        /// Like bounds which moves map to the track but you can move it freely
+        case free(Track)
     }
 
     let overlays: [any MKOverlay]
@@ -43,10 +45,11 @@ struct TrackingMapView: UIViewRepresentable {
         // Interaction restrictions
         mapView.isPitchEnabled = false
         mapView.isRotateEnabled = false
-        mapView.isScrollEnabled = false
+        
         mapView.isZoomEnabled = true
         switch mapMode {
         case .trackUser:
+            mapView.isScrollEnabled = false
             let camera = MKMapCamera()
             camera.pitch = 80
             camera.altitude = 80
@@ -62,6 +65,19 @@ struct TrackingMapView: UIViewRepresentable {
                 mapView.addOverlay(overlay)
             }
         case .bounds(let track):
+            mapView.isScrollEnabled = false
+            mapView.showsUserLocation = false
+            if let region = getRegion(for: track) {
+                mapView.setRegion(region, animated: true)
+            }
+            for marker in markers {
+                mapView.addAnnotation(marker)
+            }
+            for overlay in overlays {
+                mapView.addOverlay(overlay)
+            }
+        case .free(let track):
+            mapView.isScrollEnabled = true
             mapView.showsUserLocation = false
             if let region = getRegion(for: track) {
                 mapView.setRegion(region, animated: true)
