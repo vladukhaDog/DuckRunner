@@ -157,6 +157,10 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         }
     }
     
+    func receiveCurrentTrack(_ track: Track?) {
+        self.currentTrack = track
+    }
+    
     // MARK: - Init
     init(dependencies: DependencyManager) {
         self.trackReplayCoordinator = dependencies.trackReplayCoordinator
@@ -174,7 +178,12 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         
         self.trackService
             .currentTrack
-            .assign(to: &self.$currentTrack)
+            .sink { [weak self] new in
+                Task {
+                    self?.receiveCurrentTrack(new)
+                }
+            }
+            .store(in: &cancellables)
         
         self.locationService.location
             .receive(on: RunLoop.main)

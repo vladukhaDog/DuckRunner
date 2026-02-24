@@ -327,6 +327,7 @@ struct BaseMapViewModelTests {
     // MARK: - Selecting speedtrap replay
     final class TrackStartDetectMock: LiveTrackServiceProtocol {
         var startedTrack: Bool = false
+        var stopedTrack: Bool = false
         var currentTrack: CurrentValueSubject<DuckRunner.Track?, Never> = .init(nil)
         
         func appendTrackPosition(_ point: DuckRunner.TrackPoint) throws(DuckRunner.TrackServiceError) {
@@ -337,6 +338,7 @@ struct BaseMapViewModelTests {
         }
         
         func stopTrack(at date: Date) throws(DuckRunner.TrackServiceError) -> DuckRunner.Track {
+            stopedTrack = true
             return .filledTrack
         }
     }
@@ -349,8 +351,6 @@ struct BaseMapViewModelTests {
      */
     @Test("Speedtrap selection correct location should start")
     func testSpeedtrapTrackCloseStarting() async throws {
-        
-        
         let trackService = TrackStartDetectMock()
         let vm = await BaseMapViewModel(dependencies: .mock(trackService: trackService))
         
@@ -415,6 +415,47 @@ struct BaseMapViewModelTests {
      send location
      if we are inside stop point track recording should stop
          */
+    
+    @Test("Speedtrap selection correct location should stop")
+    func testSpeedtrapTrackCorrectLocationStoping() async throws {
+        let trackService = TrackStartDetectMock()
+        let vm = await BaseMapViewModel(dependencies: .mock(trackService: trackService))
+        
+        var track = await Track.filledTrack
+        await track.changeType(to: .speedtrap)
+        await #expect(track.type == .speedtrap)
+        
+        await vm.receiveReplayTrackAction(.select(track))
+        let receivedTrack = await vm.replayTrack
+        #expect(track.id == receivedTrack?.id)
+        
+        let startCoordinate = try #require(track.points.first?.position)
+        
+        
+        let location = CLLocation(coordinate: startCoordinate,
+                                  altitude: 0,
+                                  horizontalAccuracy: 1,
+                                  verticalAccuracy: 1,
+                                  course: 0,
+                                  speed: 20,
+                                  timestamp: .now)
+        
+        await vm.receivedLocationUpdate(location)
+        #expect(trackService.startedTrack)
+        await vm.receiveCurrentTrack(.emptyTrack)
+        let stopCoordinate = try #require(track.points.last?.position)
+        
+        let stopLocation = CLLocation(coordinate: stopCoordinate,
+                                  altitude: 0,
+                                  horizontalAccuracy: 1,
+                                  verticalAccuracy: 1,
+                                  course: 0,
+                                  speed: 20,
+                                  timestamp: .now)
+        
+        await vm.receivedLocationUpdate(stopLocation)
+        #expect(trackService.stopedTrack)
+    }
      
 }
 

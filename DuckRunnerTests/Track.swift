@@ -17,6 +17,10 @@ extension Track {
 }
 // Mock FileManager that allows us to control file presence and content
 final actor MockFileManager: CacheFileManagerProtocol {
+    func fileNames(atPath path: String, containing substring: String) -> [String] {
+        return []
+    }
+    
     private let queue = DispatchQueue(label: "CacheFileManager.queue")
     var files: [String: Data] = [:]
     var writtenFiles: [(String, Data)] = []
