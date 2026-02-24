@@ -13,21 +13,71 @@
 import SwiftUI
 import MapKit
 import Combine
+import AnotherSUIRouter
 
 /// View model responsible for managing and providing detailed track data 
 /// for presentation in the TrackDetailView.
 final class TrackDetailViewModel: ObservableObject {
     /// The track instance whose details are displayed.
-    let track: Track
-    
+    @Published private(set) var track: Track
+    private let storageService: any TrackStorageProtocol
     
     /// Average speed of CLLocationSpeed
     @Published var averageSpeed: CLLocationSpeed?
+    @Published var parentTrack: Track?
+    @Published var children: [Track] = []
     
+    private var cancellables: Set<AnyCancellable> = []
+    private let dependencies: DependencyManager
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
-    init(track: Track) {
+    init(track: Track,
+         dependencies: DependencyManager) {
         self.track = track
+        self.storageService = dependencies.storageService
+        self.dependencies = dependencies
+        self.storageService.actionPublisher
+            .sink { [weak self] action in
+                self?.receiveAction(action)
+            }
+            .store(in: &cancellables)
+        Task {
+            if let parentID = track.parentID,
+               let parent = await storageService.getTrack(by: parentID){
+                await MainActor.run {
+                    self.parentTrack = parent
+                }
+            } else {
+                let children = await storageService.getTracks(withParentID: track.id)
+                await MainActor.run {
+                    self.children = children
+                }
+            }
+        }
+    }
+    
+    /// Handles updates from the storage (track creation, deletion, or update) to maintain the correct tracks list.
+    private func receiveAction(_ action: StorageAction) {
+        withAnimation {
+            switch action {
+            case .deleted(let track):
+                if track.id == self.track.id {
+                    dependencies.routers[dependencies.tabRouter.selectedTab]?
+                        .pop()
+                }
+            case .updated(let track):
+                if track.id == self.track.id {
+                    self.track = track
+                }
+            default:
+                break
+            }
+        }
+    }
+    
+    func updateTrackType(to type: TrackType) async {
+        self.track.type = type
+        try? await storageService.updateTrack(track)
     }
     
     func calculateAverageSpeed() {
@@ -58,23 +108,55 @@ final class TrackDetailViewModel: ObservableObject {
     
 }
 
+extension Route where Self == TrackDetailView.RouteBuilder {
+    /// View of a detailed track info
+    static func trackDetail(track: Track,
+                            dependencies: DependencyManager) -> TrackDetailView.RouteBuilder {
+        TrackDetailView.RouteBuilder(track: track, dependencies: dependencies)
+    }
+}
+
+
 /// A detailed view presenting comprehensive information about a finished track.
 /// This view uses `TrackDetailViewModel` as its source of truth,
 /// and serves as a detail/history screen displaying time, speed, distance,
 /// and a map snippet of the track route.
 struct TrackDetailView: View {
+    struct RouteBuilder: Route {
+        static func == (lhs: TrackDetailView.RouteBuilder, rhs: TrackDetailView.RouteBuilder) -> Bool {
+            lhs.track == rhs.track
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(track)
+        }
+        
+        let track: Track
+        let dependencies: DependencyManager
+
+        func build() -> AnyView {
+            AnyView(TrackDetailView(track: track,
+                                    dependencies: dependencies))
+        }
+    }
+    
+    
     /// View model instance managing the track data and logic.
     @StateObject private var vm: TrackDetailViewModel
     
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
+    private let dependencies: DependencyManager
+    
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
-    init(track: Track) {
-        self._vm = .init(wrappedValue: .init(track: track))
+    init(track: Track,
+         dependencies: DependencyManager) {
+        self._vm = .init(wrappedValue: .init(track: track, dependencies: dependencies))
+        self.dependencies = dependencies
     }
-
+    
     var body: some View {
         List {
             Section (header: Text("Track Details")){
@@ -83,9 +165,66 @@ struct TrackDetailView: View {
             Section {
                 topSpeed
             }
+            Section("Control") {
+                Picker("Mode", selection: .init(get: {
+                    vm.track.type
+                }, set: { new in
+                    Task {
+                        await vm.updateTrackType(to: new)
+                    }
+                })) {
+                    ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
+                        Text(type.rawValue)
+                            .tag(type)
+                    }
+                }
+                Button("Replay Track") {
+                    Task {
+                        await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
+                    }
+                    dependencies.tabRouter.selectedTab = "map"
+                }
+                
+                if vm.track.parentID == nil,
+                   vm.children.isEmpty,
+                   let start = vm.track.points.first,
+                   let stop = vm.track.points.last {
+                    Button("Edit Track") {
+                        dependencies.routers[dependencies.tabRouter.selectedTab]?
+                            .push(.trackTrim(track: vm.track,
+                                             first: start,
+                                             last: stop,
+                                             dependencies: dependencies))
+                    }
+                }
+                
+                Button("Delete Track") {
+                    Task {
+                        await dependencies.storageService.deleteTrack(vm.track)
+                    }
+                }
+            }
+            
+            if let parentTrack = vm.parentTrack {
+                Button("Parent track") {
+                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
+                }
+            }
+            
+            if !vm.children.isEmpty  {
+                Section("Replays") {
+                    ForEach(vm.children, id: \.id) { track in
+                        Button {
+                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: track, dependencies: dependencies))
+                        } label: {
+                            let date = track.startDate.toString(format: "EEE HH:mm")
+                            Text("Replay at \(date)")
+                        }
+                    }
+                }
+            }
             
         }
-        
         .onAppear(perform: {
             self.vm.calculateAverageSpeed()
         })
@@ -143,8 +282,10 @@ struct TrackDetailView: View {
     }
 }
 
+
+
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack)
+        TrackDetailView(track: .filledTrack, dependencies: .mock())
     }
 }

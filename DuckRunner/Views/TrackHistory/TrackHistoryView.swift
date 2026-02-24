@@ -9,12 +9,9 @@ import SwiftUI
 import Combine
 
 extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
-    init(storage: any TrackStorageProtocol,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
-        self.init(vm: .init(storage: storage),
-                  mapSnapshotGenerator: mapSnapshotGenerator,
-                  mapSnippetCache: mapSnippetCache)
+    init(dependencies: DependencyManager) {
+        self.init(vm: .init(dependencies: dependencies),
+                  dependencies: dependencies)
     }
 }
 
@@ -25,43 +22,43 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     /// User's preferred unit for speed display, persisted locally.
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol
+    private let dependencies: DependencyManager
     
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+         dependencies: DependencyManager) {
         self._vm = .init(wrappedValue: vm)
-        self.mapSnippetCache = mapSnippetCache
-        self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.dependencies = dependencies
     }
     
     /// The main UI displaying history list, navigation links, and date selector.
     var body: some View {
         NavigationView {
             ScrollView {
-                dateSelector
-                Divider()
-                LazyVStack(spacing: 5) {
-                    if vm.tracks.isEmpty {
-                        Text("Empty history")
-                            .font(.largeTitle)
-                            .opacity(0.6)
-                            .transition(.opacity)
-                    }
-                    ForEach(vm.tracks, id: \.startDate) { track in
-                        NavigationLink {
-                            TrackDetailView(track: track)
-                        } label: {
-                            TrackHistoryCellView(track: track,
-                                                 unit: UnitSpeed.byName(speedUnit),
-                                             mapSnapshotGenerator: mapSnapshotGenerator,
-                                             mapSnippetCache: mapSnippetCache)
+                VStack {
+                    dateSelector
+                    Divider()
+                    LazyVStack(spacing: 5) {
+                        if vm.tracks.isEmpty {
+                            Text("Empty history")
+                                .font(.largeTitle)
+                                .opacity(0.6)
+                                .transition(.opacity)
+                        }
+                        ForEach(vm.tracks, id: \.id) { track in
+                            Button {
+                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                                    .trackDetail(track: track, dependencies: dependencies))
+                            } label: {
+                                TrackHistoryCellView(track: track,
+                                                     unit: UnitSpeed.byName(speedUnit),
+                                                     dependencies: dependencies)
+                            }
                         }
                     }
+                    
                 }
-                
+                .padding(.horizontal)
             }
             .frame(maxWidth: .infinity)
             .animation(.default, value: vm.tracks.isEmpty)
@@ -76,7 +73,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
         DatePicker("Date",
                    selection: $vm.selectedDate,
                    displayedComponents: [.date])
-        .datePickerStyle(.graphical)
+        .datePickerStyle(.compact)
             
     }
 }
@@ -95,21 +92,11 @@ fileprivate final class PreviewModel: TrackHistoryViewModelProtocol {
     
 }
 
-private actor TestCache: TrackMapSnippetCacheProtocol {
-    func getSnippet(for track: Track, size: CGSize) async -> UIImage? {
-        return nil
-    }
-    
-    func cacheSnippet(_ snippet: UIImage, for track: Track, size: CGSize) async {
-    }
-}
-
 
 
 
 #Preview {
     TrackHistoryView(vm: PreviewModel(),
-                     mapSnapshotGenerator: MapSnapshotGenerator(),
-                     mapSnippetCache: TestCache()
+                     dependencies: .mock()
     )
 }

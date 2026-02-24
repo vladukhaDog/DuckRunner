@@ -109,6 +109,8 @@ final class TrackRepository: TrackStorageProtocol {
                         item.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
                         item.stopDate = track.stopDate
                         item.startDate = track.startDate
+                        item.parentID = track.parentID
+                        item.type = track.type.rawValue
                         if context.hasChanges {
                             try context.save()
                             self.sendAction(.updated(track))
@@ -155,9 +157,43 @@ final class TrackRepository: TrackStorageProtocol {
                 request.predicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
                                                 Calendar.current.startOfDay(for: date) as NSDate,
                                                 Calendar.current.startOfDay(for: nextDay) as NSDate)
+                request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
+                let tracks = (try? context.fetch(request)) ?? []
+                continuation.resume(returning: tracks.map({Track($0)}))
+            }
+        }
+    }
+    
+    /// Retrieves tracks that have specific parent
+    func getTracks(withParentID parent: String) async -> [Track] {
+        let context = self.backgroundContext
+        return await withCheckedContinuation { [context] continuation in
+            context.performAndWait {
+                
+                let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
+                request.predicate = NSPredicate(format: "parentID == %@", parent)
                 
                 let tracks = (try? context.fetch(request)) ?? []
                 continuation.resume(returning: tracks.map({Track($0)}))
+            }
+        }
+    }
+    
+    /// Retrieves track by id
+    func getTrack(by id: String) async -> Track? {
+        let context = self.backgroundContext
+        return await withCheckedContinuation { [context] continuation in
+            context.performAndWait {
+                
+                let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
+                request.predicate = NSPredicate(format: "id == %@", id)
+                request.fetchLimit = 1
+                let tracks = (try? context.fetch(request)) ?? []
+                if let track = tracks.first {
+                    continuation.resume(returning: Track(track))
+                } else {
+                    continuation.resume(returning: nil)
+                }
             }
         }
     }

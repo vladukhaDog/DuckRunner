@@ -16,7 +16,7 @@ struct TrackServiceTests {
     
     @Test("append point throws .noCurrentTrack if no track started")
     func appendTrackPosition_noCurrentTrack_throws() async throws {
-        let service = await TrackService()
+        let service = await LiveTrackService()
         let pt = await TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0, date: .now)
         do {
             try await service.appendTrackPosition(pt)
@@ -28,7 +28,7 @@ struct TrackServiceTests {
 
     @Test("append point throws .currentTrackIsFinished if track is stopped")
     func appendTrackPosition_stoppedTrack_throws() async throws {
-        let service = await TrackService()
+        let service = await LiveTrackService()
         await service.startTrack(at: Date())
         _ = try await service.stopTrack(at: Date())
         let pt = await TrackPoint(position: .init(latitude: 0, longitude: 0), speed: 0, date: .now)
@@ -42,7 +42,7 @@ struct TrackServiceTests {
 
     @Test("append point works for active track")
     func appendTrackPosition_activeTrack_succeeds() async throws {
-        let service = await TrackService()
+        let service = await LiveTrackService()
         await service.startTrack(at: Date())
         let pt = await TrackPoint(position: .init(latitude: 10, longitude: 20), speed: 5, date: .now)
         try await service.appendTrackPosition(pt)
@@ -52,7 +52,7 @@ struct TrackServiceTests {
 
     @Test("stopTrack throws .noCurrentTrack if no track started")
     func stopTrack_noCurrentTrack_throws() async throws {
-        let service = await TrackService()
+        let service = await LiveTrackService()
         do {
             _ = try await service.stopTrack(at: Date())
             Issue.record("Should have thrown")
@@ -63,7 +63,7 @@ struct TrackServiceTests {
 
     @Test("stopTrack works for active track")
     func stopTrack_activeTrack_succeeds() async throws {
-        let service = await TrackService()
+        let service = await LiveTrackService()
         let start = Date()
         await service.startTrack(at: start)
         let stop = Date().addingTimeInterval(10)

@@ -16,12 +16,11 @@ struct TrackHistoryCellView: View {
     
     /// Initializes the history view with the given view model.
     init(track: Track, unit: UnitSpeed,
-         mapSnapshotGenerator: any MapSnapshotGeneratorProtocol,
-         mapSnippetCache: any TrackMapSnippetCacheProtocol) {
+         dependencies: DependencyManager) {
         self.track = track
         self.unit = unit
-        self.mapSnippetCache = mapSnippetCache
-        self.mapSnapshotGenerator = mapSnapshotGenerator
+        self.mapSnippetCache = dependencies.mapSnippetCache
+        self.mapSnapshotGenerator = dependencies.mapSnapshotGenerator
     }
     
     var body: some View {
@@ -54,7 +53,6 @@ struct TrackHistoryCellView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .glassEffect(in: RoundedRectangle(cornerRadius: 15))
-        .padding()
     }
     
     private var time: some View {
@@ -71,6 +69,21 @@ struct TrackHistoryCellView: View {
             .bold()
     }
     
+    func generateMapImage(size: CGSize) async {
+        guard let image = try? await mapSnapshotGenerator
+            .generateSnapshot(track: track, size: size) else {
+            return
+        }
+        await MainActor.run {
+            withAnimation {
+                self.mapSnippetImage = image
+            }
+        }
+        await mapSnippetCache.cacheSnippet(image,
+                                           for: track,
+                                           size: size)
+    }
+    
     @State private var mapSnippetImage: UIImage?
     private var mapSnippet: some View {
         LinearGradient(colors: [.init(white: 0.2), .init(white: 0.1),
@@ -81,26 +94,17 @@ struct TrackHistoryCellView: View {
             .background {
                 GeometryReader { geo in
                     Color.clear
-                        .task {
-                            if let cachedImage = await mapSnippetCache.getSnippet(for: track, size: geo.size) {
-                                await MainActor.run {
-                                    withAnimation {
-                                        self.mapSnippetImage = cachedImage
+                        .onAppear {
+                            Task {
+                                if let cachedImage = await mapSnippetCache.getSnippet(for: track, size: geo.size) {
+                                    await MainActor.run {
+                                        withAnimation {
+                                            self.mapSnippetImage = cachedImage
+                                        }
                                     }
+                                } else {
+                                    await generateMapImage(size: geo.size)
                                 }
-                            } else {
-                                guard let image = try? await mapSnapshotGenerator
-                                    .generateSnapshot(track: track, size: geo.size) else {
-                                    return
-                                }
-                                await MainActor.run {
-                                    withAnimation {
-                                        self.mapSnippetImage = image
-                                    }
-                                }
-                                await mapSnippetCache.cacheSnippet(image,
-                                                                   for: track,
-                                                                   size: geo.size)
                             }
                         }
                 }
@@ -118,17 +122,10 @@ struct TrackHistoryCellView: View {
             .opacity(0.8)
             .disabled(true)
             .allowsHitTesting(false)
+            
     }
 }
 
-private actor TestCache: TrackMapSnippetCacheProtocol {
-    func getSnippet(for track: Track, size: CGSize) async -> UIImage? {
-        return nil
-    }
-    
-    func cacheSnippet(_ snippet: UIImage, for track: Track, size: CGSize) async {
-    }
-}
 
 #Preview {
     ZStack {
@@ -136,12 +133,10 @@ private actor TestCache: TrackMapSnippetCacheProtocol {
         VStack {
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .kilometersPerHour,
-                                 mapSnapshotGenerator: MapSnapshotGenerator(),
-                                 mapSnippetCache: TestCache())
+                                 dependencies: .mock())
             TrackHistoryCellView(track: .filledTrack,
                                  unit: .milesPerHour,
-                                 mapSnapshotGenerator: MapSnapshotGenerator(),
-                                 mapSnippetCache: TestCache())
+                                 dependencies: .mock())
         }
     }
 }

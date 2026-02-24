@@ -10,24 +10,39 @@ import SwiftData
 
 @main
 struct DuckRunnerApp: App {
-    let trackService: any TrackServiceProtocol = TrackService()
-    let locationService: any LocationServiceProtocol = LocationService()
-    let storageService: any TrackStorageProtocol = TrackRepository()
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol = MapSnapshotGenerator()
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol = TrackMapSnippetCache(fileManager: CacheFileManager())
+    @State var tabRouter: any TabRouterProtocol
+    private let dependencies: DependencyManager
+    init() {
+        self.dependencies = .production(tabs: [
+            "History",
+                                              ])
+        self.tabRouter = dependencies.tabRouter
+    }
+    
+    
     var body: some Scene {
         WindowGroup {
-            TabView {
-                Tab("Map", systemImage: "map") {
-                    BaseMapView(trackService: trackService,
-                                locationService: locationService,
-                                storageService: storageService)
+            TabView(selection: $tabRouter.selectedTab) {
+                
+                BaseMapView(dependencies: dependencies)
+                .tabItem {
+                    Label("Map", systemImage: "map")
                 }
-                Tab("History", systemImage: "book.pages") {
-                    TrackHistoryView(storage: storageService,
-                                     mapSnapshotGenerator: mapSnapshotGenerator,
-                                     mapSnippetCache: mapSnippetCache)
+                .tag("Map")
+                if let router = dependencies.routers["History"] {
+                    NavigatableView(router) {
+                        TrackHistoryView(dependencies: dependencies)
+                    }
+                    .tabItem {
+                        Label("History", systemImage: "book.pages")
+                    }
+                    .tag("History")
                 }
+                SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
+                .tag("Settings")
             }
             
         }
