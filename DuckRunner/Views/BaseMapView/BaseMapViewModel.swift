@@ -9,7 +9,7 @@ import Combine
 import MapKit
 
 
-final class BaseMapViewModel: BaseMapViewModelProtocol {
+final class BaseMapViewModel: BaseMapViewModelProtocol, LocationAccessViewModelProtocol, TrackControllerProtocol {
     // MARK: - Outside parameters
     let mapMode: TrackingMapView.MapViewMode = .trackUser
     @Published var isTrackControlAvailable: Bool = true
@@ -20,6 +20,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     
     @Published var replayTrack: Track? = nil
     @Published var checkpoints: [TrackCheckPoint] = []
+    
+    @Published var locationAccess: CLAuthorizationStatus = .notDetermined
     
     // MARK: - Outside methods
     func startTrack() {
@@ -44,6 +46,10 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     
     func deselectReplay() {
         self.receiveReplayTrackAction(.deselect)
+    }
+    
+    func requestLocation() {
+        self.locationService.requestLocationAccess()
     }
     
     // MARK: - Dependencies
@@ -183,6 +189,13 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
             .receive(on: RunLoop.main)
             .sink {[weak self] action in
                 self?.receiveReplayTrackAction(action)
+            }
+            .store(in: &cancellables)
+        
+        self.locationService
+            .authorizationStatus
+            .sink { [weak self] status in
+                self?.locationAccess = status
             }
             .store(in: &cancellables)
         

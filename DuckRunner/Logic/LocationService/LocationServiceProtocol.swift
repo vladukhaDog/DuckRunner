@@ -9,4 +9,6 @@ import CoreLocation
 
 protocol LocationServiceProtocol {
     var location: PassthroughSubject<CLLocation, Never> { get }
+    var authorizationStatus: CurrentValueSubject<CLAuthorizationStatus, Never> { get }
+    func requestLocationAccess()
 }

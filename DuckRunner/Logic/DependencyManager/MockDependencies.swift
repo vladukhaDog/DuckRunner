@@ -82,6 +82,12 @@ extension DependencyManager {
     }
     
     final class MockLocationService: LocationServiceProtocol {
+        var authorizationStatus: CurrentValueSubject<CLAuthorizationStatus, Never> = .init(.notDetermined)
+        
+        func requestLocationAccess() {
+            
+        }
+        
         var location: PassthroughSubject<CLLocation, Never> = .init()
     }
     

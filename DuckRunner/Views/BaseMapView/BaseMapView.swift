@@ -46,37 +46,52 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
                 }
             }
             .overlay(alignment: .bottom, content: {
-                VStack(alignment: .trailing) {
-                    if vm.replayTrack != nil {
-                        Button {
-                            vm.deselectReplay()
-                        } label: {
-                            Text("Stop Replay")
-                                .bold()
-                                .foregroundStyle(Color.primary)
-                                .padding(8)
-                        }
-                        .glassEffect(.regular.tint(.accentColor.opacity(0.5)).interactive(), in: Capsule())
-                        .transition(.opacity)
-                    }
-                    if let track = vm.currentTrack {
-                        TrackLiveInfoView(track: track, unit: unitSpeed)
-                    }
-                        TrackControlButton(vm: vm)
-                            .disabled(vm.isTrackControlAvailable == false)
-                            .opacity(vm.isTrackControlAvailable ? 1 : 0.6)
-                       
-                }
-                .padding(10)
-                .animation(.default, value: vm.replayTrack != nil)
-                
+                controls
             })
             .animation(.bouncy, value: vm.currentSpeed != nil)
+    }
+    
+    private var controls: some View {
+        VStack(alignment: .trailing) {
+            if vm.replayTrack != nil {
+                Button {
+                    vm.deselectReplay()
+                } label: {
+                    Text("Stop Replay")
+                        .bold()
+                        .foregroundStyle(Color.primary)
+                        .padding(8)
+                }
+                .glassEffect(.regular.tint(.accentColor.opacity(0.5)).interactive(), in: Capsule())
+                .transition(.opacity)
+            }
+            if vm.locationAccess.isAuthorized() {
+                if let track = vm.currentTrack {
+                    let unitSpeed = UnitSpeed.byName(speedUnit)
+                    TrackLiveInfoView(track: track, unit: unitSpeed)
+                }
+                    TrackControlButton(vm: vm)
+                        .disabled(vm.isTrackControlAvailable == false)
+                        .opacity(vm.isTrackControlAvailable ? 1 : 0.6)
+            } else {
+                LocationAccessControlView(vm: vm)
+            }
+               
+        }
+        .padding(10)
+        .animation(.default, value: vm.replayTrack != nil)
+        
     }
 }
 
 import Combine
 private final class PreviewModel: BaseMapViewModelProtocol {
+    var locationAccess: CLAuthorizationStatus = .notDetermined
+    
+    func requestLocation() {
+        
+    }
+    
     func deselectReplay() {
     }
     
