@@ -33,11 +33,28 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        
-        MapWithRenderedTrackInfo(currentTrack:  vm.currentTrack,
-                                 replayTrack:   vm.replayTrack,
-                                 checkpoints:   vm.checkpoints,
-                                 mapMode: vm.mapMode)
+        MapView(mode: vm.mapMode) {
+            UserAnnotation()
+            if let replayTrack = vm.replayTrack {
+                MapContents.replayTrack(replayTrack)
+            }
+            if let currentTrack = vm.currentTrack {
+                MapContents.speedTrack(currentTrack)
+            }
+            ForEach(vm.checkpoints, id: \.id) { checkpoint in
+                MapContents.checkPoint(checkpoint)
+            }
+            
+            if let startPoint = vm.replayTrack?.points.first,
+               vm.currentTrack != nil {
+                MapContents.startPoint(startPoint)
+            }
+            
+            if let stopPoint = vm.replayTrack?.points.last {
+                MapContents.stopPoint(stopPoint)
+            }
+            
+        }
             .ignoresSafeArea(.all)
             .overlay(alignment: .top) {
                 if let currentSpeed = vm.currentSpeed {
@@ -95,7 +112,7 @@ private final class PreviewModel: BaseMapViewModelProtocol {
     func deselectReplay() {
     }
     
-    var mapMode: TrackingMapView.MapViewMode = .bounds(.filledTrack)
+    var mapMode: MapViewMode = .bounds(.filledTrack)
     
     var checkpoints: [TrackCheckPoint] = {
         let points = Track.filledTrack.points

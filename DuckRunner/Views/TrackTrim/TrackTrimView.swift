@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AnotherSUIRouter
+import MapKit
 
 extension Route where Self == TrackTrimView.RouteBuilder {
     /// View of trimming the track
@@ -72,11 +73,10 @@ struct TrackTrimView: View {
         let trimmedTrack = trimmedTrack(track.points,
                                        start: start,
                                        stop: stop)
-        TrackingMapView(overlays: [
-            FantomTrackOverlay(track: track.points),
-            SpeedTrackOverlay(track: trimmedTrack)
-                                  ],
-                        mapMode: .free(track))
+        MapView(mode: .free(track)) {
+            MapContents.fantomTrack(track)
+            MapContents.speedTrack(trimmedTrack)
+        }
         .ignoresSafeArea()
             .overlay(alignment: .bottom) {
                 VStack {

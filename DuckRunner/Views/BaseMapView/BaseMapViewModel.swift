@@ -11,7 +11,7 @@ import MapKit
 
 final class BaseMapViewModel: BaseMapViewModelProtocol, LocationAccessViewModelProtocol, TrackControllerProtocol {
     // MARK: - Outside parameters
-    let mapMode: TrackingMapView.MapViewMode = .trackUser
+    let mapMode: MapViewMode = .trackUser
     @Published var isTrackControlAvailable: Bool = true
     
     @Published var currentTrack: Track? = nil

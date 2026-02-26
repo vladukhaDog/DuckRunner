@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+//internal import MapKit
 
 @main
 struct DuckRunnerApp: App {

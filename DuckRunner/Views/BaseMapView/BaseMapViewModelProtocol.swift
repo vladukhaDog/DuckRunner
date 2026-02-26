@@ -21,7 +21,7 @@ protocol BaseMapViewModelProtocol: ObservableObject, TrackControllerProtocol, Lo
     /// Checkpoints to display
     var checkpoints: [TrackCheckPoint] { get }
     
-    var mapMode: TrackingMapView.MapViewMode { get }
+    var mapMode: MapViewMode { get }
     
     /// The user's current measured speed, if available.
     var currentSpeed: CLLocationSpeed? { get set }
