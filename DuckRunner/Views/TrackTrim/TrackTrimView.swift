@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import AnotherSUIRouter
+import SimpleRouter
 import MapKit
 
 extension Route where Self == TrackTrimView.RouteBuilder {

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6122F42C2F431E3100E20474 /* DuckRunner.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6122F42B2F431E3100E20474 /* DuckRunner.icon */; };
-		617E75C42F4DBB3F00E8D4D0 /* AnotherSUIRouter in Frameworks */ = {isa = PBXBuildFile; productRef = 617E75C32F4DBB3F00E8D4D0 /* AnotherSUIRouter */; };
+		61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */ = {isa = PBXBuildFile; productRef = 61BF8F1B2F51DD78000808F6 /* SimpleRouter */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				617E75C42F4DBB3F00E8D4D0 /* AnotherSUIRouter in Frameworks */,
+				61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,7 +122,7 @@
 			);
 			name = DuckRunner;
 			packageProductDependencies = (
-				617E75C32F4DBB3F00E8D4D0 /* AnotherSUIRouter */,
+				61BF8F1B2F51DD78000808F6 /* SimpleRouter */,
 			);
 			productName = DuckRunner;
 			productReference = 61399C622F41223F008A0F49 /* DuckRunner.app */;
@@ -207,7 +207,7 @@
 			mainGroup = 61399C592F41223F008A0F49;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				617E75C22F4DBB3F00E8D4D0 /* XCLocalSwiftPackageReference "../AnotherSUIRouter" */,
+				61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 61399C632F41223F008A0F49 /* Products */;
@@ -598,17 +598,22 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		617E75C22F4DBB3F00E8D4D0 /* XCLocalSwiftPackageReference "../AnotherSUIRouter" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../AnotherSUIRouter;
+/* Begin XCRemoteSwiftPackageReference section */
+		61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vladukhaDog/SimpleRouter";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		617E75C32F4DBB3F00E8D4D0 /* AnotherSUIRouter */ = {
+		61BF8F1B2F51DD78000808F6 /* SimpleRouter */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = AnotherSUIRouter;
+			package = 61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */;
+			productName = SimpleRouter;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

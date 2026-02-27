@@ -13,7 +13,7 @@
 import SwiftUI
 import MapKit
 import Combine
-import AnotherSUIRouter
+import SimpleRouter
 
 /// View model responsible for managing and providing detailed track data 
 /// for presentation in the TrackDetailView.

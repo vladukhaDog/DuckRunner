@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import AnotherSUIRouter
+import SimpleRouter
 
 /// Class to control navigation
 @MainActor

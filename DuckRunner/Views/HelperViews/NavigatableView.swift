@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import AnotherSUIRouter
+import SimpleRouter
 
 /// Wrapper to add NavigationStack, route handlers, adds rotuer as environmentObject
 struct NavigatableView<Root: View>: View {

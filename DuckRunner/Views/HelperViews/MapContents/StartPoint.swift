@@ -14,7 +14,7 @@ extension MapContents {
         
         Annotation(coordinate: trackPoint.position,
                    anchor: .bottom) {
-            StartPointView(trackPoint: trackPoint)
+            StartPointView(startPoint: trackPoint)
         } label: {
         }
 
