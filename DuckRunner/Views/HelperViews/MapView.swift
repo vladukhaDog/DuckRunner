@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import Combine
 
 enum MapViewMode: Equatable {
     case trackUser
@@ -22,15 +23,31 @@ final class MapViewModel {
     var cameraPosition: CLLocationCoordinate2D?
     let interactionModes: MapInteractionModes
     
+    var isMovingMap: Bool = false
     var mapPosition: MapCameraPosition
     var bounds: MapCameraBounds? = nil
-    init(mode: MapViewMode) {
+    
+    private var cancellables: Set<AnyCancellable> = []
+    
+    init(mode: MapViewMode,
+         dependencies: DependencyManager) {
         self.mode = mode
         switch mode {
         case .trackUser:
             self.mapPosition = .userLocation(followsHeading: true, fallback: .automatic)
             self.interactionModes = .all
             self.bounds = nil
+            dependencies.locationService
+                .location
+                .sink { newLocation in
+                    self.receivedLocationUpdate(newLocation)
+                }
+                .store(in: &cancellables)
+            Task {
+                try? await Task.sleep(for: .seconds(0.1))
+                // reposition because after map loading it looses heading follow
+                self.mapPosition = .userLocation(followsHeading: true, fallback: .automatic)
+            }
         case .bounds(let track):
             let region = track.points.regionOfATrack()
             self.mapPosition = .region(region)
@@ -44,6 +61,19 @@ final class MapViewModel {
         }
     }
     
+    //https://github.com/vladukhaDog/DuckRunner/issues/24
+    //https://github.com/vladukhaDog/DuckRunner/issues/23#issuecomment-3959911829
+    private func receivedLocationUpdate(_ newLocation: CLLocation) {
+        guard case .trackUser = mode,
+        (!self.mapPosition.followsUserHeading || !self.mapPosition.followsUserLocation),
+        !isMovingMap else {
+            return
+        }
+        withAnimation(.easeOut) {
+            self.mapPosition = .userLocation(followsHeading: true, fallback: .automatic)
+        }
+    }
+    
 }
 
 struct MapView<Content: MapContent>: View {
@@ -51,9 +81,10 @@ struct MapView<Content: MapContent>: View {
     @State private var vm: MapViewModel
     
     init(mode: MapViewMode,
+         dependencies: DependencyManager,
          @MapContentBuilder content: @escaping () -> Content) {
         self.content = content
-        self._vm = .init(initialValue: .init(mode: mode))
+        self._vm = .init(initialValue: .init(mode: mode, dependencies: dependencies))
     }
     
     
@@ -63,10 +94,15 @@ struct MapView<Content: MapContent>: View {
                 bounds: vm.bounds,
                 interactionModes: vm.interactionModes,
                 content: content)
+            .onMapCameraChange(frequency: .onEnd, {
+                self.vm.isMovingMap = false
+            })
             .onMapCameraChange(frequency: .continuous) { context in
                 self.vm.cameraPosition = context.region.center
+                if self.vm.mapPosition.positionedByUser {
+                    self.vm.isMovingMap = true
+                }
             }
-//            .mapControlVisibility(.hidden)
             .mapControls({
                 MapCompass()
                     
@@ -77,11 +113,6 @@ struct MapView<Content: MapContent>: View {
                     .padding(.horizontal)
                     .padding(.top)
             }
-            
-//            .mapControlVisibility(.)
-//            .overlay(alignment: .topTrailing) {
-//                followButton
-//            }
         }
     }
     
@@ -112,7 +143,7 @@ struct MapView<Content: MapContent>: View {
 }
 
 #Preview {
-    MapView(mode: .trackUser) {
+    MapView(mode: .trackUser, dependencies: .mock()) {
         UserAnnotation()
         MapContents.speedTrack(.filledTrack)
         MapContents.fantomTrack(.filledTrack)

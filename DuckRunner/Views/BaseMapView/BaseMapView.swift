@@ -12,7 +12,7 @@ import MapKit
 /// Convenience initializer for standard setup with required services.
 extension BaseMapView where ViewModel == BaseMapViewModel {
     init(dependencies: DependencyManager) {
-        self.init(vm: BaseMapViewModel(dependencies: dependencies))
+        self.init(vm: BaseMapViewModel(dependencies: dependencies), dependencies: dependencies)
     }
 }
 
@@ -23,9 +23,11 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
     @StateObject private var vm: ViewModel
     /// User's preferred unit for speed display (persisted in app storage).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
-    
+    private let dependencies: DependencyManager
     /// Creates a new map view bound to the provided view model instance.
-    init(vm: ViewModel) {
+    init(vm: ViewModel,
+         dependencies: DependencyManager) {
+        self.dependencies = dependencies
         self._vm = .init(wrappedValue: vm)
     }
     
@@ -33,7 +35,7 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        MapView(mode: vm.mapMode) {
+        MapView(mode: vm.mapMode, dependencies: dependencies) {
             UserAnnotation()
             if let replayTrack = vm.replayTrack {
                 MapContents.replayTrack(replayTrack)
@@ -155,5 +157,5 @@ private final class PreviewModel: BaseMapViewModelProtocol {
 }
 
 #Preview {
-    BaseMapView(vm: PreviewModel())
+    BaseMapView(vm: PreviewModel(), dependencies: .mock())
 }

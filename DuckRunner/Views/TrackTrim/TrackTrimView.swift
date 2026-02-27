@@ -73,7 +73,7 @@ struct TrackTrimView: View {
         let trimmedTrack = trimmedTrack(track.points,
                                        start: start,
                                        stop: stop)
-        MapView(mode: .free(track)) {
+        MapView(mode: .free(track), dependencies: dependencies) {
             MapContents.fantomTrack(track)
             MapContents.speedTrack(trimmedTrack)
         }

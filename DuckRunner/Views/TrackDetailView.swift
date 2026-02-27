@@ -234,7 +234,7 @@ struct TrackDetailView: View {
     
     private var baseTrackInfo: some View {
         VStack {
-            MapView(mode: .bounds(vm.track)) {
+            MapView(mode: .bounds(vm.track), dependencies: dependencies) {
                 MapContents.speedTrack(vm.track)
                 if let start = vm.track.points.first {
                     MapContents.startPoint(start)
