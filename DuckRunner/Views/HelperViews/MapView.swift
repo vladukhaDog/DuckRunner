@@ -104,6 +104,8 @@ struct MapView<Content: MapContent>: View {
                 }
             }
             .mapControls({
+                MapPitchToggle()
+                    .mapControlVisibility(.visible)
                 MapCompass()
                     
             })
