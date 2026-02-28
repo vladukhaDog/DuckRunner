@@ -165,45 +165,18 @@ struct TrackDetailView: View {
             Section {
                 topSpeed
             }
-            Section("Control") {
-                Picker("Mode", selection: .init(get: {
-                    vm.track.type
-                }, set: { new in
-                    Task {
-                        await vm.updateTrackType(to: new)
-                    }
-                })) {
-                    ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
-                        Text(type.rawValue)
-                            .tag(type)
-                    }
-                }
-                Button("Replay Track") {
+            if vm.track.parentID == nil {
+                Button {
                     Task {
                         await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
                     }
                     dependencies.tabRouter.selectedTab = "map"
-                }
-                
-                if vm.track.parentID == nil,
-                   vm.children.isEmpty,
-                   let start = vm.track.points.first,
-                   let stop = vm.track.points.last {
-                    Button("Edit Track") {
-                        dependencies.routers[dependencies.tabRouter.selectedTab]?
-                            .push(.trackTrim(track: vm.track,
-                                             first: start,
-                                             last: stop,
-                                             dependencies: dependencies))
-                    }
-                }
-                
-                Button("Delete Track") {
-                    Task {
-                        await dependencies.storageService.deleteTrack(vm.track)
-                    }
+                } label: {
+                    Label("Replay the track", systemImage: "repeat")
                 }
             }
+            
+            editSection
             
             if let parentTrack = vm.parentTrack {
                 Button("Parent track") {
@@ -218,7 +191,7 @@ struct TrackDetailView: View {
                             dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: track, dependencies: dependencies))
                         } label: {
                             let date = track.startDate.toString(format: "EEE HH:mm")
-                            Text("Replay at \(date)")
+                            Text("Replay as of \(date)")
                         }
                     }
                 }
@@ -230,6 +203,48 @@ struct TrackDetailView: View {
         })
         .navigationTitle("\(vm.track.startDate.toString(style: .medium)) Track")
         .navigationBarTitleDisplayMode(.large)
+    }
+    
+    private var editSection: some View {
+        Section("Edit") {
+            Picker("Mode", selection: .init(get: {
+                vm.track.type
+            }, set: { new in
+                Task {
+                    await vm.updateTrackType(to: new)
+                }
+            })) {
+                ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
+                    Text(type.rawValue.capitalized)
+                        .tag(type)
+                }
+            }
+            
+            if vm.track.parentID == nil,
+               vm.children.isEmpty,
+               let start = vm.track.points.first,
+               let stop = vm.track.points.last {
+                Button {
+                    dependencies.routers[dependencies.tabRouter.selectedTab]?
+                        .push(.trackTrim(track: vm.track,
+                                         first: start,
+                                         last: stop,
+                                         dependencies: dependencies))
+                } label: {
+                    Label("Edit track", systemImage: "timeline.selection")
+                }
+            }
+            if vm.children.isEmpty {
+                Button(role: .destructive) {
+                    Task {
+                        await dependencies.storageService.deleteTrack(vm.track)
+                    }
+                } label: {
+                    Label("Delete track", systemImage: "trash")
+                        .foregroundStyle(.red)
+                }
+            }
+        }
     }
     
     private var baseTrackInfo: some View {
