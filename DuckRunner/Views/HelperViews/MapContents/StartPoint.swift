@@ -28,7 +28,8 @@ private struct StartPointView: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("START")
-                .stroke(color: .black, width: 1)
+                .font(.caption)
+                .stroke(color: .black, width: 0.5)
             .bold()
             let unFilledAmount = 0.75
             let degree = (180 - (360 - (360 * (unFilledAmount)))) / 2
@@ -36,13 +37,13 @@ private struct StartPointView: View {
                 Circle()
                    .trim(from: 0.0,
                          to: unFilledAmount)
-                   .stroke(Color.gray,
+                   .stroke(Color.green.gradient.opacity(0.8),
                            style: .init(lineWidth: 4,
                                         lineCap: .round))
                    .rotationEffect(.degrees(180))
                    .rotationEffect(.degrees((-degree)))
             }
-               .frame(width: 30)
+               .frame(width: 20)
         }
     }
 }
@@ -50,7 +51,7 @@ private struct StartPointView: View {
 #Preview {
     VStack {
         Map() {
-//            MapContents.speedTrack(.filledTrack)
+            MapContents.speedTrack(.filledTrack)
             MapContents.startPoint(Track.filledTrack.points.first!)
         }
     }

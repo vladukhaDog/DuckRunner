@@ -24,20 +24,21 @@ extension MapContents {
 private struct StopPointView: View {
     let trackPoint: TrackPoint
     
+    private var icon: some View {
+        Image(systemName: "flag.pattern.checkered.2.crossed")
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(Color.green)
+            .stroke(color: .black, width: 0.2)
+    }
+    
     var body: some View {
-        VStack(spacing: 1) {
-            Image(systemName: "flag.pattern.checkered.2.crossed")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50)
-                .foregroundStyle(Color.green)
-                .stroke(color: .black, width: 0.2)
+        VStack(spacing: 0) {
+            Text("FINISH")
+                .font(.caption)
+                .stroke(color: .black, width: 0.5)
             .bold()
-            Circle()
-                .fill(Color.cyan)
-                .stroke(.red, lineWidth: 2, antialiased: true)
-                .frame(width: 5, height: 5)
-                .offset(y: 2.5)
+            icon
         }
     }
 }
@@ -45,7 +46,7 @@ private struct StopPointView: View {
 #Preview {
     VStack {
         Map() {
-//            MapContents.speedTrack(.filledTrack)
+            MapContents.speedTrack(.filledTrack)
             MapContents.stopPoint(Track.filledTrack.points.first!)
         }
     }
