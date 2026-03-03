@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6122F42C2F431E3100E20474 /* DuckRunner.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6122F42B2F431E3100E20474 /* DuckRunner.icon */; };
 		61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */ = {isa = PBXBuildFile; productRef = 61BF8F1B2F51DD78000808F6 /* SimpleRouter */; };
+		61C220562F572409003846E3 /* FlowLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 61C220552F572409003846E3 /* FlowLayout */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61C220562F572409003846E3 /* FlowLayout in Frameworks */,
 				61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,6 +125,7 @@
 			name = DuckRunner;
 			packageProductDependencies = (
 				61BF8F1B2F51DD78000808F6 /* SimpleRouter */,
+				61C220552F572409003846E3 /* FlowLayout */,
 			);
 			productName = DuckRunner;
 			productReference = 61399C622F41223F008A0F49 /* DuckRunner.app */;
@@ -208,6 +211,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */,
+				61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 61399C632F41223F008A0F49 /* Products */;
@@ -607,6 +611,14 @@
 				kind = branch;
 			};
 		};
+		61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vladukhaDog/FlowLayout.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -614,6 +626,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */;
 			productName = SimpleRouter;
+		};
+		61C220552F572409003846E3 /* FlowLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */;
+			productName = FlowLayout;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

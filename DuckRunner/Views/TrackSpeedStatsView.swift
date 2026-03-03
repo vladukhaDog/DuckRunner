@@ -7,41 +7,74 @@
 
 import SwiftUI
 import Charts
+import FlowLayout
 
 struct TrackSpeedStatsView: View {
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     let track: Track
     let parentTrack: Track?
     var body: some View {
-        Chart {
-            ForEach(track.points.enumerated(), id: \.element.hashValue) { index, point in
-                LineMark(
-                    x: .value("Time Elapsed (s)", point.date.timeIntervalSince(track.startDate)),
-                    y: .value("Speed", SpeedConverter(speed: point.speed).getSpeed(.byName(speedUnit))),
-                    series: .value("", "Current")
-                )
-                .foregroundStyle(Color.cyan.opacity(0.7))
-                .lineStyle(.init(lineWidth: 6, lineCap: .round))
-                .interpolationMethod(.cardinal)
-            }
-            if let parentTrack {
-                ForEach(parentTrack.points.enumerated(), id: \.element.hashValue) { index, point in
+        VStack {
+            Chart {
+                if let parentTrack {
+                    ForEach(parentTrack.points.enumerated(), id: \.element.hashValue) { index, point in
+                        LineMark(
+                            x: .value("Time Elapsed (s)", point.date.timeIntervalSince(parentTrack.startDate)),
+                            y: .value("Speed", SpeedConverter(speed: point.speed).getSpeed(.byName(speedUnit))),
+                            series: .value("", "Parent")
+                        )
+                        .foregroundStyle(Color.gray)
+                        .lineStyle(.init(lineWidth: 3, lineCap: .round, dash: [4,6]))
+                        .interpolationMethod(.cardinal)
+                    }
+                }
+                ForEach(track.points.enumerated(), id: \.element.hashValue) { index, point in
                     LineMark(
-                        x: .value("Time Elapsed (s)", point.date.timeIntervalSince(parentTrack.startDate)),
+                        x: .value("Time Elapsed (s)", point.date.timeIntervalSince(track.startDate)),
                         y: .value("Speed", SpeedConverter(speed: point.speed).getSpeed(.byName(speedUnit))),
-                        series: .value("", "Parent")
+                        series: .value("", "Current")
                     )
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(Color.cyan.opacity(0.5))
                     .lineStyle(.init(lineWidth: 6, lineCap: .round))
                     .interpolationMethod(.cardinal)
                 }
+                
             }
+            .chartYAxisLabel(speedUnit)
+            .chartXAxisLabel("Time Elapsed (s)")
+            FlowStack(HSpacing: 20) {
+                currentTrackLegend
+                parentTrackLegend
+            }
+            
         }
-        .chartYAxisLabel(speedUnit)
-        .chartXAxisLabel("Time Elapsed (s)")
+    }
+    
+    @ViewBuilder
+    private var parentTrackLegend: some View {
+        HStack(spacing: 8) {
+            StraightLine()
+                .stroke(Color.gray, style: .init(lineWidth: 4,
+                                                 lineCap: .round,
+                                                 dash: [4,6]))
+                .frame(width: 30, height: 4)
+            Text("Parent track")
+                .font(.caption)
+        }
+    }
+    
+    private var currentTrackLegend: some View {
+        HStack(spacing: 8) {
+            StraightLine()
+                .stroke(Color.cyan, style: .init(lineWidth: 4, lineCap: .round))
+                .frame(width: 30, height: 4)
+            Text("This track")
+                .font(.caption)
+        }
     }
 }
 
 #Preview {
     TrackSpeedStatsView(track: .filledTrack, parentTrack: .filledTrack)
+        .padding()
 }
