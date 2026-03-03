@@ -52,14 +52,16 @@ struct TrackSpeedStatsView: View {
     
     @ViewBuilder
     private var parentTrackLegend: some View {
-        HStack(spacing: 8) {
-            StraightLine()
-                .stroke(Color.gray, style: .init(lineWidth: 4,
-                                                 lineCap: .round,
-                                                 dash: [4,6]))
-                .frame(width: 30, height: 4)
-            Text("Parent track")
-                .font(.caption)
+        if parentTrack != nil {
+            HStack(spacing: 8) {
+                StraightLine()
+                    .stroke(Color.gray, style: .init(lineWidth: 4,
+                                                     lineCap: .round,
+                                                     dash: [4,6]))
+                    .frame(width: 30, height: 4)
+                Text("Parent track")
+                    .font(.caption)
+            }
         }
     }
     
