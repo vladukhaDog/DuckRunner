@@ -5,14 +5,13 @@
 //  Created by vladukha on 18.02.2026.
 //
 
-
 import Testing
 import UIKit
 @testable import DuckRunner
 
 extension Track {
     init(id: String) {
-        self.init(id: id, points: [], startDate: .now, stopDate: nil)
+        self.init(id: id, points: [])
     }
 }
 // Mock FileManager that allows us to control file presence and content

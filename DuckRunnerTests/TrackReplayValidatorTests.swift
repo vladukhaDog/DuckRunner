@@ -44,7 +44,7 @@ struct TrackReplayValidatorTests {
             await points.append(TrackPoint(position: coord, speed: 0, date: .now))
             current += stepMeters
         }
-        let track = await Track(points: points, startDate: .now)
+        let track = await Track(points: points)
 
         let validator = await TrackReplayValidator(replayingTrack: track, checkPointInterval: 500)
         let count = await validator.checkpoints.count
@@ -66,7 +66,7 @@ struct TrackReplayValidatorTests {
             await points.append(TrackPoint(position: coord, speed: 0, date: .now))
             current += stepMeters
         }
-        let track = await Track(points: points, startDate: .now)
+        let track = await Track(points: points)
 
         // Initialize validator
         let validator = await TrackReplayValidator(replayingTrack: track, checkPointInterval: 50)
@@ -112,7 +112,7 @@ struct TrackReplayValidatorTests {
             
             current += stepMeters
         }
-        let track = await Track(points: points, startDate: .now)
+        let track = await Track(points: points)
 
         // Initialize validator
         let validator = await TrackReplayValidator(replayingTrack: track, checkPointInterval: 500)
