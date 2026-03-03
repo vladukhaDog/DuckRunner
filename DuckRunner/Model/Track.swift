@@ -9,7 +9,7 @@ import CoreLocation
 import CoreData
 
 /// Represents a recorded track consisting of multiple location points and timing information.
-struct Track: Codable, Hashable {
+struct Track: Codable, Hashable, Identifiable {
     /// Unique identifier for the track.
     let id: String
     /// The sequence of recorded location points that form this track.

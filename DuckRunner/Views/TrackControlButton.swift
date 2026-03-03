@@ -17,16 +17,16 @@ import Combine
 /// The button uses animation and custom transitions to smoothly switch between states, enhancing user experience.
 /// 
 /// - Note: The view observes the `ViewModel` to reactively update the UI when tracking state changes.
-struct TrackControlButton<ViewModel: TrackControllerProtocol>: View {
+struct TrackControlButton: View {
     /// The observed view model providing the current track state and control methods.
     /// 
     /// This property is marked with `@ObservedObject` to automatically update the UI when `currentTrack` changes.
-    private var vm: ViewModel
+    private var vm: any TrackControllerProtocol
     
     /// Initializes the TrackControlButton with a given view model.
     ///
     /// - Parameter vm: The view model conforming to `TrackControllerProtocol` which controls tracking.
-    init(vm: ViewModel) {
+    init(vm: any TrackControllerProtocol) {
         self.vm = vm
     }
     

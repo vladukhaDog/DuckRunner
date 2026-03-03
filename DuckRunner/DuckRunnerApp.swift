@@ -13,11 +13,15 @@ import SwiftData
 struct DuckRunnerApp: App {
     @State var tabRouter: any TabRouterProtocol
     private let dependencies: DependencyManager
+    private let baseMapViewModel: BaseMapViewModel
+    private let trackHistoryViewModel: TrackHistoryViewModel
     init() {
         self.dependencies = .production(tabs: [
             "History",
                                               ])
         self.tabRouter = dependencies.tabRouter
+        self.baseMapViewModel = BaseMapViewModel(dependencies: dependencies)
+        self.trackHistoryViewModel = TrackHistoryViewModel(dependencies: dependencies)
     }
     
     
@@ -25,14 +29,16 @@ struct DuckRunnerApp: App {
         WindowGroup {
             TabView(selection: $tabRouter.selectedTab) {
                 
-                BaseMapView(dependencies: dependencies)
+                BaseMapView(vm: baseMapViewModel,
+                            dependencies: dependencies)
                 .tabItem {
                     Label("Map", systemImage: "map")
                 }
                 .tag("Map")
                 if let router = dependencies.routers["History"] {
                     NavigatableView(router) {
-                        TrackHistoryView(dependencies: dependencies)
+                        TrackHistoryView(vm: trackHistoryViewModel,
+                                         dependencies: dependencies)
                     }
                     .tabItem {
                         Label("History", systemImage: "book.pages")

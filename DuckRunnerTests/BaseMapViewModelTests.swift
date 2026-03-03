@@ -5,6 +5,9 @@ import CoreLocation
 @testable import DuckRunner
 
 final class MockTrackService: TrackRecordingServiceProtocol {
+    func clearTrack() {
+    }
+    
     private(set) var currentTrack: DuckRunner.Track? = nil
     
     private(set) var isActive = false
@@ -334,6 +337,10 @@ struct BaseMapViewModelTests {
     
     // MARK: - Selecting speedtrap replay
     final class TrackStartDetectMock: TrackRecordingServiceProtocol {
+        func clearTrack() {
+        
+        }
+        
         var startedTrack: Bool = false
         var stopedTrack: Bool = false
         var currentTrack: DuckRunner.Track? = nil

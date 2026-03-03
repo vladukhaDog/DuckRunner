@@ -8,27 +8,19 @@
 import SwiftUI
 import MapKit
 
-
-/// Convenience initializer for standard setup with required services.
-extension BaseMapView where ViewModel == BaseMapViewModel {
-    init(dependencies: DependencyManager) {
-        self.init(vm: BaseMapViewModel(dependencies: dependencies), dependencies: dependencies)
-    }
-}
-
 /// View for displaying an interactive map and current tracking information, including speed and live track data.
 /// Hosts overlays for live speed and track info, and manages user tracking controls.
-struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
+struct BaseMapView: View {
     /// The view model providing current track, speed, and control actions for the map.
-    @State private var vm: ViewModel
+    @State private var vm: any BaseMapViewModelProtocol
     /// User's preferred unit for speed display (persisted in app storage).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     private let dependencies: DependencyManager
     /// Creates a new map view bound to the provided view model instance.
-    init(vm: ViewModel,
+    init(vm: any BaseMapViewModelProtocol,
          dependencies: DependencyManager) {
         self.dependencies = dependencies
-        self._vm = .init(initialValue: vm)
+        self._vm = State(wrappedValue: vm)
     }
     
     
@@ -61,9 +53,12 @@ struct BaseMapView<ViewModel: BaseMapViewModelProtocol>: View {
             
         }
         .overlay(alignment: .top) {
-            if let currentSpeed = vm.currentSpeed {
-                SpeedometerView(currentSpeed, displayUnit: unitSpeed)
-                    .transition(.opacity)
+            VStack {
+                if let currentSpeed = vm.currentSpeed {
+                    SpeedometerView(currentSpeed, displayUnit: unitSpeed)
+                        .transition(.opacity)
+                }
+                Text(vm.replayValidator?.checkpoints.count(where: {$0.value.checkPointPassed}).description ?? "Cant count")
             }
         }
         .overlay(alignment: .bottom) {

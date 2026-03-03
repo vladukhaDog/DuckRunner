@@ -9,6 +9,7 @@ import Foundation
 import CoreLocation
 import SwiftUI
 
+let replayValidatorLogger = MainLogger.init("TrackReplayValidator")
 enum SuggestedRecordingAction {
     case allow
     case forbid
@@ -56,13 +57,20 @@ final class TrackReplayValidator {
     ///   - replayingTrack: The original track to validate against.
     ///   - checkPointInterval: Distance in meters between checkpoints along the track.
     init(replayingTrack: Track, checkPointInterval: CLLocationDistance) {
+        replayValidatorLogger.log("Initializing", message: replayingTrack.id, .info)
         self.track = replayingTrack
 
         // Build checkpoints every 500 meters starting at the first point
         let points = replayingTrack.points
         // Guard for at least one point
-        guard let firstPoint = points.first else { return }
-        guard let lastPoint = points.last else { return }
+        guard let firstPoint = points.first else {
+            replayValidatorLogger.log("Could not find the first point, initialization Failed", .error)
+            return
+        }
+        guard let lastPoint = points.last else {
+            replayValidatorLogger.log("Could not find the last point, initialization Failed", .error)
+            return
+        }
 
         // Helper to compute distance between two coordinates
         func distance(_ a: CLLocationCoordinate2D, _ b: CLLocationCoordinate2D) -> CLLocationDistance {
@@ -80,7 +88,7 @@ final class TrackReplayValidator {
                                                      distanceThreshold: SettingsService.shared.checkpointDistanceActivateThreshold)
         self.stopReplayCheckpoint = TrackCheckPoint(point: lastPoint,
                                                      distanceThreshold: SettingsService.shared.checkpointDistanceActivateThreshold)
-        
+        replayValidatorLogger.log("Initialized start and stop checkpoints", .info)
         
         var lastCoord = firstPoint.position
         nextThreshold += interval
@@ -98,6 +106,7 @@ final class TrackReplayValidator {
             }
             lastCoord = coord
         }
+        replayValidatorLogger.log("Initialized", .info)
     }
     
     /// Registers that the user passed near a given point along the replayed path.
@@ -110,20 +119,14 @@ final class TrackReplayValidator {
     func passedPoint(_ point: TrackPoint) async {
         let coordinate = point.position
         
-        if startReplayCheckpoint?.checkPointPassed == false {
-            return
-        }
-        
-        if stopReplayCheckpoint?.checkPointPassed == true {
-            return
-        }
-        
         let checkpointsToCheck = checkpoints.map({$0.value})
         
         var isPassed = false
         for checkpoint in checkpointsToCheck where checkpoint.checkPointPassed == false {
             isPassed = checkpoint.isPointInCheckpoint(coordinate)
+            
             if isPassed {
+                replayValidatorLogger.log("Passed checkpoint \(checkpoint.id)", .info)
                 self.checkpoints[checkpoint.id]?.setCheckpointPassing(to: isPassed)
             }
         }
@@ -166,11 +169,13 @@ final class TrackReplayValidator {
     /// Sets startReplayCheckpoint as passed
     func startValidatingReplay() {
         self.startReplayCheckpoint?.setCheckpointPassing(to: true)
+        replayValidatorLogger.log("Start checkpoint tagged as passed \(startReplayCheckpoint?.checkPointPassed.description ?? "NOT?")", .info)
     }
     
     /// Sets stopreplayCheckpoint as passed
     func stopValidatingReplay() {
         self.stopReplayCheckpoint?.setCheckpointPassing(to: true)
+        replayValidatorLogger.log("Stop checkpoint tagged as passed \(stopReplayCheckpoint?.checkPointPassed.description ?? "NOT?")", .info)
     }
     
     /// Returns overall completion based on passed checkpoints.
@@ -184,6 +189,7 @@ final class TrackReplayValidator {
         let total = checkpoints.count
         let passedCheckpoints = checkpoints.count(where: {$0.value.checkPointPassed})
         let percent: Double = Double(passedCheckpoints) / Double(total)
+        replayValidatorLogger.log("Asked for completion, its \(percent)", .info)
         return max(0.0, min(1.0, percent))
     }
     

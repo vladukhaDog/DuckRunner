@@ -8,13 +8,6 @@
 import SwiftUI
 import Combine
 
-extension TrackHistoryView where ViewModel == TrackHistoryViewModel {
-    init(dependencies: DependencyManager) {
-        self.init(vm: .init(dependencies: dependencies),
-                  dependencies: dependencies)
-    }
-}
-
 /// Root view for displaying the user's track history with date-based navigation and detail view links.
 struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     /// The view model managing and providing track history data and selection.
@@ -27,7 +20,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     /// Initializes the history view with the given view model.
     init(vm: ViewModel,
          dependencies: DependencyManager) {
-        self._vm = .init(wrappedValue: vm)
+        self._vm = StateObject(wrappedValue: vm)
         self.dependencies = dependencies
     }
     

@@ -8,8 +8,8 @@
 import SwiftUI
 import UIKit
 
-struct LocationAccessControlView<ViewModel: LocationAccessViewModelProtocol>: View {
-    var vm: ViewModel
+struct LocationAccessControlView: View {
+    var vm: any LocationAccessViewModelProtocol
     
     private func openAppSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -17,7 +17,7 @@ struct LocationAccessControlView<ViewModel: LocationAccessViewModelProtocol>: Vi
         }
     }
     
-    init(vm: ViewModel) {
+    init(vm: any LocationAccessViewModelProtocol) {
         self.vm = vm
     }
     

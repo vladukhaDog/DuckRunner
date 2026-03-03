@@ -42,7 +42,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     func stopTrack() async throws {
         var track = try self.trackRecordingService.stopTrack(at: .now)
         
-        if self.replayValidator?.stopReplayCheckpoint?.checkPointPassed == true {
+        if self.replayValidator?.stopReplayCheckpoint?.checkPointPassed == true,
+           await (self.replayValidator?.trackCompletionByCheckpoints() ?? 0) >= SettingsService.shared.replayCompletionThreshold {
             track.parentID = self.replayValidator?.track.id
         }
         
@@ -81,15 +82,6 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         
         await self.replayValidator?.passedPoint(trackPoint)
         
-        if self.replayValidator?.startReplayCheckpoint?.checkPointPassed == true,
-        self.trackRecordingService.currentTrack == nil {
-            self.startTrack()
-        }
-        
-        if self.replayValidator?.stopReplayCheckpoint?.checkPointPassed == true {
-            try? await self.stopTrack()
-        }
-        
         
         
     }
@@ -111,6 +103,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
                 self.trackControlMode = .unavailable
             case .immediate:
                 self.trackControlMode = .available
+                self.replayValidator?.startValidatingReplay()
                 self.startTrack()
             }
             
@@ -124,6 +117,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
                 self.trackControlMode = .unavailable
             case .immediate:
                 self.trackControlMode = .available
+                self.replayValidator?.stopValidatingReplay()
                 try? await self.stopTrack()
             }
         }

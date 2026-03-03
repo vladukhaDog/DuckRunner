@@ -162,9 +162,6 @@ struct TrackDetailView: View {
             Section (header: Text("Track Details")){
                 baseTrackInfo
             }
-            Section {
-                topSpeed
-            }
             if vm.track.parentID == nil {
                 Button {
                     Task {
@@ -175,6 +172,12 @@ struct TrackDetailView: View {
                     Label("Replay the track", systemImage: "repeat")
                 }
             }
+            Section {
+                TrackSpeedStatsView(track: vm.track, parentTrack: vm.parentTrack)
+                    .frame(height: 150)
+                topSpeed
+            }
+            
             
             editSection
             
