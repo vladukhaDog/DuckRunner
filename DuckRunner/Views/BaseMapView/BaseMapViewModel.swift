@@ -105,6 +105,10 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
                 self.trackControlMode = .available
                 self.replayValidator?.startValidatingReplay()
                 self.startTrack()
+                // Record this point at which the start occured
+                try? self.trackRecordingService.appendTrackPosition(.init(position: location.coordinate,
+                                                                     speed: location.speed,
+                                                                     date: location.timestamp))
             }
             
         } else {
