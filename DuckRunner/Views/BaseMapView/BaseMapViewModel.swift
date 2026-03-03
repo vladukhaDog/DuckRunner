@@ -45,6 +45,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         if self.replayValidator?.stopReplayCheckpoint?.checkPointPassed == true,
            await (self.replayValidator?.trackCompletionByCheckpoints() ?? 0) >= SettingsService.shared.replayCompletionThreshold {
             track.parentID = self.replayValidator?.track.id
+            track.type = .replay
         }
         
         guard track.points.isEmpty == false else { return }

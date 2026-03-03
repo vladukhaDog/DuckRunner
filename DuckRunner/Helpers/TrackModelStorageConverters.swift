@@ -52,6 +52,7 @@ extension TrackDTO {
         self.id = track.id
         self.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
         self.parentID = track.parentID
+        self.startDate = track.startDate
         self.type = track.type.rawValue
     }
 }

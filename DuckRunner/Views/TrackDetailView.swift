@@ -65,12 +65,18 @@ final class TrackDetailViewModel: ObservableObject {
                     dependencies.routers[dependencies.tabRouter.selectedTab]?
                         .pop()
                 }
+                self.children.removeAll(where: {$0.id == track.id})
             case .updated(let track):
                 if track.id == self.track.id {
                     self.track = track
                 }
-            default:
-                break
+                if let indexOfChild = self.children.firstIndex(where: {$0.id == track.id}) {
+                    self.children[indexOfChild] = track
+                }
+            case .created(let track):
+                if track.parentID == self.track.id {
+                    self.children.append(track)
+                }
             }
         }
     }
@@ -174,19 +180,18 @@ struct TrackDetailView: View {
             }
             
             Section {
+                if let parentTrack = vm.parentTrack {
+                    Button("Parent track") {
+                        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
+                    }
+                }
                 TrackSpeedStatsView(track: vm.track, parentTrack: vm.parentTrack)
                     .frame(height: 150)
                 topSpeed
             }
-            
-            
             editSection
             
-            if let parentTrack = vm.parentTrack {
-                Button("Parent track") {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
-                }
-            }
+            
             
             if !vm.children.isEmpty  {
                 Section("Replays") {
@@ -211,16 +216,18 @@ struct TrackDetailView: View {
     
     private var editSection: some View {
         Section("Edit") {
-            Picker("Mode", selection: .init(get: {
-                vm.track.type
-            }, set: { new in
-                Task {
-                    await vm.updateTrackType(to: new)
-                }
-            })) {
-                ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
-                    Text(type.rawValue.capitalized)
-                        .tag(type)
+            if vm.track.type != .replay {
+                Picker("Mode", selection: .init(get: {
+                    vm.track.type
+                }, set: { new in
+                    Task {
+                        await vm.updateTrackType(to: new)
+                    }
+                })) {
+                    ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
+                        Text(type.rawValue.capitalized)
+                            .tag(type)
+                    }
                 }
             }
             

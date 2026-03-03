@@ -11,4 +11,7 @@ enum TrackType: String, Codable {
     case classical
     /// Speeedtrap track, which is a track started already at some speed and used to measure how fast some distance a driver can pass
     case speedtrap
+    
+    /// Track is a replay of another track
+    case replay
 }

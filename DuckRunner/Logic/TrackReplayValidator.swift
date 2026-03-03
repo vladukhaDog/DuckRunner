@@ -154,6 +154,9 @@ final class TrackReplayValidator {
             } else {
                 return .forbid
             }
+        case .replay:
+            // Must be ignored actually, as replaying of a replayed track is a logic error
+            return .allow
         }
     }
     

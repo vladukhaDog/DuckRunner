@@ -109,6 +109,7 @@ final class TrackRepository: TrackStorageProtocol {
                         item.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
                         item.parentID = track.parentID
                         item.type = track.type.rawValue
+                        item.startDate = track.startDate
                         if context.hasChanges {
                             try context.save()
                             self.sendAction(.updated(track))
