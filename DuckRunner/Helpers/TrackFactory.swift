@@ -10,4 +10,7 @@ import Foundation
 extension Track {
     static let emptyTrack = Track()
     static let filledTrack = Track(points: .roadInSPB)
+    static func newFilledTrack() -> Track {
+        return Track(points: .roadInSPB)
+    }
 }

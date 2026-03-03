@@ -31,7 +31,7 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                 VStack {
                     dateSelector
                     Divider()
-                    LazyVStack(spacing: 5) {
+                    LazyVStack(spacing: 15) {
                         if vm.tracks.isEmpty {
                             Text("Empty history")
                                 .font(.largeTitle)
@@ -80,7 +80,11 @@ fileprivate final class PreviewModel: TrackHistoryViewModelProtocol {
         
     }
     init() {
-        self.tracks.append(.filledTrack)
+        self.tracks.append(.newFilledTrack())
+        self.tracks.append(.newFilledTrack())
+        self.tracks.append(.newFilledTrack())
+        self.tracks.append(.newFilledTrack())
+        self.tracks.append(.newFilledTrack())
     }
     
 }
