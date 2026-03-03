@@ -38,6 +38,17 @@ struct TrackSpeedStatsView: View {
                     .lineStyle(.init(lineWidth: 6, lineCap: .round))
                     .interpolationMethod(.cardinal)
                 }
+                if let topSpeedPoint = track.points.topSpeedPoint() {
+                    PointMark(
+                        x: .value("Time Elapsed (s)", topSpeedPoint.date.timeIntervalSince(track.startDate)),
+                        y: .value("Speed", SpeedConverter(speed: topSpeedPoint.speed).getSpeed(.byName(speedUnit)))
+                    )
+                    .annotation(position: .top, alignment: .center) {
+                        Text("🔥")
+                            .font(.title2)
+                            .accessibilityLabel("Top Speed")
+                    }
+                }
                 
             }
             .chartYAxisLabel(speedUnit)

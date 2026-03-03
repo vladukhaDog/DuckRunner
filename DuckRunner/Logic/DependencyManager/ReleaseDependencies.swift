@@ -9,7 +9,6 @@ import Foundation
 
 extension DependencyManager {
     static public func production(tabs: [String] = []) -> DependencyManager {
-        let trackService = TrackRecordingService()
         let locationService = LocationService()
         let storageService = TrackRepository()
         let mapSnapshotGenerator = MapSnapshotGenerator()

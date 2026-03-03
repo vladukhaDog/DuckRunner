@@ -75,14 +75,22 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
                                  speed: point.speed,
                                  date: point.date)
         }
+        let fastestPoint: NormalizedTrackPoint?
+        if let fastestTrackPoint = track.points.topSpeedPoint() {
+            fastestPoint = NormalizedTrackPoint(position: snapshot.point(for: fastestTrackPoint.position),
+                                                    speed: fastestTrackPoint.speed,
+                                                    date: fastestTrackPoint.date)
+        } else {
+            fastestPoint = nil
+        }
         let paths = makeColoredPaths(from: normalizedPoints)
         guard !Task.isCancelled else { return nil }
         let finalImage = drawColoredPaths(on: snapshot.image,
-                                segments: paths,
-                                lineWidth: 3,
-                                startPoint: normalizedPoints.first?.position,
-                                stopPoint: normalizedPoints.last?.position)
-//        await cache?.cacheSnippet(finalImage, for: track, size: size)
+                                          segments: paths,
+                                          lineWidth: 3,
+                                          startPoint: normalizedPoints.first?.position,
+                                          stopPoint: normalizedPoints.last?.position,
+                                          fastestPoint: fastestPoint?.position)
         return finalImage
     }
 
@@ -98,7 +106,8 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
         segments: [ColoredPathSegment],
         lineWidth: CGFloat,
         startPoint: CGPoint?,
-        stopPoint: CGPoint?
+        stopPoint: CGPoint?,
+        fastestPoint: CGPoint?
     ) -> UIImage {
 
         let format = UIGraphicsImageRendererFormat()
@@ -145,6 +154,19 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
                     title: "Stop",
                     in: context
                 )
+            }
+            
+            // ---- Draw fastest point fire emoji ----
+            if let fastest = fastestPoint {
+                let emoji = "🔥" as NSString
+                let font = UIFont.systemFont(ofSize: 14)
+                let attrs: [NSAttributedString.Key: Any] = [
+                    .font: font
+                ]
+                // Center the emoji over the point
+                let size = emoji.size(withAttributes: attrs)
+                let drawPoint = CGPoint(x: fastest.x - size.width/2, y: fastest.y - size.height/2)
+                emoji.draw(at: drawPoint, withAttributes: attrs)
             }
         }
     }
@@ -228,4 +250,13 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
         return result
     }
 
+}
+
+import SwiftUI
+
+#Preview {
+    MapSnippetView(mapSnippetCache: DependencyManager.MockTrackMapSnippetCache(),
+                   mapSnapshotGenerator: MapSnapshotGenerator(),
+                   track: .filledTrack)
+    .frame(height: 250)
 }

@@ -186,7 +186,7 @@ struct TrackDetailView: View {
                     }
                 }
                 TrackSpeedStatsView(track: vm.track, parentTrack: vm.parentTrack)
-                    .frame(height: 150)
+                    .frame(height: 200)
                 topSpeed
             }
             editSection

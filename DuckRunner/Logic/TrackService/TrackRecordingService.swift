@@ -47,7 +47,7 @@ final class TrackRecordingService: TrackRecordingServiceProtocol {
     func stopTrack(at date: Date) throws(TrackServiceError) -> Track {
         // Re-enable the idle timer after stopping the track
         UIApplication.shared.isIdleTimerDisabled = false
-        guard var currentTrack = currentTrack else {
+        guard let currentTrack = currentTrack else {
             throw .noCurrentTrack
         }
         self.isRecording = false

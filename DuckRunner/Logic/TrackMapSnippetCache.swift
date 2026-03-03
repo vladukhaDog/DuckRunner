@@ -16,6 +16,7 @@ protocol CacheFileManagerProtocol: Actor {
     func createFile(atPath path: String, contents data: Data?, attributes attr: [Data.WritingOptions]?)
     func removeItem(atPath path: String)
     func fileNames(atPath path: String, containing substring: String) -> [String]
+    func removeAllTrackMapCacheFiles() async
 }
 
 
@@ -76,6 +77,13 @@ final actor CacheFileManager: CacheFileManagerProtocol {
             return []
         }
     }
+    
+    func removeAllTrackMapCacheFiles() async {
+        let allFiles = fileNames(atPath: NSTemporaryDirectory(), containing: "trackmapcache")
+        for file in allFiles {
+            removeItem(atPath: (NSTemporaryDirectory() as NSString).appendingPathComponent(file))
+        }
+    }
 }
 
 
@@ -83,6 +91,7 @@ protocol TrackMapSnippetCacheProtocol {
     func getSnippet(for track: Track, size: CGSize) async -> UIImage?
     func cacheSnippet(_ snippet: UIImage, for track: Track, size: CGSize) async
     func invalidateCache(for trackID: String) async
+    func removeAllCacheFiles() async
 }
 
 actor TrackMapSnippetCache: TrackMapSnippetCacheProtocol {
@@ -119,6 +128,10 @@ actor TrackMapSnippetCache: TrackMapSnippetCacheProtocol {
         let filePath = path(for: trackID, size: size)
         guard let data = snippet.pngData() else { return }
         await fileManager.createFile(atPath: filePath, contents: data, attributes: [.atomic])
+    }
+    
+    func removeAllCacheFiles() async {
+        await fileManager.removeAllTrackMapCacheFiles()
     }
 }
 

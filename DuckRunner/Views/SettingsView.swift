@@ -9,6 +9,7 @@ import SwiftUI
 import CoreLocation
 
 struct SettingsView: View {
+    let dependencies: DependencyManager
     var settings = SettingsService.shared
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     var body: some View {
@@ -53,11 +54,15 @@ struct SettingsView: View {
                                         .tag(unit)
                                 }
                             }
-            
+            Button("reset") {
+                Task {
+                    await dependencies.mapSnippetCache.removeAllCacheFiles()
+                }
+            }
         }
     }
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(dependencies: .mock())
 }

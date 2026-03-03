@@ -73,6 +73,9 @@ extension DependencyManager {
     }
     
     final actor MockCacheFileManager: CacheFileManagerProtocol {
+        func removeAllTrackMapCacheFiles() async {
+        }
+        
         func fileNames(atPath path: String, containing substring: String) -> [String] {
             return []
         }
@@ -114,6 +117,9 @@ extension DependencyManager {
     }
     
     final class MockTrackMapSnippetCache: TrackMapSnippetCacheProtocol {
+        func removeAllCacheFiles() async {
+        }
+        
         func invalidateCache(for trackID: String) async {
         }
         
