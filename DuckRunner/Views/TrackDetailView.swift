@@ -172,6 +172,7 @@ struct TrackDetailView: View {
                     Label("Replay the track", systemImage: "repeat")
                 }
             }
+            
             Section {
                 TrackSpeedStatsView(track: vm.track, parentTrack: vm.parentTrack)
                     .frame(height: 150)
@@ -251,18 +252,13 @@ struct TrackDetailView: View {
     }
     
     private var baseTrackInfo: some View {
-        VStack {
-            MapView(mode: .bounds(vm.track), dependencies: dependencies) {
-                MapContents.speedTrack(vm.track)
-                if let start = vm.track.points.first {
-                    MapContents.startPoint(start)
-                }
-                if let stop = vm.track.points.last {
-                    MapContents.stopPoint(stop)
-                }
-            }
+        VStack(spacing: 8) {
+            MapSnippetView(mapSnippetCache: dependencies.mapSnippetCache,
+                           mapSnapshotGenerator: dependencies.mapSnapshotGenerator,
+                           track: vm.track)
                 .frame(height: 200)
-                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
             mainStat
         }
     }

@@ -69,59 +69,13 @@ struct TrackHistoryCellView: View {
             .bold()
     }
     
-    func generateMapImage(size: CGSize) async {
-        guard let image = try? await mapSnapshotGenerator
-            .generateSnapshot(track: track, size: size) else {
-            return
-        }
-        await MainActor.run {
-            withAnimation {
-                self.mapSnippetImage = image
-            }
-        }
-        await mapSnippetCache.cacheSnippet(image,
-                                           for: track,
-                                           size: size)
-    }
-    
-    @State private var mapSnippetImage: UIImage?
     private var mapSnippet: some View {
-        LinearGradient(colors: [.init(white: 0.2), .init(white: 0.1),
-            .init(white: 0.15)],
-                       startPoint: .topLeading,
-                       endPoint: .topTrailing)
+        MapSnippetView(mapSnippetCache: mapSnippetCache,
+                       mapSnapshotGenerator: mapSnapshotGenerator,
+                       track: track)
             .frame(height: 100)
-            .background {
-                GeometryReader { geo in
-                    Color.clear
-                        .onAppear {
-                            Task {
-                                if let cachedImage = await mapSnippetCache.getSnippet(for: track, size: geo.size) {
-                                    await MainActor.run {
-                                        withAnimation {
-                                            self.mapSnippetImage = cachedImage
-                                        }
-                                    }
-                                } else {
-                                    await generateMapImage(size: geo.size)
-                                }
-                            }
-                        }
-                }
-            }
-            .overlay(content: {
-                if let mapSnippetImage {
-                    Image(uiImage: mapSnippetImage)
-                        .resizable()
-                        .scaledToFit()
-                }
-            })
-            .redacted(reason: mapSnippetImage == nil ? .placeholder : [])
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 0)
-            .opacity(0.8)
-            .disabled(true)
-            .allowsHitTesting(false)
             
     }
 }

@@ -65,17 +65,18 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
         options.size = size
         options.mapType = .standard
         options.traitCollection = .init(userInterfaceStyle: .dark)
+        guard !Task.isCancelled else { return nil }
         //  Create snapshotter
         let snapshotter = MKMapSnapshotter(options: options)
         let snapshot = try await snapshotter.start()
-        
+        guard !Task.isCancelled else { return nil }
         let normalizedPoints = track.points.map { point in
             NormalizedTrackPoint(position: snapshot.point(for: point.position),
                                  speed: point.speed,
                                  date: point.date)
         }
         let paths = makeColoredPaths(from: normalizedPoints)
-        
+        guard !Task.isCancelled else { return nil }
         let finalImage = drawColoredPaths(on: snapshot.image,
                                 segments: paths,
                                 lineWidth: 3,
