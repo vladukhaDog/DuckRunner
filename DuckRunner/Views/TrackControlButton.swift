@@ -80,11 +80,15 @@ struct TrackControlButton: View {
             Text("Start Recording")
                 .font(.title)
                 .bold()
-                .foregroundStyle(Color.primary)
+                .shadow(radius: 5)
+                .foregroundStyle(Color.white)
                 .padding(8)
                 .padding(.horizontal, 8)
         }
-        .glassEffect(.regular.tint(.green.opacity(0.5)).interactive(), in: Capsule())
+        .glassEffect(.regular.tint(.green
+            .mix(with: .primary, by: 0.1)
+            .opacity(0.6))
+            .interactive(), in: Capsule())
         .id("startbutton")
     }
     
@@ -106,12 +110,15 @@ struct TrackControlButton: View {
                     .bold()
             }
                 .font(.title)
-                
-                .foregroundStyle(Color.primary)
+                .shadow(radius: 5)
+                .foregroundStyle(Color.white)
                 .padding(8)
                 .padding(.horizontal, 8)
         }
-        .glassEffect(.regular.tint(.red.opacity(0.5)).interactive(), in: Capsule())
+        .glassEffect(.regular.tint(.red
+            .mix(with: .primary, by: 0.1)
+            .opacity(0.6))
+            .interactive(), in: Capsule())
         .id("stopbutton")
     }
 }

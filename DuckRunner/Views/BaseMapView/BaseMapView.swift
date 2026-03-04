@@ -60,6 +60,8 @@ struct BaseMapView: View {
         }
         .overlay(alignment: .bottom) {
             controls
+            // Moving control out of the way of Apple Maps legal label
+            .padding(.bottom, 25)
         }
         .overlay(alignment: .topLeading) {
             replayDeselect
@@ -87,6 +89,7 @@ struct BaseMapView: View {
         }
     }
     
+
     private var controls: some View {
         VStack {
             if vm.locationAccess.isAuthorized() {
@@ -106,7 +109,6 @@ struct BaseMapView: View {
             }
         }
         .padding(.horizontal, 10)
-        .padding(.bottom, 5)
     }
 }
 
