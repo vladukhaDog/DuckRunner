@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6112C2042F582CD800097AB3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6112C2032F582CD800097AB3 /* Localizable.xcstrings */; };
 		6122F42C2F431E3100E20474 /* DuckRunner.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6122F42B2F431E3100E20474 /* DuckRunner.icon */; };
 		61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */ = {isa = PBXBuildFile; productRef = 61BF8F1B2F51DD78000808F6 /* SimpleRouter */; };
 		61C220562F572409003846E3 /* FlowLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 61C220552F572409003846E3 /* FlowLayout */; };
@@ -30,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6112C2032F582CD800097AB3 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		611CD5A32F423F4300979943 /* DuckRunner.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = DuckRunner.xctestplan; sourceTree = "<group>"; };
 		6122F42B2F431E3100E20474 /* DuckRunner.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = DuckRunner.icon; sourceTree = "<group>"; };
 		61399C622F41223F008A0F49 /* DuckRunner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DuckRunner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,6 +87,7 @@
 		61399C592F41223F008A0F49 = {
 			isa = PBXGroup;
 			children = (
+				6112C2032F582CD800097AB3 /* Localizable.xcstrings */,
 				611CD5A32F423F4300979943 /* DuckRunner.xctestplan */,
 				61399C642F41223F008A0F49 /* DuckRunner */,
 				61399C742F412241008A0F49 /* DuckRunnerTests */,
@@ -206,6 +209,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 61399C592F41223F008A0F49;
 			minimizedProjectReferenceProxies = 1;
@@ -231,6 +235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6122F42C2F431E3100E20474 /* DuckRunner.icon in Resources */,
+				6112C2042F582CD800097AB3 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,6 +353,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -405,6 +411,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

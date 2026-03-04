@@ -26,7 +26,7 @@ struct TrackTopSpeedView: View {
                 .bold()
                 .contentTransition(.numericText())
                 .animation(.bouncy(duration: 0.2), value: speed)
-            Text("Top " + displayUnit.symbol)
+            Text("Top \(displayUnit.symbol)")
                 .opacity(0.6)
                 .font(.caption)
         }

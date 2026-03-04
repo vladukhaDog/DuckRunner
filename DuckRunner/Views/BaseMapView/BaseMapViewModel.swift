@@ -27,9 +27,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     
     // MARK: - Outside methods
     
-    func isReplayingTrack() -> Bool {
-        if let track = self.trackRecordingService.currentTrack,
-           track.stopDate == nil {
+    func isRecordingTrack() -> Bool {
+        if self.trackRecordingService.isRecording {
             return true
         } else {
             return false

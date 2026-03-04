@@ -53,12 +53,9 @@ struct BaseMapView: View {
             
         }
         .overlay(alignment: .top) {
-            VStack {
-                if let currentSpeed = vm.currentSpeed {
-                    SpeedometerView(currentSpeed, displayUnit: unitSpeed)
-                        .transition(.opacity)
-                }
-                Text(vm.replayValidator?.checkpoints.count(where: {$0.value.checkPointPassed}).description ?? "Cant count")
+            if let currentSpeed = vm.currentSpeed {
+                SpeedometerView(currentSpeed, displayUnit: unitSpeed)
+                    .transition(.opacity)
             }
         }
         .overlay(alignment: .bottom) {
@@ -116,7 +113,7 @@ struct BaseMapView: View {
 import Combine
 @Observable
 private final class PreviewModel: BaseMapViewModelProtocol {
-    func isReplayingTrack() -> Bool {
+    func isRecordingTrack() -> Bool {
         return true
     }
     

@@ -43,7 +43,7 @@ struct TrackControlButton: View {
     var body: some View {
         Group {
             // If there is a current active track without stopDate, show Stop button
-            if vm.isReplayingTrack() {
+            if vm.isRecordingTrack() {
                 stopBigButton
                     .transition(.asymmetric(insertion: .move(edge: .bottom)
                         .combined(with: .opacity)
@@ -63,7 +63,7 @@ struct TrackControlButton: View {
             }
         }
         // Animate changes when the stopDate of the current track changes using a bouncy animation
-        .animation(.bouncy, value: vm.isReplayingTrack())
+        .animation(.bouncy, value: vm.isRecordingTrack())
     }
     
     
@@ -82,6 +82,7 @@ struct TrackControlButton: View {
                 .bold()
                 .foregroundStyle(Color.primary)
                 .padding(8)
+                .padding(.horizontal, 8)
         }
         .glassEffect(.regular.tint(.green.opacity(0.5)).interactive(), in: Capsule())
         .id("startbutton")
@@ -101,13 +102,14 @@ struct TrackControlButton: View {
         } label: {
             HStack {
                 Image(systemName: "stop.circle")
-                Text("Recording")
+                Text("Stop Recording")
                     .bold()
             }
                 .font(.title)
                 
                 .foregroundStyle(Color.primary)
                 .padding(8)
+                .padding(.horizontal, 8)
         }
         .glassEffect(.regular.tint(.red.opacity(0.5)).interactive(), in: Capsule())
         .id("stopbutton")
@@ -121,7 +123,7 @@ final private class PreviewModel: TrackControllerProtocol {
     init(isReplaying: Bool) {
         self.isReplaying = isReplaying
     }
-    func isReplayingTrack() -> Bool {
+    func isRecordingTrack() -> Bool {
         return isReplaying
     }
     

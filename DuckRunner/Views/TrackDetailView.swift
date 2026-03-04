@@ -181,7 +181,7 @@ struct TrackDetailView: View {
             
             Section {
                 if let parentTrack = vm.parentTrack {
-                    Button("Parent track") {
+                    Button("Original route") {
                         dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
                     }
                 }

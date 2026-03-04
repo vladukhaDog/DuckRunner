@@ -70,7 +70,7 @@ struct TrackSpeedStatsView: View {
                                                      lineCap: .round,
                                                      dash: [4,6]))
                     .frame(width: 30, height: 4)
-                Text("Parent track")
+                Text("Original route")
                     .font(.caption)
             }
         }

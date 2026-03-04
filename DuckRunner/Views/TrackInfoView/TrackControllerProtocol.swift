@@ -8,7 +8,7 @@ import Foundation
 
 /// Protocol describing ViewModel to connect UI controlling the Track
 protocol TrackControllerProtocol: Observable {
-    func isReplayingTrack() -> Bool
+    func isRecordingTrack() -> Bool
     func startTrack()
     func stopTrack() async throws
 }
