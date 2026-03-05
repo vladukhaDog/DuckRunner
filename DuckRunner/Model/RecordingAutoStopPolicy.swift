@@ -22,9 +22,9 @@ struct RecordingAutoStopPolicy {
         switch type {
         case .manual:
             return "hand.tap"
-        case .reachingSpeed(let cLLocationSpeed):
+        case .reachingSpeed(_):
             return "gauge.open.with.lines.needle.67percent.and.arrowtriangle"
-        case .reachingDistance(let cLLocationDistance):
+        case .reachingDistance(_):
             return "lines.measurement.horizontal.aligned.bottom"
         }
     }

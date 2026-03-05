@@ -75,7 +75,8 @@ struct BaseMapView: View {
         .animation(.default, value: vm.replayValidator?.track != nil)
         .animation(.default, value: vm.locationAccess.isAuthorized())
         .sheet(isPresented: $showMeasuredTracksSelector) {
-            TrackPresetsView(vm: vm, dependencies: dependencies)
+            TrackPresetsView(vm: TrackPresetsViewModel(baseMapVM: vm,
+                                                       dependencies: dependencies))
         }
     }
     

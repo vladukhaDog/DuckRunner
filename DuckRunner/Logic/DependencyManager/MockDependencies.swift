@@ -36,6 +36,10 @@ extension DependencyManager {
 // MARK: - Mock default implementations
 extension DependencyManager {
     final class MockMeasuredTrackStorageService: MeasuredTrackStorageProtocol {
+        func getShortestMeasuredTrack(named name: String) async -> MeasuredTrack? {
+            return nil
+        }
+        
         var actionPublisher: PassthroughSubject<MeasuredTrackStorageAction, Never> = .init()
         
         func getMeasuredTracks() async -> [MeasuredTrack] {

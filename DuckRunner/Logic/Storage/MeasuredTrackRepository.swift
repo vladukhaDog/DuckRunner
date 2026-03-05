@@ -100,4 +100,43 @@ final class MeasuredTrackRepository: MeasuredTrackStorageProtocol {
             }
         }
     }
+    
+    func getShortestMeasuredTrack(named name: String) async -> MeasuredTrack? {
+        let context = self.backgroundContext
+        return await withCheckedContinuation { [context] continuation in
+            context.performAndWait {
+                let request: NSFetchRequest<MeasuredTrackDTO> = MeasuredTrackDTO.fetchRequest()
+                request.predicate = NSPredicate(format: "name == %@", name)
+                do {
+                    let dtos = try context.fetch(request)
+                    // Map to models, dropping orphans (and cleaning them up)
+                    var tracks: [MeasuredTrack] = []
+                    var didDelete = false
+                    for dto in dtos {
+                        let model = MeasuredTrack(dto)
+                        if dto.track == nil {
+                            context.delete(dto)
+                            self.sendAction(.deleted(model))
+                            didDelete = true
+                            continue
+                        }
+                        tracks.append(model)
+                    }
+                    if didDelete, context.hasChanges {
+                        try? context.save()
+                    }
+                    // Compute shortest by duration
+                    let shortest = tracks.min(by: { lhs, rhs in
+                        let ld = (lhs.track.stopDate ?? lhs.track.startDate).timeIntervalSince(lhs.track.startDate)
+                        let rd = (rhs.track.stopDate ?? rhs.track.startDate).timeIntervalSince(rhs.track.startDate)
+                        return ld < rd
+                    })
+                    continuation.resume(returning: shortest)
+                } catch {
+                    trackRepositoryLogger.log("Failed fetching measured tracks by name", message: error.localizedDescription, .error)
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
 }

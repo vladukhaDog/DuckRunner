@@ -25,4 +25,6 @@ protocol MeasuredTrackStorageProtocol {
     func getMeasuredTracks() async -> [MeasuredTrack]
     func addMeasuredTrack(_ track: MeasuredTrack) async
     func deleteMeasuredTrack(_ track: MeasuredTrack) async
+    /// Fetch measured tracks by measurement name and return the one with the shortest duration.
+    func getShortestMeasuredTrack(named name: String) async -> MeasuredTrack?
 }
