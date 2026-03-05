@@ -44,13 +44,19 @@ final class MeasuredTrackRepository: MeasuredTrackStorageProtocol {
                 
                 let measuredTracks: [MeasuredTrack] = measuredTrackDTOs
                     .compactMap { dto in
-                        guard let trackID = dto.trackID else { return nil }
-                        let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
-                        request.predicate = NSPredicate(format: "id == %@", trackID)
-                        request.fetchLimit = 1
-                        guard let track = (try? context.fetch(request))?.first else { return nil }
-                        return MeasuredTrack(dto, track)
+                        let track = MeasuredTrack(dto)
+                        guard dto.track != nil else {
+                            context.delete(dto)
+                            self.sendAction(.deleted(track))
+                            return nil
+                        }
+                        return track
                     }
+                if context.hasChanges {
+                    do { try context.save() } catch {
+                        trackRepositoryLogger.log("Failed deleting orphaned measured tracks", message: error.localizedDescription, .error)
+                    }
+                }
                 
                 continuation.resume(returning: measuredTracks)
             }

@@ -132,7 +132,7 @@ final class TrackRepository: TrackStorageProtocol {
             context.performAndWait {
                 
                 let request = TrackDTO.fetchRequest()
-                
+                request.predicate = NSPredicate(format: "measure == nil")
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 
                 do {
@@ -155,9 +155,11 @@ final class TrackRepository: TrackStorageProtocol {
                 
                 let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
                 let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: date) ?? date
-                request.predicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
+                let datePredicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
                                                 Calendar.current.startOfDay(for: date) as NSDate,
                                                 Calendar.current.startOfDay(for: nextDay) as NSDate)
+                let measureNilPredicate = NSPredicate(format: "measure == nil")
+                request.predicate = NSCompoundPredicate(type: .and, subpredicates: [datePredicate, measureNilPredicate])
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 let tracks = (try? context.fetch(request)) ?? []
                 continuation.resume(returning: tracks.map({Track($0)}))
@@ -172,7 +174,9 @@ final class TrackRepository: TrackStorageProtocol {
             context.performAndWait {
                 
                 let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
-                request.predicate = NSPredicate(format: "parentID == %@", parent)
+                let parentPredicate = NSPredicate(format: "parentID == %@", parent)
+                let measureNilPredicate = NSPredicate(format: "measure == nil")
+                request.predicate = NSCompoundPredicate(type: .and, subpredicates: [parentPredicate, measureNilPredicate])
                 
                 let tracks = (try? context.fetch(request)) ?? []
                 continuation.resume(returning: tracks.map({Track($0)}))

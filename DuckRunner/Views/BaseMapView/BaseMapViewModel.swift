@@ -81,7 +81,6 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         
         guard track.points.isEmpty == false else { return }
         
-        try await self.trackStorageService.addTrack(track)
         switch measurementType.type {
         case .manual:
             break

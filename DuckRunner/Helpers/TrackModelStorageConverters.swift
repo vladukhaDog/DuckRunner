@@ -85,12 +85,12 @@ extension MeasuredTrackDTO {
             self.value = distance
         }
         self.name = track.measurement.name
-        self.trackID = track.track.id
+        self.track = .init(context: context, track.track)
     }
 }
 
 extension MeasuredTrack {
-    init(_ measuredDTO: MeasuredTrackDTO, _ trackDTO: TrackDTO) {
+    init(_ measuredDTO: MeasuredTrackDTO) {
         switch measuredDTO.type {
         case "speed":
             self.measurement = .reachingSpeed(measuredDTO.value, name: measuredDTO.name ?? "Speed")
@@ -99,7 +99,11 @@ extension MeasuredTrack {
         default:
             self.measurement = .manual
         }
-        self.track = .init(trackDTO)
+        if let trackDTO = measuredDTO.track {
+            self.track = .init(trackDTO)
+        } else {
+            self.track = .emptyTrack
+        }
         self.id = measuredDTO.id ?? UUID().uuidString
     }
 }
