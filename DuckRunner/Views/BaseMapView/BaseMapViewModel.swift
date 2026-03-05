@@ -27,6 +27,10 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     
     // MARK: - Outside methods
     
+    func dismissRecordedTrack() {
+        self.trackRecordingService.clearTrack()
+    }
+    
     func isRecordingTrack() -> Bool {
         if self.trackRecordingService.isRecording {
             return true

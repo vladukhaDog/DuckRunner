@@ -81,5 +81,7 @@ final class TrackRecordingService: TrackRecordingServiceProtocol {
     func clearTrack() {
         self.currentTrack = nil
         self.isRecording = false
+        self.stopPolicy = .manual
+        self.stopPolicyProgress = 0.0
     }
 }

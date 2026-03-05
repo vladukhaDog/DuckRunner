@@ -26,5 +26,7 @@ protocol BaseMapViewModelProtocol: Observable, TrackControllerProtocol, Location
     func deselectReplay()
     /// Try to request location authorization
     func requestLocation()
+    /// Dismiss stats of already recorded track
+    func dismissRecordedTrack()
 }
 

@@ -11,7 +11,7 @@ struct CircularProgressView: View {
     // 0...1
     let progress: Double
     var trackColor: Color = .gray.opacity(0.25)
-    var progressColor: Color = .green
+    var progressColor: Color = .mint
 
     var body: some View {
         GeometryReader { geo in

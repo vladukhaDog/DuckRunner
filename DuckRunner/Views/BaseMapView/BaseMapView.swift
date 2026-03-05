@@ -116,18 +116,38 @@ struct BaseMapView: View {
     private var controls: some View {
         VStack {
             if vm.locationAccess.isAuthorized() {
-                let measurement = vm.trackRecordingService.stopPolicy
-                if measurement.type != .manual {
-                    let view = measureInfoTag(measurement)
-                    // extremely stupid workaround because glass makes colors in CircularProgressView semi transparent
-                    view
-                        .opacity(.ulpOfOne)
-                    .padding(8)
-                    .glassEffect(in: RoundedRectangle(cornerRadius: 30))
-                    .overlay {
+                HStack {
+                    let measurement = vm.trackRecordingService.stopPolicy
+                    if measurement.type != .manual {
+                        let view = measureInfoTag(measurement)
+                        // extremely stupid workaround because glass makes colors in CircularProgressView semi transparent
                         view
+                            .opacity(.ulpOfOne)
+                        .padding(8)
+                        .glassEffect(in: RoundedRectangle(cornerRadius: 30))
+                        .overlay {
+                            view
+                        }
+                    }
+                    if !vm.trackRecordingService.isRecording,
+                       vm.trackRecordingService.currentTrack != nil {
+                        // Dismiss stats
+                        Button {
+                            vm.dismissRecordedTrack()
+                        } label: {
+                            Text("Dismiss track statistics")
+                                .lineLimit(1)
+                                .font(.headline)
+                                .padding(8)
+                                .padding(.horizontal)
+                                .glassEffect(.regular
+                                    .interactive(),
+                                             in: RoundedRectangle(cornerRadius: 30))
+                        }
+                        
                     }
                 }
+                .animation(.bouncy, value: vm.trackRecordingService.isRecording)
                 if let track = vm.trackRecordingService.currentTrack {
                     let unitSpeed = UnitSpeed.byName(speedUnit)
                     TrackLiveInfoView(track: track, unit: unitSpeed)
@@ -169,7 +189,7 @@ import Combine
 private final class MockTrackRecorder: TrackRecordingServiceProtocol {
     var stopPolicyProgress: Double = 1
     
-    var isRecording: Bool = true
+    var isRecording: Bool = false
     
     var currentTrack: Track? = .filledTrack
     
@@ -194,6 +214,9 @@ private final class MockTrackRecorder: TrackRecordingServiceProtocol {
 
 @Observable
 private final class PreviewModel: BaseMapViewModelProtocol {
+    func dismissRecordedTrack() {
+    }
+    
     func isRecordingTrack() -> Bool {
         return true
     }
