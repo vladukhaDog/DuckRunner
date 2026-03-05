@@ -50,6 +50,7 @@ struct TrackPresetsView: View {
                         .foregroundStyle(Color.primary)
                         .glassEffect(.regular.interactive(),
                                      in: Circle())
+                        .shadow(color: .gray.opacity(0.3), radius: 5, x: 0, y: 0)
                 }
                 
                 .padding(4)
@@ -97,7 +98,7 @@ private final class PreviewModel: TrackPresetsViewModelProtocol {
 }
 
 #Preview {
-    Color.red
+    Color.white
         .ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {
             TrackPresetsView(vm: PreviewModel())
