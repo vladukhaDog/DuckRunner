@@ -8,4 +8,5 @@ import SwiftUI
 
 protocol MeasuredTrackListViewModelProtocol: Observable {
     var tracks: [MeasuredTrack] { get }
+    func delete(at offsets: IndexSet) async
 }

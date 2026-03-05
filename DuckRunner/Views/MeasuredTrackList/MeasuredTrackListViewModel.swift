@@ -48,6 +48,13 @@ final class MeasuredTrackListViewModel: MeasuredTrackListViewModelProtocol {
             }
         }
     }
+
+    func delete(at offsets: IndexSet) async {
+        let items = offsets.map { self.tracks[$0] }
+        for item in items {
+            await storage.deleteMeasuredTrack(item)
+        }
+    }
 }
 
 extension MeasuredTrack {

@@ -17,6 +17,17 @@ struct RecordingAutoStopPolicy {
     
     let name: String
     let type: PolicyType
+    /// System name icon of a measuredType
+    var image: String {
+        switch type {
+        case .manual:
+            return "hand.tap"
+        case .reachingSpeed(let cLLocationSpeed):
+            return "gauge.open.with.lines.needle.67percent.and.arrowtriangle"
+        case .reachingDistance(let cLLocationDistance):
+            return "lines.measurement.horizontal.aligned.bottom"
+        }
+    }
     
     static let manual: RecordingAutoStopPolicy = .init(name: "manual", type: .manual)
     

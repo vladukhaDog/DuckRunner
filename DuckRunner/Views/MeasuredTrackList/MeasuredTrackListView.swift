@@ -2,41 +2,47 @@ import SwiftUI
 
 struct MeasuredTrackListView: View {
     @State private var viewModel: any MeasuredTrackListViewModelProtocol
+    private let dependencies: DependencyManager
 
     init(vm: any MeasuredTrackListViewModelProtocol,
-        dependencies: DependencyManager) {
+         dependencies: DependencyManager) {
         _viewModel = .init(wrappedValue: vm)
+        self.dependencies = dependencies
     }
 
     var body: some View {
-        ScrollView {
-            VStack {
-                ForEach(viewModel.tracks, id: \.id) { track in
-                    VStack(alignment: .leading) {
-                        Text(track.measurement.name)
-                        let firstDate = track.startDate
-                            Text(firstDate, style: .date)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Material.thin)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                }
+        List {
+            ForEach(viewModel.tracks, id: \.id) { measured in
+                MeasuredTrackCellView(measured: measured)
             }
-            .padding(.horizontal)
+            .onDelete(perform: delete)
         }
+        .frame(maxWidth: .infinity)
+        .listStyle(.insetGrouped)
         .animation(.default, value: viewModel.tracks.count)
         .navigationTitle("Measured Tracks")
     }
+
+    private func delete(at offsets: IndexSet) {
+        Task {
+            await viewModel.delete(at: offsets)
+        }
+    }
 }
+
+
 
 @Observable
 private final class PreviewModel: MeasuredTrackListViewModelProtocol {
+    func delete(at offsets: IndexSet) async {
+        self.tracks.removeAll()
+    }
+    
     var tracks: [MeasuredTrack] = [
-        .init(id: "1", measurement: .reachingDistance(800, name: "1/2 mile"), track: .filledTrack)
+        .init(id: "1", measurement: .reachingDistance(800, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "2", measurement: .reachingSpeed(800, name: "0-100 km/h"), track: .filledTrack),
+        .init(id: "3", measurement: .reachingDistance(800, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "4", measurement: .reachingDistance(800, name: "1/2 mile"), track: .filledTrack),
     ]
     
     
@@ -45,3 +51,4 @@ private final class PreviewModel: MeasuredTrackListViewModelProtocol {
 #Preview {
     MeasuredTrackListView(vm: PreviewModel(), dependencies: .mock())
 }
+
