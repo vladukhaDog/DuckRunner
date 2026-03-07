@@ -29,6 +29,7 @@ private struct StartPointView: View {
         VStack(spacing: 4) {
             Text("START")
                 .font(.caption)
+                .foregroundStyle(Color.white)
                 .stroke(color: .black, width: 0.5)
             .bold()
             let unFilledAmount = 0.75

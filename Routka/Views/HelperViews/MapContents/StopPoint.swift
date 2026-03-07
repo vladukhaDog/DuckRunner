@@ -36,6 +36,7 @@ private struct StopPointView: View {
         VStack(spacing: 0) {
             Text("FINISH")
                 .font(.caption)
+                .foregroundStyle(Color.white)
                 .stroke(color: .black, width: 0.5)
             .bold()
             icon

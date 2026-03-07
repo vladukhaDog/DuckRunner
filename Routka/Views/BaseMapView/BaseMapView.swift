@@ -46,7 +46,7 @@ struct BaseMapView: View {
             }
             
             if let startPoint = vm.replayValidator?.startReplayCheckpoint?.point,
-               vm.trackRecordingService.currentTrack == nil {
+               vm.trackRecordingService.isRecording != true {
                 MapContents.startPoint(startPoint)
             }
             
@@ -86,12 +86,15 @@ struct BaseMapView: View {
             Button {
                 vm.deselectReplay()
             } label: {
-                Text("Stop Replay")
+                HStack(spacing: 2) {
+                    Image(systemName: "xmark")
+                    Text("Stop Replay")
+                }
                     .bold()
-                    .foregroundStyle(Color.primary)
+                    .foregroundStyle(Color.white)
                     .padding(8)
             }
-            .glassEffect(.regular.tint(.accentColor.opacity(0.5)).interactive(), in: Capsule())
+            .glassEffect(.clear.tint(.red.opacity(0.8)).interactive(), in: Capsule())
             .transition(.opacity)
         }
     }
@@ -123,8 +126,9 @@ struct BaseMapView: View {
                         // extremely stupid workaround because glass makes colors in CircularProgressView semi transparent
                         view
                             .opacity(.ulpOfOne)
-                        .padding(8)
-                        .glassEffect(in: RoundedRectangle(cornerRadius: 30))
+                        .padding(10)
+//                        .padding(.horizontal, 10)
+                        .glassEffect(in: Capsule())
                         .overlay {
                             view
                         }
@@ -138,13 +142,13 @@ struct BaseMapView: View {
                             Text("Dismiss track statistics")
                                 .lineLimit(1)
                                 .font(.headline)
-                                .padding(8)
+                                .padding(10)
                                 .padding(.horizontal)
-                                .glassEffect(.regular
-                                    .interactive(),
-                                             in: RoundedRectangle(cornerRadius: 30))
+                                
                         }
-                        
+                        .glassEffect(.regular
+                            .interactive(),
+                                     in: Capsule())
                     }
                 }
                 .animation(.bouncy, value: vm.trackRecordingService.isRecording)
@@ -231,7 +235,7 @@ private final class PreviewModel: BaseMapViewModelProtocol {
     
     var trackRecordingService: any TrackRecordingServiceProtocol = MockTrackRecorder()
     
-    var replayValidator: TrackReplayValidator? = nil
+    var replayValidator: TrackReplayValidator? = .init(replayingTrack: .filledTrack, checkPointInterval: 20)
     
     func startTrack(_ mode: RecordingAutoStopPolicy) {
     }
