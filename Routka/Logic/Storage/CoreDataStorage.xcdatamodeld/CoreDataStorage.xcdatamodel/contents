@@ -10,9 +10,10 @@
     <entity name="TrackDTO" representedClassName="TrackDTO" syncable="YES" codeGenerationType="class">
         <attribute name="id" attributeType="String"/>
         <attribute name="parentID" optional="YES" attributeType="String"/>
+        <attribute name="replayMode" optional="YES" attributeType="String"/>
         <attribute name="startDate" attributeType="Date" defaultDateTimeInterval="792937740" usesScalarValueType="NO"/>
         <attribute name="stopDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="trackType" optional="YES" attributeType="String"/>
         <relationship name="measure" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MeasuredTrackDTO" inverseName="track" inverseEntity="MeasuredTrackDTO"/>
         <relationship name="points" toMany="YES" deletionRule="Cascade" destinationEntity="TrackPointDTO" inverseName="track" inverseEntity="TrackPointDTO"/>
     </entity>

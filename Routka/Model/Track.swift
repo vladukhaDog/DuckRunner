@@ -36,13 +36,15 @@ struct Track: Codable, Hashable, Identifiable {
     var parentID: String?
     
     /// The type of the track, which influences how the track is replayed or handled.
-    var type: TrackType = .classical
+    var replayMode: ReplayMode = .classical
+    
+    var trackType: TrackType = .record
     
     /// Changes the type of the track.
     ///
     /// - Parameter newType: The new track type to set.
-    mutating func changeType(to newType: TrackType) {
-        self.type = newType
+    mutating func changeType(to newType: ReplayMode) {
+        self.replayMode = newType
     }
     
     /// Creates a new Track instance with specified id, points, and optional parentID.

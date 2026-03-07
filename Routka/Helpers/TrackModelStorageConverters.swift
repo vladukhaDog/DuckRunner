@@ -23,11 +23,18 @@ extension Track {
             .sorted(by: {$0.date < $1.date})
         self.id = track.id ?? UUID().uuidString
         self.parentID = track.parentID
-        if let type = track.type,
-           let typeEnum = TrackType(rawValue: type) {
-            self.type = typeEnum
+        if let mode = track.replayMode,
+           let modeEnum = ReplayMode(rawValue: mode) {
+            self.replayMode = modeEnum
         } else {
-            self.type = .classical
+            self.replayMode = .classical
+        }
+        
+        if let type = track.trackType,
+           let typeEnum = TrackType(rawValue: type) {
+            self.trackType = typeEnum
+        } else {
+            self.trackType = .record
         }
     }
 }
@@ -53,7 +60,8 @@ extension TrackDTO {
         self.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
         self.parentID = track.parentID
         self.startDate = track.startDate
-        self.type = track.type.rawValue
+        self.replayMode = track.replayMode.rawValue
+        self.trackType = track.trackType.rawValue
     }
 }
 

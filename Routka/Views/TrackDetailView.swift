@@ -81,8 +81,8 @@ final class TrackDetailViewModel: ObservableObject {
         }
     }
     
-    func updateTrackType(to type: TrackType) async {
-        self.track.type = type
+    func updateTrackType(to type: ReplayMode) async {
+        self.track.replayMode = type
         try? await storageService.updateTrack(track)
     }
     
@@ -216,15 +216,15 @@ struct TrackDetailView: View {
     
     private var editSection: some View {
         Section("Edit") {
-            if vm.track.type != .replay {
+            if vm.track.replayMode != .replay {
                 Picker("Mode", selection: .init(get: {
-                    vm.track.type
+                    vm.track.replayMode
                 }, set: { new in
                     Task {
                         await vm.updateTrackType(to: new)
                     }
                 })) {
-                    ForEach([TrackType.classical, .speedtrap], id: \.rawValue) { type in
+                    ForEach([ReplayMode.classical, .speedtrap], id: \.rawValue) { type in
                         Text(type.rawValue.capitalized)
                             .tag(type)
                     }

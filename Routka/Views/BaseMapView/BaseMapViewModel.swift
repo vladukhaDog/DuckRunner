@@ -93,7 +93,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         if self.replayValidator?.stopReplayCheckpoint?.checkPointPassed == true,
            await (self.replayValidator?.trackCompletionByCheckpoints() ?? 0) >= SettingsService.shared.replayCompletionThreshold {
             track.parentID = self.replayValidator?.track.id
-            track.type = .replay
+            track.replayMode = .replay
         }
         
         guard track.points.isEmpty == false else { return }
@@ -101,7 +101,8 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     }
     
     private func stopAndSaveAsMeasuredTrack() async throws {
-        let track = try self.trackRecordingService.stopTrack()
+        var track = try self.trackRecordingService.stopTrack()
+        track.trackType = .measurement
         let measurementType = self.trackRecordingService.stopPolicy
         
         guard track.points.isEmpty == false else { return }

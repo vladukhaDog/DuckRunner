@@ -110,7 +110,8 @@ final class TrackRepository: TrackStorageProtocol {
                     if let item = try context.fetch(request).first {
                         item.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
                         item.parentID = track.parentID
-                        item.type = track.type.rawValue
+                        item.trackType = track.trackType.rawValue
+                        item.replayMode = track.replayMode.rawValue
                         item.startDate = track.startDate
                         if context.hasChanges {
                             try context.save()
@@ -132,7 +133,7 @@ final class TrackRepository: TrackStorageProtocol {
             context.performAndWait {
                 
                 let request = TrackDTO.fetchRequest()
-                request.predicate = NSPredicate(format: "measure == nil")
+                request.predicate = NSPredicate(format: "trackType == \(TrackType.record.rawValue)")
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 
                 do {
@@ -158,7 +159,7 @@ final class TrackRepository: TrackStorageProtocol {
                 let datePredicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
                                                 Calendar.current.startOfDay(for: date) as NSDate,
                                                 Calendar.current.startOfDay(for: nextDay) as NSDate)
-                let measureNilPredicate = NSPredicate(format: "measure == nil")
+                let measureNilPredicate = NSPredicate(format: "trackType == \(TrackType.record.rawValue)")
                 request.predicate = NSCompoundPredicate(type: .and, subpredicates: [datePredicate, measureNilPredicate])
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 let tracks = (try? context.fetch(request)) ?? []
@@ -175,7 +176,7 @@ final class TrackRepository: TrackStorageProtocol {
                 
                 let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
                 let parentPredicate = NSPredicate(format: "parentID == %@", parent)
-                let measureNilPredicate = NSPredicate(format: "measure == nil")
+                let measureNilPredicate = NSPredicate(format: "trackType == \(TrackType.record.rawValue)")
                 request.predicate = NSCompoundPredicate(type: .and, subpredicates: [parentPredicate, measureNilPredicate])
                 
                 let tracks = (try? context.fetch(request)) ?? []
