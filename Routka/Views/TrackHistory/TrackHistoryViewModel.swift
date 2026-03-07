@@ -58,11 +58,14 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
         withAnimation {
             switch action {
             case .created(let track):
+                guard track.trackType == .record else { return }
                 let index = self.tracks.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
                 self.tracks.insert(track, at: index)
             case .deleted(let track):
+                guard track.trackType == .record else { return }
                 self.tracks.removeAll(where: { $0.id == track.id })
             case .updated(let track):
+                guard track.trackType == .record else { return }
                 if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
                     self.tracks[index] = track
                 }

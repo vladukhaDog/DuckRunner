@@ -133,7 +133,7 @@ final class TrackRepository: TrackStorageProtocol {
             context.performAndWait {
                 
                 let request = TrackDTO.fetchRequest()
-                request.predicate = NSPredicate(format: "trackType == \(trackType.rawValue)")
+                request.predicate = NSPredicate(format: "trackType == %@", trackType.rawValue)
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 
                 do {
@@ -159,7 +159,7 @@ final class TrackRepository: TrackStorageProtocol {
                 let datePredicate = NSPredicate(format: "startDate >= %@ && startDate <= %@",
                                                 Calendar.current.startOfDay(for: date) as NSDate,
                                                 Calendar.current.startOfDay(for: nextDay) as NSDate)
-                let measureNilPredicate = NSPredicate(format: "trackType == \(trackType.rawValue)")
+                let measureNilPredicate = NSPredicate(format: "trackType == %@", trackType.rawValue)
                 request.predicate = NSCompoundPredicate(type: .and, subpredicates: [datePredicate, measureNilPredicate])
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
                 let tracks = (try? context.fetch(request)) ?? []
@@ -176,7 +176,7 @@ final class TrackRepository: TrackStorageProtocol {
                 
                 let request: NSFetchRequest<TrackDTO> = TrackDTO.fetchRequest()
                 let parentPredicate = NSPredicate(format: "parentID == %@", parent)
-                let measureNilPredicate = NSPredicate(format: "trackType == \(trackType.rawValue)")
+                let measureNilPredicate = NSPredicate(format: "trackType == %@", trackType.rawValue)
                 request.predicate = NSCompoundPredicate(type: .and, subpredicates: [parentPredicate, measureNilPredicate])
                 
                 let tracks = (try? context.fetch(request)) ?? []

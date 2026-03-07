@@ -17,6 +17,7 @@ struct RoutkaApp: App {
     private let baseMapViewModel: BaseMapViewModel
     private let trackHistoryViewModel: TrackHistoryViewModel
     private let measurementsViewModel: any MeasuredTrackListViewModelProtocol
+    private let importedTracksViewModel: any ImportedTracksListViewModelProtocol
     init() {
         self.dependencies = .production(tabs: [
             "History",
@@ -26,6 +27,7 @@ struct RoutkaApp: App {
         self.baseMapViewModel = BaseMapViewModel(dependencies: dependencies)
         self.trackHistoryViewModel = TrackHistoryViewModel(dependencies: dependencies)
         self.measurementsViewModel = MeasuredTrackListViewModel(dependencies: dependencies)
+        self.importedTracksViewModel = ImportedTracksListViewModel(dependencies: dependencies)
     }
     
     /// The main scene of the application providing the app's user interface structure.
@@ -41,8 +43,9 @@ struct RoutkaApp: App {
                 .tag("Map")
                 if let router = dependencies.routers["History"] {
                     NavigatableView(router) {
-                        TrackHistoryView(vm: trackHistoryViewModel,
-                                         dependencies: dependencies)
+                        ImportedTracksListView(vm: importedTracksViewModel, dependencies: dependencies)
+//                        TrackHistoryView(vm: trackHistoryViewModel,
+//                                         dependencies: dependencies)
                     }
                     .tabItem {
                         Label("History", systemImage: "book.pages")

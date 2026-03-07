@@ -26,39 +26,43 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     
     /// The main UI displaying history list, navigation links, and date selector.
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack {
-                    dateSelector
-                    Divider()
-                    LazyVStack(spacing: 15) {
-                        if vm.tracks.isEmpty {
-                            Text("Empty history")
-                                .font(.largeTitle)
-                                .opacity(0.6)
-                                .transition(.opacity)
-                        }
-                        ForEach(vm.tracks, id: \.id) { track in
-                            Button {
-                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                    .trackDetail(track: track, dependencies: dependencies))
-                            } label: {
-                                TrackHistoryCellView(track: track,
-                                                     unit: UnitSpeed.byName(speedUnit),
-                                                     dependencies: dependencies)
-                            }
+        ScrollView {
+            VStack {
+                dateSelector
+                Divider()
+                LazyVStack(spacing: 15) {
+                    ForEach(vm.tracks, id: \.id) { track in
+                        Button {
+                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                                .trackDetail(track: track, dependencies: dependencies))
+                        } label: {
+                            TrackHistoryCellView(track: track,
+                                                 unit: UnitSpeed.byName(speedUnit),
+                                                 dependencies: dependencies)
                         }
                     }
-                    
                 }
-                .padding(.horizontal)
+                
             }
-            .frame(maxWidth: .infinity)
-            .animation(.default, value: vm.tracks.isEmpty)
-            .navigationTitle("History")
-            .background(Color.cyan.gradient.opacity(0.05))
+            .padding(.horizontal)
         }
-        
+        .frame(maxWidth: .infinity)
+        .animation(.default, value: vm.tracks.isEmpty)
+        .navigationTitle("History")
+        .background {
+            if vm.tracks.isEmpty {
+                emptyTag
+            }
+        }
+        .background(Color.cyan.gradient.opacity(0.05))
+    }
+    
+    private var emptyTag: some View {
+        Text("Empty history")
+            .font(.largeTitle)
+            .opacity(0.6)
+            .transition(.opacity)
+            .multilineTextAlignment(.center)
     }
     
     /// UI component for selecting the date whose tracks are shown.
