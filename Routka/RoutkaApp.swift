@@ -21,7 +21,8 @@ struct RoutkaApp: App {
     init() {
         self.dependencies = .production(tabs: [
             "History",
-            "Measurements"
+            "Measurements",
+            "Imports"
                                               ])
         self.tabRouter = dependencies.tabRouter
         self.baseMapViewModel = BaseMapViewModel(dependencies: dependencies)
@@ -43,9 +44,8 @@ struct RoutkaApp: App {
                 .tag("Map")
                 if let router = dependencies.routers["History"] {
                     NavigatableView(router) {
-                        ImportedTracksListView(vm: importedTracksViewModel, dependencies: dependencies)
-//                        TrackHistoryView(vm: trackHistoryViewModel,
-//                                         dependencies: dependencies)
+                        TrackHistoryView(vm: trackHistoryViewModel,
+                                         dependencies: dependencies)
                     }
                     .tabItem {
                         Label("History", systemImage: "book.pages")
@@ -62,13 +62,23 @@ struct RoutkaApp: App {
                     }
                     .tag("Measurements")
                 }
-                SettingsView(dependencies: dependencies)
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
+                if let router = dependencies.routers["Imports"] {
+                    NavigatableView(router) {
+                        ImportedTracksListView(vm: importedTracksViewModel, dependencies: dependencies)
+                    }
+                    .tabItem {
+                        Label("Imports", systemImage: "book.pages")
+                    }
+                    .tag("Imports")
                 }
-                .tag("Settings")
+//                SettingsView(dependencies: dependencies)
+//                .tabItem {
+//                    Label("Settings", systemImage: "gear")
+//                }
+//                .tag("Settings")
             }
             .disclaimerOnce()
+            .fileManager(managedBy: dependencies.trackFileService)
         }
     }
 }

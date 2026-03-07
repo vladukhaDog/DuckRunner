@@ -19,7 +19,7 @@ enum TrackStorageAction {
 
 /// Abstraction for components that provide persistent storage and retrieval of tracks.
 /// Defines CRUD methods and a publisher for storage action events.
-protocol TrackStorageProtocol {
+protocol TrackStorageProtocol: AnyObject {
     /// Retrieves all tracks that start on the given date.
     func getTracks(for date: Date, ofType trackType: TrackType) async -> [Track]
     /// Retrieves all tracks in storage.

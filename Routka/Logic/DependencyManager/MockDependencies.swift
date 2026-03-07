@@ -19,6 +19,7 @@ extension DependencyManager {
                      tabRouter: any TabRouterProtocol = MockTabRouter(),
                      cacheFileManager: any CacheFileManagerProtocol = MockCacheFileManager(),
                      measuredTrackStorageService: any MeasuredTrackStorageProtocol = MockMeasuredTrackStorageService(),
+                     trackFileService: any TrackFileServiceProtocol = MockTrackFileService(),
                      routers: [String: Router] = [:]
     ) -> Self {
         self.init(locationService: locationService,
@@ -29,12 +30,30 @@ extension DependencyManager {
                   tabRouter: tabRouter,
                   cacheFileManager: cacheFileManager,
                   measuredTrackStorageService: measuredTrackStorageService,
+                  trackFileService: trackFileService,
                   routers: routers)
     }
 }
 
 // MARK: - Mock default implementations
 extension DependencyManager {
+    final class MockTrackFileService: TrackFileServiceProtocol {
+        func showImporter() {
+        }
+        
+        func exportTrack(_ track: Track) {
+        }
+        
+        var isExporterPresented: Bool = false
+        
+        var fileToExport: URL? = nil
+        
+        var isImporterPresented: Bool  = false
+        
+        func importFromFile(url: URL) async {
+        }
+    }
+    
     final class MockMeasuredTrackStorageService: MeasuredTrackStorageProtocol {
         func getShortestMeasuredTrack(named name: String) async -> MeasuredTrack? {
             return nil

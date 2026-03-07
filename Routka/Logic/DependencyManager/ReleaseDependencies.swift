@@ -18,7 +18,7 @@ extension DependencyManager {
         let tabRouter = TabRouter()
         let measuredTrackStorageService = MeasuredTrackRepository()
         let routers = Dictionary(uniqueKeysWithValues: tabs.map({($0, Router())}))
-        
+        let trackFileService = TrackFileService(trackStorage: storageService)
         return .init(locationService: locationService,
                      storageService: storageService,
                      mapSnapshotGenerator: mapSnapshotGenerator,
@@ -27,6 +27,7 @@ extension DependencyManager {
                      tabRouter: tabRouter,
                      cacheFileManager: cacheFileManager,
                      measuredTrackStorageService: measuredTrackStorageService,
+                     trackFileService: trackFileService,
                      routers: routers)
     }
 }

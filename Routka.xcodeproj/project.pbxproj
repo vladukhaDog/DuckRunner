@@ -39,9 +39,22 @@
 		61399C7B2F412241008A0F49 /* RoutkaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoutkaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		61ACC0DD2F5CDBF1009364A6 /* Exceptions for "Routka" folder in "Routka" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 61399C612F41223F008A0F49 /* Routka */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		61399C642F41223F008A0F49 /* Routka */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				61ACC0DD2F5CDBF1009364A6 /* Exceptions for "Routka" folder in "Routka" target */,
+			);
 			path = Routka;
 			sourceTree = "<group>";
 		};
@@ -426,6 +439,7 @@
 				DEVELOPMENT_TEAM = SZ24TTUHBL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Routka/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow us to show and record current location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -460,6 +474,7 @@
 				DEVELOPMENT_TEAM = SZ24TTUHBL;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Routka/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow us to show and record current location.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

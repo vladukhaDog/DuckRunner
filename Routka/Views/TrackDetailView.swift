@@ -168,6 +168,11 @@ struct TrackDetailView: View {
             Section (header: Text("Track Details")){
                 baseTrackInfo
             }
+            Button("EXPORT") {
+                Task {
+                    dependencies.trackFileService.exportTrack(vm.track)
+                }
+            }
             if vm.track.parentID == nil {
                 Button {
                     Task {

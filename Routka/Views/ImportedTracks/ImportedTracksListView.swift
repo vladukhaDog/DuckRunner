@@ -40,7 +40,7 @@ struct ImportedTracksListView: View {
         .frame(maxWidth: .infinity)
         .animation(.default, value: vm.tracks.isEmpty)
         .navigationTitle("Imported Tracks")
-        .background {
+        .overlay {
             if vm.tracks.isEmpty {
                 emptyTag
             }
@@ -57,7 +57,9 @@ struct ImportedTracksListView: View {
                 .transition(.opacity)
                 .multilineTextAlignment(.center)
             Button {
-                
+                Task {
+                    dependencies.trackFileService.showImporter()
+                }
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.down")

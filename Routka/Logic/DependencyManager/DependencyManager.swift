@@ -16,7 +16,7 @@ final class DependencyManager {
     let tabRouter: any TabRouterProtocol
     let cacheFileManager: any CacheFileManagerProtocol
     let measuredTrackStorageService: any MeasuredTrackStorageProtocol
-    
+    let trackFileService: any TrackFileServiceProtocol
     /// Routers by Tab tags
     let routers: [String: Router]
     
@@ -28,7 +28,8 @@ final class DependencyManager {
         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
         tabRouter: any TabRouterProtocol,
         cacheFileManager: any CacheFileManagerProtocol,
-    measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+        measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+        trackFileService: any TrackFileServiceProtocol,
         routers: [String: Router],
     ) {
         self.locationService = locationService
@@ -39,6 +40,7 @@ final class DependencyManager {
         self.tabRouter = tabRouter
         self.cacheFileManager = cacheFileManager
         self.measuredTrackStorageService = measuredTrackStorageService
+        self.trackFileService = trackFileService
         self.routers = routers
     }
 }
