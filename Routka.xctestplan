@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "142110FE-DB03-44C8-A5A6-58E8EA203104",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:RoutkaTests.xcodeproj",
+      "identifier" : "61399C612F41223F008A0F49",
+      "name" : "RoutkaTests"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Routka.xcodeproj",
+        "identifier" : "61399C702F412241008A0F49",
+        "name" : "RoutkaTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Routka.xcodeproj",
+        "identifier" : "61399C7A2F412241008A0F49",
+        "name" : "RoutkaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

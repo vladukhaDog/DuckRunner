@@ -1,0 +1,645 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6112C2042F582CD800097AB3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6112C2032F582CD800097AB3 /* Localizable.xcstrings */; };
+		6122F42C2F431E3100E20474 /* Routka.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6122F42B2F431E3100E20474 /* Routka.icon */; };
+		61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */ = {isa = PBXBuildFile; productRef = 61BF8F1B2F51DD78000808F6 /* SimpleRouter */; };
+		61C220562F572409003846E3 /* FlowLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 61C220552F572409003846E3 /* FlowLayout */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		61399C722F412241008A0F49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 61399C5A2F41223F008A0F49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 61399C612F41223F008A0F49;
+			remoteInfo = DuckRunner;
+		};
+		61399C7C2F412241008A0F49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 61399C5A2F41223F008A0F49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 61399C612F41223F008A0F49;
+			remoteInfo = DuckRunner;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6112C2032F582CD800097AB3 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		611CD5A32F423F4300979943 /* Routka.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Routka.xctestplan; sourceTree = "<group>"; };
+		6122F42B2F431E3100E20474 /* Routka.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Routka.icon; sourceTree = "<group>"; };
+		61399C622F41223F008A0F49 /* Routka.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Routka.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		61399C712F412241008A0F49 /* RoutkaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoutkaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		61399C7B2F412241008A0F49 /* RoutkaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoutkaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		61399C642F41223F008A0F49 /* Routka */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Routka;
+			sourceTree = "<group>";
+		};
+		61399C742F412241008A0F49 /* RoutkaTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RoutkaTests;
+			sourceTree = "<group>";
+		};
+		61399C7E2F412241008A0F49 /* RoutkaUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RoutkaUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		61399C5F2F41223F008A0F49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61C220562F572409003846E3 /* FlowLayout in Frameworks */,
+				61BF8F1C2F51DD78000808F6 /* SimpleRouter in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C6E2F412241008A0F49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C782F412241008A0F49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		61399C592F41223F008A0F49 = {
+			isa = PBXGroup;
+			children = (
+				6112C2032F582CD800097AB3 /* Localizable.xcstrings */,
+				611CD5A32F423F4300979943 /* Routka.xctestplan */,
+				61399C642F41223F008A0F49 /* Routka */,
+				61399C742F412241008A0F49 /* RoutkaTests */,
+				61399C7E2F412241008A0F49 /* RoutkaUITests */,
+				61399C632F41223F008A0F49 /* Products */,
+				6122F42B2F431E3100E20474 /* Routka.icon */,
+			);
+			sourceTree = "<group>";
+		};
+		61399C632F41223F008A0F49 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				61399C622F41223F008A0F49 /* Routka.app */,
+				61399C712F412241008A0F49 /* RoutkaTests.xctest */,
+				61399C7B2F412241008A0F49 /* RoutkaUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		61399C612F41223F008A0F49 /* Routka */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61399C852F412241008A0F49 /* Build configuration list for PBXNativeTarget "Routka" */;
+			buildPhases = (
+				61399C5E2F41223F008A0F49 /* Sources */,
+				61399C5F2F41223F008A0F49 /* Frameworks */,
+				61399C602F41223F008A0F49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				61399C642F41223F008A0F49 /* Routka */,
+			);
+			name = Routka;
+			packageProductDependencies = (
+				61BF8F1B2F51DD78000808F6 /* SimpleRouter */,
+				61C220552F572409003846E3 /* FlowLayout */,
+			);
+			productName = DuckRunner;
+			productReference = 61399C622F41223F008A0F49 /* Routka.app */;
+			productType = "com.apple.product-type.application";
+		};
+		61399C702F412241008A0F49 /* RoutkaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61399C882F412241008A0F49 /* Build configuration list for PBXNativeTarget "RoutkaTests" */;
+			buildPhases = (
+				61399C6D2F412241008A0F49 /* Sources */,
+				61399C6E2F412241008A0F49 /* Frameworks */,
+				61399C6F2F412241008A0F49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				61399C732F412241008A0F49 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				61399C742F412241008A0F49 /* RoutkaTests */,
+			);
+			name = RoutkaTests;
+			packageProductDependencies = (
+			);
+			productName = DuckRunnerTests;
+			productReference = 61399C712F412241008A0F49 /* RoutkaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		61399C7A2F412241008A0F49 /* RoutkaUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 61399C8B2F412241008A0F49 /* Build configuration list for PBXNativeTarget "RoutkaUITests" */;
+			buildPhases = (
+				61399C772F412241008A0F49 /* Sources */,
+				61399C782F412241008A0F49 /* Frameworks */,
+				61399C792F412241008A0F49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				61399C7D2F412241008A0F49 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				61399C7E2F412241008A0F49 /* RoutkaUITests */,
+			);
+			name = RoutkaUITests;
+			packageProductDependencies = (
+			);
+			productName = DuckRunnerUITests;
+			productReference = 61399C7B2F412241008A0F49 /* RoutkaUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		61399C5A2F41223F008A0F49 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					61399C612F41223F008A0F49 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					61399C702F412241008A0F49 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 61399C612F41223F008A0F49;
+					};
+					61399C7A2F412241008A0F49 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 61399C612F41223F008A0F49;
+					};
+				};
+			};
+			buildConfigurationList = 61399C5D2F41223F008A0F49 /* Build configuration list for PBXProject "Routka" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ru,
+			);
+			mainGroup = 61399C592F41223F008A0F49;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */,
+				61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 61399C632F41223F008A0F49 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				61399C612F41223F008A0F49 /* Routka */,
+				61399C702F412241008A0F49 /* RoutkaTests */,
+				61399C7A2F412241008A0F49 /* RoutkaUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		61399C602F41223F008A0F49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6122F42C2F431E3100E20474 /* Routka.icon in Resources */,
+				6112C2042F582CD800097AB3 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C6F2F412241008A0F49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C792F412241008A0F49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		61399C5E2F41223F008A0F49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C6D2F412241008A0F49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		61399C772F412241008A0F49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		61399C732F412241008A0F49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 61399C612F41223F008A0F49 /* Routka */;
+			targetProxy = 61399C722F412241008A0F49 /* PBXContainerItemProxy */;
+		};
+		61399C7D2F412241008A0F49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 61399C612F41223F008A0F49 /* Routka */;
+			targetProxy = 61399C7C2F412241008A0F49 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		61399C832F412241008A0F49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		61399C842F412241008A0F49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		61399C862F412241008A0F49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Routka;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow us to show and record current location.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.Routka;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		61399C872F412241008A0F49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Routka;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Allow us to show and record current location.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.Routka;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		61399C892F412241008A0F49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.RoutkaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Routka.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Routka";
+			};
+			name = Debug;
+		};
+		61399C8A2F412241008A0F49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.RoutkaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Routka.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Routka";
+			};
+			name = Release;
+		};
+		61399C8C2F412241008A0F49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.RoutkaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DuckRunner;
+			};
+			name = Debug;
+		};
+		61399C8D2F412241008A0F49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SZ24TTUHBL;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.vladukha.RoutkaUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = DuckRunner;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		61399C5D2F41223F008A0F49 /* Build configuration list for PBXProject "Routka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61399C832F412241008A0F49 /* Debug */,
+				61399C842F412241008A0F49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		61399C852F412241008A0F49 /* Build configuration list for PBXNativeTarget "Routka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61399C862F412241008A0F49 /* Debug */,
+				61399C872F412241008A0F49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		61399C882F412241008A0F49 /* Build configuration list for PBXNativeTarget "RoutkaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61399C892F412241008A0F49 /* Debug */,
+				61399C8A2F412241008A0F49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		61399C8B2F412241008A0F49 /* Build configuration list for PBXNativeTarget "RoutkaUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				61399C8C2F412241008A0F49 /* Debug */,
+				61399C8D2F412241008A0F49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vladukhaDog/SimpleRouter";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vladukhaDog/FlowLayout.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		61BF8F1B2F51DD78000808F6 /* SimpleRouter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 61BF8F1A2F51DD78000808F6 /* XCRemoteSwiftPackageReference "SimpleRouter" */;
+			productName = SimpleRouter;
+		};
+		61C220552F572409003846E3 /* FlowLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 61C220542F572409003846E3 /* XCRemoteSwiftPackageReference "FlowLayout" */;
+			productName = FlowLayout;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 61399C5A2F41223F008A0F49 /* Project object */;
+}
