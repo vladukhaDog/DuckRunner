@@ -6,7 +6,7 @@ import Combine
 @Observable
 final class MeasuredTrackListViewModel: MeasuredTrackListViewModelProtocol {
     /// The list of currently loaded measured tracks.
-    private(set) var tracks: [MeasuredTrack] = []
+    private(set) var state: ListState<MeasuredTrack> = .loading
     private let storage: any MeasuredTrackStorageProtocol
     private var cancellables: Set<AnyCancellable> = []
 
@@ -25,10 +25,10 @@ final class MeasuredTrackListViewModel: MeasuredTrackListViewModelProtocol {
 
         // Load initial tracks asynchronously
         Task {
-            let loaded = await storage.getMeasuredTracks()
+            let loaded = await storage.getMeasuredTracks(limit: nil)
             await MainActor.run {
                 withAnimation {
-                    self.tracks = loaded
+                    self.state = .list(loaded)
                 }
             }
         }
@@ -37,17 +37,27 @@ final class MeasuredTrackListViewModel: MeasuredTrackListViewModelProtocol {
     private func receiveAction(_ action: MeasuredTrackStorageAction) {
         switch action {
         case .created(let track):
-            // Insert track by descending startDate order
-            if let index = tracks.firstIndex(where: { $0.startDate > track.startDate }) {
-                tracks.insert(track, at: index)
+            
+            if case .list(var array) = state {
+                let index = array.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
+                array.insert(track, at: index)
+                self.state = .list(array)
             } else {
-                tracks.insert(track, at: 0)
+                self.state = .list([track])
             }
+            
         case .deleted(let track):
-            tracks.removeAll(where: { $0.id == track.id })
+            if case .list(var array) = state {
+                array.removeAll(where: { $0.id == track.id })
+                self.state = .list(array)
+            }
         case .updated(let track):
-            if let index = tracks.firstIndex(where: { $0.id == track.id }) {
-                tracks[index] = track
+            
+            if case .list(var array) = state {
+                if let index = array.firstIndex(where: { $0.id == track.id }) {
+                    array[index] = track
+                    self.state = .list(array)
+                }
             }
         }
     }
@@ -55,7 +65,10 @@ final class MeasuredTrackListViewModel: MeasuredTrackListViewModelProtocol {
     /// Deletes measured tracks at the specified offsets asynchronously.
     /// - Parameter offsets: The index set of tracks to delete.
     func delete(at offsets: IndexSet) async {
-        let items = offsets.map { self.tracks[$0] }
+        guard case .list(let array) = state else {
+            return
+        }
+        let items = offsets.map { array[$0] }
         for item in items {
             await storage.deleteMeasuredTrack(item)
         }

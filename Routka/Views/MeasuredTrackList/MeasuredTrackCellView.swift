@@ -17,8 +17,6 @@ struct MeasuredTrackCellView: View {
             }
             Spacer()
             duration
-            Image(systemName: "chevron.right")
-                .foregroundStyle(Color.primary.opacity(0.6))
         }
     }
     

@@ -11,9 +11,9 @@ import Combine
 /// A view model protocol that provides track history data and manages the selected date for filtering.
 /// 
 /// Conforming types supply an array of tracks filtered by the selected date and allow the date to be changed.
-protocol TrackHistoryViewModelProtocol: ObservableObject {
+protocol TrackHistoryViewModelProtocol: Observable {
     /// The tracks to display, typically filtered by the selected date.
-    var tracks: [Track] { get }
+    var state: ListState<Track> { get }
     
     /// The currently selected date for viewing track history.
     var selectedDate: Date { get set }

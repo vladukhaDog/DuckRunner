@@ -12,12 +12,17 @@ import Combine
 /// 
 /// It provides a published list of tracks corresponding to the selected date and listens to updates from the storage.
 /// When the selected date changes or the underlying storage updates, the tracks list is refreshed accordingly.
+@Observable
 final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
     /// The list of tracks for the selected date, published for UI updates.
-    @Published private(set) var tracks: [Track] = []
+    private(set) var state: ListState<Track> = .loading
     
     /// The date currently selected by the user in the UI.
-    @Published var selectedDate: Date = .now
+    var selectedDate: Date = .now {
+        didSet {
+            fetchByDay()
+        }
+    }
     
     /// Reference to the underlying storage mechanism for tracks.
     private let storage: any TrackStorageProtocol
@@ -36,21 +41,19 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
                 self?.receiveAction(action)
             }
             .store(in: &cancellables)
-        
-        self.$selectedDate
-            .sink { date in
-                Task.detached { [weak self] in
-                    guard let self else { return }
-                    let tracks = await self.storage.getTracks(for: date, ofType: .record)
-                    await MainActor.run {
-                        withAnimation {
-                            self.tracks = tracks
-                        }
-                    }
+        fetchByDay()
+    }
+    
+    private func fetchByDay() {
+        Task.detached { [weak self] in
+            guard let self else { return }
+            let tracks = await self.storage.getTracks(for: selectedDate, ofType: .record)
+            await MainActor.run {
+                withAnimation {
+                    self.state = .list(tracks)
                 }
             }
-            .store(in: &cancellables)
-        
+        }
     }
     
     /// Handles updates from the storage (track creation, deletion, or update) to maintain the correct tracks list.
@@ -59,15 +62,27 @@ final class TrackHistoryViewModel: TrackHistoryViewModelProtocol {
             switch action {
             case .created(let track):
                 guard track.trackType == .record else { return }
-                let index = self.tracks.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
-                self.tracks.insert(track, at: index)
+                if case .list(var array) = state {
+                    let index = array.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
+                    array.insert(track, at: index)
+                    self.state = .list(array)
+                } else {
+                    self.state = .list([track])
+                }
+                
             case .deleted(let track):
                 guard track.trackType == .record else { return }
-                self.tracks.removeAll(where: { $0.id == track.id })
+                if case .list(var array) = state {
+                    array.removeAll(where: { $0.id == track.id })
+                    self.state = .list(array)
+                }
             case .updated(let track):
                 guard track.trackType == .record else { return }
-                if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-                    self.tracks[index] = track
+                if case .list(var array) = state {
+                    if let index = array.firstIndex(where: { $0.id == track.id }) {
+                        array[index] = track
+                        self.state = .list(array)
+                    }
                 }
             }
         }

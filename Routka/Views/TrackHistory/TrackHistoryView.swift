@@ -7,20 +7,48 @@
 
 import SwiftUI
 import Combine
+import SimpleRouter
+
+extension Route where Self == TrackHistoryView.RouteBuilder {
+    /// View of a detailed measured track view
+    static func trackHistory(vm: any TrackHistoryViewModelProtocol,
+                            dependencies: DependencyManager) -> TrackHistoryView.RouteBuilder {
+        TrackHistoryView.RouteBuilder(vm: vm, dependencies: dependencies)
+    }
+}
+  
 
 /// Root view for displaying the user's track history with date-based navigation and detail view links.
-struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
+struct TrackHistoryView: View {
+    
+    struct RouteBuilder: Route {
+        let id: String = UUID.init().uuidString
+        static func == (lhs: TrackHistoryView.RouteBuilder, rhs: TrackHistoryView.RouteBuilder) -> Bool {
+            lhs.id == rhs.id
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
+        let vm: any TrackHistoryViewModelProtocol
+        let dependencies: DependencyManager
+
+        func build() -> AnyView {
+            AnyView(TrackHistoryView(vm: vm, dependencies: dependencies))
+        }
+    }
+    
     /// The view model managing and providing track history data and selection.
-    @StateObject private var vm: ViewModel
+    @State private var vm: any TrackHistoryViewModelProtocol
     /// User's preferred unit for speed display, persisted locally.
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
     private let dependencies: DependencyManager
     
     /// Initializes the history view with the given view model.
-    init(vm: ViewModel,
+    init(vm: any TrackHistoryViewModelProtocol,
          dependencies: DependencyManager) {
-        self._vm = StateObject(wrappedValue: vm)
+        self._vm = .init(wrappedValue: vm)
         self.dependencies = dependencies
     }
     
@@ -31,14 +59,23 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
                 dateSelector
                 Divider()
                 LazyVStack(spacing: 15) {
-                    ForEach(vm.tracks, id: \.id) { track in
-                        Button {
-                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                .trackDetail(track: track, dependencies: dependencies))
-                        } label: {
-                            TrackHistoryCellView(track: track,
-                                                 unit: UnitSpeed.byName(speedUnit),
-                                                 dependencies: dependencies)
+                    if case .list(let array) = vm.state {
+                        ForEach(array, id: \.id) { track in
+                            Button {
+                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                                    .trackDetail(track: track, dependencies: dependencies))
+                            } label: {
+                                TrackHistoryCellView(track: track,
+                                                     unit: UnitSpeed.byName(speedUnit),
+                                                     dependencies: dependencies)
+                                .containerRelativeFrame([.horizontal, .vertical]) { size, axis in
+                                    if axis == .vertical {
+                                        return size * 0.4
+                                    } else {
+                                        return size
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -47,10 +84,11 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
             .padding(.horizontal)
         }
         .frame(maxWidth: .infinity)
-        .animation(.default, value: vm.tracks.isEmpty)
+        .animation(.default, value: vm.state)
         .navigationTitle("History")
         .background {
-            if vm.tracks.isEmpty {
+            if case .list(let array) = vm.state,
+               array.isEmpty {
                 emptyTag
             }
         }
@@ -58,11 +96,12 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     }
     
     private var emptyTag: some View {
-        Text("Empty history")
+        Text("Empty history by day")
             .font(.largeTitle)
             .opacity(0.6)
             .transition(.opacity)
             .multilineTextAlignment(.center)
+            .padding(.horizontal)
     }
     
     /// UI component for selecting the date whose tracks are shown.
@@ -75,20 +114,23 @@ struct TrackHistoryView<ViewModel: TrackHistoryViewModelProtocol>: View {
     }
 }
 
+@Observable
 fileprivate final class PreviewModel: TrackHistoryViewModelProtocol {
-    @Published var selectedDate: Date = .now
+    var state: ListState<Track> = .list([
+        .newFilledTrack(),
+        .newFilledTrack(),
+        .newFilledTrack(),
+        .newFilledTrack(),
+        .newFilledTrack()
+    ])
     
-    @Published var tracks: [Track] = []
+    var selectedDate: Date = .now
+    
     
     func deleteDestinations(_ indexSet: IndexSet) {
         
     }
     init() {
-        self.tracks.append(.newFilledTrack())
-        self.tracks.append(.newFilledTrack())
-        self.tracks.append(.newFilledTrack())
-        self.tracks.append(.newFilledTrack())
-        self.tracks.append(.newFilledTrack())
     }
     
 }

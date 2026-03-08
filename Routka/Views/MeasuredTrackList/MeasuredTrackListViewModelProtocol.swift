@@ -9,7 +9,7 @@ import SwiftUI
 /// An interface for managing and deleting measured track lists.
 protocol MeasuredTrackListViewModelProtocol: Observable {
     /// The list of measured tracks.
-    var tracks: [MeasuredTrack] { get }
+    var state: ListState<MeasuredTrack> { get }
     
     /// Deletes measured tracks at the specified offsets.
     /// - Parameter offsets: The index set indicating which tracks to delete.

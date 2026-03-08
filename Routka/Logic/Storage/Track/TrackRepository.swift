@@ -127,7 +127,7 @@ final class TrackRepository: TrackStorageProtocol {
     }
     
     /// Retrieves all tracks from storage, sorted by start date.
-    func getAllTracks(ofType trackType: TrackType = .record) async -> [Track] {
+    func getAllTracks(ofType trackType: TrackType = .record, limit: Int?) async -> [Track] {
         let context = self.backgroundContext
         return await withCheckedContinuation { [context] continuation in
             context.performAndWait {
@@ -135,7 +135,9 @@ final class TrackRepository: TrackStorageProtocol {
                 let request = TrackDTO.fetchRequest()
                 request.predicate = NSPredicate(format: "trackType == %@", trackType.rawValue)
                 request.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: false)]
-                
+                if let limit {
+                    request.fetchLimit = limit
+                }
                 do {
                     let items = try context.fetch(request)
                     let dtos = items.compactMap { Track($0) }

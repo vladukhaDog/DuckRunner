@@ -8,5 +8,5 @@ import SwiftUI
 
 /// Protocol for the imported tracks list view model
 protocol ImportedTracksListViewModelProtocol: Observable {
-    var tracks: [Track] { get }
+    var screenState: ListState<Track> { get }
 }

@@ -15,20 +15,14 @@ struct RoutkaApp: App {
     @State var tabRouter: any TabRouterProtocol
     private let dependencies: DependencyManager
     private let baseMapViewModel: BaseMapViewModel
-    private let trackHistoryViewModel: TrackHistoryViewModel
-    private let measurementsViewModel: any MeasuredTrackListViewModelProtocol
-    private let importedTracksViewModel: any ImportedTracksListViewModelProtocol
+    private let tracksTabViewModel: TracksTabViewModel
     init() {
         self.dependencies = .production(tabs: [
-            "History",
-            "Measurements",
-            "Imports"
+            "Tracks"
                                               ])
         self.tabRouter = dependencies.tabRouter
         self.baseMapViewModel = BaseMapViewModel(dependencies: dependencies)
-        self.trackHistoryViewModel = TrackHistoryViewModel(dependencies: dependencies)
-        self.measurementsViewModel = MeasuredTrackListViewModel(dependencies: dependencies)
-        self.importedTracksViewModel = ImportedTracksListViewModel(dependencies: dependencies)
+        self.tracksTabViewModel = .init(dependencies: dependencies)
     }
     
     /// The main scene of the application providing the app's user interface structure.
@@ -42,35 +36,16 @@ struct RoutkaApp: App {
                     Label("Map", systemImage: "map")
                 }
                 .tag("Map")
-                if let router = dependencies.routers["History"] {
+                if let router = dependencies.routers["Tracks"] {
                     NavigatableView(router) {
-                        TrackHistoryView(vm: trackHistoryViewModel,
-                                         dependencies: dependencies)
+                        TracksTabView(vm: tracksTabViewModel, dependencies: dependencies)
                     }
                     .tabItem {
-                        Label("History", systemImage: "book.pages")
+                        Label("Tracks", systemImage: "book.pages")
                     }
-                    .tag("History")
+                    .tag("Tracks")
                 }
-                if let router = dependencies.routers["Measurements"] {
-                    NavigatableView(router) {
-                        MeasuredTrackListView(vm: measurementsViewModel,
-                                              dependencies: dependencies)
-                    }
-                    .tabItem {
-                        Label("Measurements", systemImage: "book.pages")
-                    }
-                    .tag("Measurements")
-                }
-                if let router = dependencies.routers["Imports"] {
-                    NavigatableView(router) {
-                        ImportedTracksListView(vm: importedTracksViewModel, dependencies: dependencies)
-                    }
-                    .tabItem {
-                        Label("Imports", systemImage: "book.pages")
-                    }
-                    .tag("Imports")
-                }
+              
 //                SettingsView(dependencies: dependencies)
 //                .tabItem {
 //                    Label("Settings", systemImage: "gear")

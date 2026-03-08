@@ -10,7 +10,8 @@ import Combine
 /// View model for the imported tracks list
 @Observable
 final class ImportedTracksListViewModel: ImportedTracksListViewModelProtocol {
-    private(set) var tracks: [Track] = []
+    private(set) var screenState: ListState<Track> = .loading
+
     private let storage: any TrackStorageProtocol
     
     private var cancellables: Set<AnyCancellable> = []
@@ -26,9 +27,9 @@ final class ImportedTracksListViewModel: ImportedTracksListViewModelProtocol {
         
         // Load imported tracks
         Task {
-            let loaded = await storage.getAllTracks(ofType: .import)
+            let loaded = await storage.getAllTracks(ofType: .import, limit: nil)
             withAnimation {
-                self.tracks = loaded
+                self.screenState = .list(loaded)
             }
         }
     }
@@ -39,15 +40,27 @@ final class ImportedTracksListViewModel: ImportedTracksListViewModelProtocol {
             switch action {
             case .created(let track):
                 guard track.trackType == .import else { return }
-                let index = self.tracks.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
-                self.tracks.insert(track, at: index)
+                if case .list(var array) = screenState {
+                    let index = array.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
+                    array.insert(track, at: index)
+                    self.screenState = .list(array)
+                } else {
+                    self.screenState = .list([track])
+                }
+                
             case .deleted(let track):
                 guard track.trackType == .import else { return }
-                self.tracks.removeAll(where: { $0.id == track.id })
+                if case .list(var array) = screenState {
+                    array.removeAll(where: { $0.id == track.id })
+                    self.screenState = .list(array)
+                }
             case .updated(let track):
                 guard track.trackType == .import else { return }
-                if let index = self.tracks.firstIndex(where: { $0.id == track.id }) {
-                    self.tracks[index] = track
+                if case .list(var array) = screenState {
+                    if let index = array.firstIndex(where: { $0.id == track.id }) {
+                        array[index] = track
+                        self.screenState = .list(array)
+                    }
                 }
             }
         }

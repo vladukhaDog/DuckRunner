@@ -22,7 +22,7 @@ enum MeasuredTrackStorageAction {
 protocol MeasuredTrackStorageProtocol {
     /// Publisher that notifies about storage actions performed on tracks.
     var actionPublisher: PassthroughSubject<MeasuredTrackStorageAction, Never> { get }
-    func getMeasuredTracks() async -> [MeasuredTrack]
+    func getMeasuredTracks(limit: Int?) async -> [MeasuredTrack]
     func addMeasuredTrack(_ track: MeasuredTrack) async
     func deleteMeasuredTrack(_ track: MeasuredTrack) async
     /// Fetch measured tracks by measurement name and return the one with the shortest duration.

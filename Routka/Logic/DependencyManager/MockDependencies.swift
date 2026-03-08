@@ -61,7 +61,7 @@ extension DependencyManager {
         
         var actionPublisher: PassthroughSubject<MeasuredTrackStorageAction, Never> = .init()
         
-        func getMeasuredTracks() async -> [MeasuredTrack] {
+        func getMeasuredTracks(limit: Int?) async -> [MeasuredTrack] {
             return []
         }
         
@@ -85,7 +85,7 @@ extension DependencyManager {
             return []
         }
         
-        func getAllTracks(ofType trackType: TrackType) async -> [Track] {
+        func getAllTracks(ofType trackType: TrackType, limit: Int?) async -> [Track] {
             return []
         }
         

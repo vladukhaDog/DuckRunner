@@ -33,13 +33,15 @@ final class MeasuredTrackRepository: MeasuredTrackStorageProtocol {
         return newbackgroundContext
     }()
 
-    func getMeasuredTracks() async -> [MeasuredTrack] {
+    func getMeasuredTracks(limit: Int?) async -> [MeasuredTrack] {
         let context = self.backgroundContext
         return await withCheckedContinuation { [context] continuation in
             context.performAndWait {
                 
                 let request: NSFetchRequest<MeasuredTrackDTO> = MeasuredTrackDTO.fetchRequest()
-                
+                if let limit {
+                    request.fetchLimit = limit
+                }
                 let measuredTrackDTOs = (try? context.fetch(request)) ?? []
                 
                 let measuredTracks: [MeasuredTrack] = measuredTrackDTOs
