@@ -12,107 +12,7 @@
 
 import SwiftUI
 import MapKit
-import Combine
 import SimpleRouter
-
-/// View model responsible for managing and providing detailed track data 
-/// for presentation in the TrackDetailView.
-final class TrackDetailViewModel: ObservableObject {
-    /// The track instance whose details are displayed.
-    @Published private(set) var track: Track
-    private let storageService: any TrackStorageProtocol
-    
-    /// Average speed of CLLocationSpeed
-    @Published var averageSpeed: CLLocationSpeed?
-    @Published var parentTrack: Track?
-    @Published var children: [Track] = []
-    
-    private var cancellables: Set<AnyCancellable> = []
-    private let dependencies: DependencyManager
-    /// Initializes the view model with a specific track.
-    /// - Parameter track: The track to present.
-    init(track: Track,
-         dependencies: DependencyManager) {
-        self.track = track
-        self.storageService = dependencies.storageService
-        self.dependencies = dependencies
-        self.storageService.actionPublisher
-            .sink { [weak self] action in
-                self?.receiveAction(action)
-            }
-            .store(in: &cancellables)
-        Task {
-            if let parentID = track.parentID,
-               let parent = await storageService.getTrack(by: parentID){
-                await MainActor.run {
-                    self.parentTrack = parent
-                }
-            } else {
-                let children = await storageService.getTracks(withParentID: track.id, ofType: .record)
-                await MainActor.run {
-                    self.children = children
-                }
-            }
-        }
-    }
-    
-    /// Handles updates from the storage (track creation, deletion, or update) to maintain the correct tracks list.
-    private func receiveAction(_ action: TrackStorageAction) {
-        withAnimation {
-            switch action {
-            case .deleted(let track):
-                if track.id == self.track.id {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?
-                        .pop()
-                }
-                self.children.removeAll(where: {$0.id == track.id})
-            case .updated(let track):
-                if track.id == self.track.id {
-                    self.track = track
-                }
-                if let indexOfChild = self.children.firstIndex(where: {$0.id == track.id}) {
-                    self.children[indexOfChild] = track
-                }
-            case .created(let track):
-                if track.parentID == self.track.id {
-                    self.children.append(track)
-                }
-            }
-        }
-    }
-    
-    func updateTrackType(to type: ReplayMode) async {
-        self.track.replayMode = type
-        try? await storageService.updateTrack(track)
-    }
-    
-    func calculateAverageSpeed() {
-        let points = track.points
-        guard !points.isEmpty,
-        let stopDate = track.stopDate else {
-            return
-        }
-
-        // Calculate total distance traveled
-        let totalDistance = points.totalDistance()
-        
-        // Calculate total time (in seconds)
-        let totalTime = (stopDate.timeIntervalSince(track.startDate))
-        
-        // Guard against zero or near-zero time
-        guard totalTime > 0 else {
-            return
-        }
-
-        // Average speed in m/s
-        let averageSpeedInMetersPerSecond = totalDistance / totalTime
-        
-        // Set the average speed (m/s)
-        self.averageSpeed = CLLocationSpeed(averageSpeedInMetersPerSecond)
-    }
-    
-    
-}
 
 extension Route where Self == TrackDetailView.RouteBuilder {
     /// View of a detailed track info
@@ -148,7 +48,7 @@ struct TrackDetailView: View {
     
     
     /// View model instance managing the track data and logic.
-    @StateObject private var vm: TrackDetailViewModel
+    @State private var vm: TrackDetailViewModel
     
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
@@ -168,7 +68,7 @@ struct TrackDetailView: View {
             Section (header: Text("Track Details")){
                 baseTrackInfo
             }
-            if vm.track.parentID == nil {
+            if vm.showReplayButton  {
                 Button {
                     Task {
                         await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
@@ -189,10 +89,10 @@ struct TrackDetailView: View {
                     .frame(height: 200)
                 topSpeed
             }
-            if vm.track.trackType != .import {
+            if vm.showEditSection {
                 editSection
             }
-            if vm.children.isEmpty {
+            if vm.showDeleteTrackButton {
                 Button(role: .destructive) {
                     Task {
                         await dependencies.storageService.deleteTrack(vm.track)
@@ -204,7 +104,7 @@ struct TrackDetailView: View {
             }
             
             
-            if !vm.children.isEmpty  {
+            if vm.showReplaysSection {
                 Section("Replays") {
                     ForEach(vm.children, id: \.id) { track in
                         Button {
@@ -224,8 +124,7 @@ struct TrackDetailView: View {
         .navigationTitle("\(vm.track.startDate.toString(style: .medium)) Track")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            if vm.track.trackType != .import,
-               vm.track.replayMode != .replay {
+            if vm.showExportButton {
                 ToolbarItem(placement: .navigationBarTrailing) { // Specify placement
                     Button {
                         Task {
@@ -241,7 +140,7 @@ struct TrackDetailView: View {
     
     private var editSection: some View {
         Section("Edit") {
-            if vm.track.replayMode != .replay {
+            if vm.showModeEditButton {
                 Picker("Mode", selection: .init(get: {
                     vm.track.replayMode
                 }, set: { new in
@@ -256,8 +155,7 @@ struct TrackDetailView: View {
                 }
             }
             
-            if vm.track.parentID == nil,
-               vm.children.isEmpty {
+            if vm.showTrimButton {
                 Button {
                     dependencies.routers[dependencies.tabRouter.selectedTab]?
                         .push(.trackTrim(track: vm.track,
