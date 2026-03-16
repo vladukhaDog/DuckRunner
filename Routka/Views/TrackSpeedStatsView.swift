@@ -13,8 +13,16 @@ struct TrackSpeedStatsView: View {
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     let track: Track
     let parentTrack: Track?
+    let shortTimeIntervalFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .positional
+        formatter.allowedUnits = [.minute, .second]
+        formatter.zeroFormattingBehavior = .dropAll
+        return formatter
+    }()
     var body: some View {
         VStack {
+            let duration = track.stopDate?.timeIntervalSince(track.startDate) ?? 1
             Chart {
                 if let parentTrack {
                     ForEach(parentTrack.points.enumerated(), id: \.element.hashValue) { index, point in
@@ -34,8 +42,8 @@ struct TrackSpeedStatsView: View {
                         y: .value("Speed", SpeedConverter(speed: point.speed).getSpeed(.byName(speedUnit))),
                         series: .value("", "Current")
                     )
-                    .foregroundStyle(Color.cyan.opacity(0.5))
-                    .lineStyle(.init(lineWidth: 6, lineCap: .round))
+                    .foregroundStyle(Color.cyan.opacity(0.8))
+                    .lineStyle(.init(lineWidth: 3, lineCap: .round))
                     .interpolationMethod(.cardinal)
                 }
                 if let topSpeedPoint = track.points.topSpeedPoint() {
@@ -51,7 +59,18 @@ struct TrackSpeedStatsView: View {
                 }
                 
             }
+            .chartXScale(domain: 0...(duration * 1.1))
             .chartYAxisLabel(speedUnit)
+            .chartXAxis {
+                AxisMarks(values: .automatic) { value in
+                    AxisValueLabel {
+                        if let seconds = value.as(Double.self) {
+                            Text(shortTimeIntervalFormatter.string(from: seconds) ?? "_")
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
             .chartXAxisLabel("Time Elapsed (s)")
             FlowStack(HSpacing: 20) {
                 currentTrackLegend
