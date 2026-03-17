@@ -69,14 +69,7 @@ struct TrackDetailView: View {
                 baseTrackInfo
             }
             if vm.showReplayButton  {
-                Button {
-                    Task {
-                        await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
-                    }
-                    dependencies.tabRouter.selectedTab = "map"
-                } label: {
-                    Label("Replay the track", systemImage: "repeat")
-                }
+                replaySection
             }
             
             Section {
@@ -134,6 +127,31 @@ struct TrackDetailView: View {
                         Image(systemName: "square.and.arrow.up")
                     }
                 }
+            }
+        }
+    }
+    
+    private var replaySection: some View {
+        Section(LocalizedStringKey(vm.track.replayMode.rawValue)) {
+            Group {
+                switch vm.track.replayMode {
+                case .classical:
+                    Text("classical replay hint")
+                case .speedtrap:
+                    Text("speedtrap replay hint")
+                case .replay:
+                    EmptyView()
+                }
+            }
+            .font(.caption)
+            .opacity(0.7)
+            Button {
+                Task {
+                    await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
+                }
+                dependencies.tabRouter.selectedTab = "map"
+            } label: {
+                Label("Replay the track", systemImage: "repeat")
             }
         }
     }
@@ -224,6 +242,8 @@ struct TrackDetailView: View {
 
 #Preview {
     NavigationView {
-        TrackDetailView(track: .filledTrack, dependencies: .mock())
+        var track = Track(id: "", points: .roadInSPB, parentID: nil)
+        track.replayMode = .speedtrap
+        return TrackDetailView(track: track, dependencies: .mock())
     }
 }
