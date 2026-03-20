@@ -138,7 +138,8 @@ struct TrackDetailView: View {
                 case .classical:
                     Text("classical replay hint")
                 case .speedtrap:
-                    Text("speedtrap replay hint")
+                    let requiredSpeed: String = Int(SettingsService.shared.speedToAutoStartReplay).description
+                    Text("speedtrap replay hint \(requiredSpeed) \(speedUnit)")
                 case .replay:
                     EmptyView()
                 }
@@ -243,7 +244,7 @@ struct TrackDetailView: View {
 #Preview {
     NavigationView {
         var track = Track(id: "", points: .roadInSPB, parentID: nil)
-        track.replayMode = .speedtrap
+        track.replayMode = .classical
         return TrackDetailView(track: track, dependencies: .mock())
     }
 }
