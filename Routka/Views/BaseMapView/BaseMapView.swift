@@ -46,7 +46,7 @@ struct BaseMapView: View {
             }
             
             if let startPoint = vm.replayValidator?.startReplayCheckpoint?.point,
-               vm.trackRecordingService.isRecording != true {
+               vm.showStartPoint {
                 MapContents.startPoint(startPoint)
             }
             
@@ -82,7 +82,7 @@ struct BaseMapView: View {
     
     @ViewBuilder
     private var replayDeselect: some View {
-        if vm.replayValidator?.track != nil {
+        if vm.showDeselectReplayButton {
             Button {
                 vm.deselectReplay()
             } label: {
@@ -120,8 +120,9 @@ struct BaseMapView: View {
         VStack {
             if vm.locationAccess.isAuthorized() {
                 HStack {
-                    let measurement = vm.trackRecordingService.stopPolicy
-                    if measurement.type != .manual {
+                    
+                    if vm.showMeasuringProgress {
+                        let measurement = vm.trackRecordingService.stopPolicy
                         let view = measureInfoTag(measurement)
                         // extremely stupid workaround because glass makes colors in CircularProgressView semi transparent
                         view
@@ -133,8 +134,7 @@ struct BaseMapView: View {
                             view
                         }
                     }
-                    if !vm.trackRecordingService.isRecording,
-                       vm.trackRecordingService.currentTrack != nil {
+                    if vm.showDismissRecordedTrackButton {
                         // Dismiss stats
                         Button {
                             vm.dismissRecordedTrack()
@@ -156,9 +156,9 @@ struct BaseMapView: View {
                     let unitSpeed = UnitSpeed.byName(speedUnit)
                     TrackLiveInfoView(track: track, unit: unitSpeed)
                 }
-                if vm.trackControlMode != .hidden {
+                if vm.showControls {
                     HStack {
-                        if !vm.isRecordingTrack() {
+                        if vm.showMeasureTrackSelectorButton {
                             Button {
                                 self.showMeasuredTracksSelector.toggle()
                             } label: {
@@ -218,6 +218,13 @@ private final class MockTrackRecorder: TrackRecordingServiceProtocol {
 
 @Observable
 private final class PreviewModel: BaseMapViewModelProtocol {
+    var showStartPoint: Bool = true
+    var showDeselectReplayButton: Bool = true
+    var showMeasuringProgress: Bool = true
+    var showDismissRecordedTrackButton: Bool = true
+    var showControls: Bool = true
+    var showMeasureTrackSelectorButton: Bool = true
+    
     func dismissRecordedTrack() {
     }
     

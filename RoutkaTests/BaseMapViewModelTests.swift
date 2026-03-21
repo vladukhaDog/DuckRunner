@@ -65,6 +65,79 @@ private func makeLocation(lat: Double = 37.3317, lon: Double = -122.0301, speed:
 
 @Suite("BaseMapViewModel Tests")
 struct BaseMapViewModelTests {
+    // MARK: - UI visibility flags
+
+    @Test("Initial UI visibility flags should match default idle state")
+    func testInitialShowFlags() async throws {
+        let trackService = MockTrackService()
+        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+
+        #expect(vm.showStartPoint)
+        #expect(!vm.showDeselectReplayButton)
+        #expect(!vm.showMeasuringProgress)
+        #expect(!vm.showDismissRecordedTrackButton)
+        #expect(vm.showControls)
+        #expect(vm.showMeasureTrackSelectorButton)
+    }
+
+    @Test("Recording state should update visibility flags")
+    func testShowFlagsWhileRecording() async throws {
+        let trackService = MockTrackService()
+        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+
+        await vm.startTrack()
+
+        #expect(!vm.showStartPoint)
+        #expect(!vm.showDismissRecordedTrackButton)
+        #expect(vm.showControls)
+        #expect(!vm.showMeasureTrackSelectorButton)
+    }
+
+    @Test("Finished track should show dismiss button and selector")
+    func testShowFlagsForFinishedTrack() async throws {
+        let trackService = MockTrackService()
+        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+
+        await trackService.setRecordedTrack(.filledTrack)
+
+        #expect(vm.showStartPoint)
+        #expect(vm.showDismissRecordedTrackButton)
+        #expect(vm.showMeasureTrackSelectorButton)
+    }
+
+    @Test("Replay selection should toggle replay-related visibility flags")
+    func testShowFlagsForSelectedReplay() async throws {
+        let vm = await BaseMapViewModel(dependencies: .mock())
+        let track = await Track.filledTrack
+
+        await vm.receiveReplayTrackAction(.select(track))
+
+        #expect(vm.showDeselectReplayButton)
+        #expect(vm.showControls)
+    }
+
+    @Test("Hidden controls mode should hide controls")
+    func testShowControlsWhenTrackControlModeHidden() async throws {
+        let vm = await BaseMapViewModel(dependencies: .mock())
+
+        await MainActor.run {
+            vm.trackControlMode = .hidden
+        }
+
+        #expect(!vm.showControls)
+    }
+
+    @Test("Non-manual stop policy should show measuring progress")
+    func testShowMeasuringProgressForAutomaticStopPolicy() async throws {
+        let trackService = MockTrackService()
+        await MainActor.run {
+            trackService.stopPolicy = .reachingDistance(100, name: "Distance")
+        }
+        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+
+        #expect(vm.showMeasuringProgress)
+    }
+
     // MARK: - Recording track
     @Test("Updating location should add a new point to the track")
     func testProvidingLocationUpdatesTrackInfo() async throws {
@@ -577,4 +650,3 @@ struct BaseMapViewModelTests {
         #expect(!trackService.isRecording)
     }
 }
-

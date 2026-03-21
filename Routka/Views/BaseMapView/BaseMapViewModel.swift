@@ -18,6 +18,32 @@ enum TrackControlMode {
 /// including track recording, location updates handling, and track replay management.
 @Observable
 final class BaseMapViewModel: BaseMapViewModelProtocol {
+    // MARK: - UI show parameters
+    var showStartPoint: Bool {
+        trackRecordingService.isRecording != true
+    }
+    
+    var showDeselectReplayButton: Bool {
+        replayValidator?.track != nil
+    }
+    
+    var showMeasuringProgress: Bool {
+        trackRecordingService.stopPolicy != .manual
+    }
+    
+    var showDismissRecordedTrackButton: Bool {
+        trackRecordingService.currentTrack != nil &&
+        trackRecordingService.isRecording == false
+    }
+    
+    var showControls: Bool {
+        trackControlMode != .hidden
+    }
+    
+    var showMeasureTrackSelectorButton: Bool {
+        isRecordingTrack() == false
+    }
+    
     
     // MARK: - Outside parameters
     
