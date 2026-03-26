@@ -81,13 +81,17 @@ final class TracksTabViewModel: TracksTabViewModelProtocol {
             case .created(let track):
                 switch track.trackType {
                 case .record:
-                    guard historyTracks.count < 6 else { return }
                     let index = self.historyTracks.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
                     self.historyTracks.insert(track, at: index)
+                    if historyTracks.count > 6 {
+                        self.historyTracks.removeLast(1)
+                    }
                 case .import:
-                    guard importedTracks.count < 6 else { return }
                     let index = self.importedTracks.firstIndex(where: { $0.startDate > track.startDate }) ?? 0
                     self.importedTracks.insert(track, at: index)
+                    if importedTracks.count > 6 {
+                        self.importedTracks.removeLast(1)
+                    }
                 case .measurement:
                     break
                 }
