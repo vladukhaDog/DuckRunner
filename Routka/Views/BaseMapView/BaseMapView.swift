@@ -61,6 +61,7 @@ struct BaseMapView: View {
                     .transition(.opacity)
             }
         }
+        .zIndex(1)
         .overlay(alignment: .bottom) {
             bottomBar
                 .padding(.horizontal, 10)
@@ -146,10 +147,18 @@ struct BaseMapView: View {
                 HStack {
                     if vm.showMeasureTrackSelectorButton {
                         measuredTracksSelector
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .leading)
+                                    .combined(with: .opacity),
+                                removal: .move(edge: .leading)
+                                    .combined(with: .opacity)
+                            ))
+                            .zIndex(1)
                     }
                     startStopButton
                 }
                 .animation(.bouncy, value: vm.showMeasureTrackSelectorButton)
+                .zIndex(2)
             }
         }
         .padding(.horizontal, 10)
@@ -197,12 +206,10 @@ struct BaseMapView: View {
                 .bold()
                 .shadow(radius: 5)
                 .foregroundStyle(Color.primary)
-                .padding(8)
+                .padding(7)
         }
         .glassEffect(.clear
             .interactive(), in: Circle())
-        .transition(.move(edge: .leading)
-            .combined(with: .opacity))
     }
     
     private var startStopButton: some View {

@@ -104,11 +104,13 @@ private final class PreviewModel: BaseMapViewModelProtocol {
     
     func startTrack(_ mode: RecordingAutoStopPolicy) {
         self.recordingButtonIsRecording.toggle()
+        self.showMeasureTrackSelectorButton = false
     }
     
     func stopTrack() async throws {
         self.recordingButtonIsRecording.toggle()
         showDismissRecordedTrackButton = true
+        self.showMeasureTrackSelectorButton = true
     }
     
     func deselectReplay() {
