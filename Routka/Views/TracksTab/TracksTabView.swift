@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct TracksTabView: View {
+    private enum SectionID: Hashable {
+        case history
+        case measurements
+        case imported
+    }
+
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     @State private var vm: any TracksTabViewModelProtocol
     private let dependencies: DependencyManager
@@ -19,22 +25,27 @@ struct TracksTabView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                heroHeader
-                historyTimeLine
-                measuredTimeLine
-                importedTimeLine
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    heroHeader(proxy: proxy)
+                    historyTimeLine
+                        .id(SectionID.history)
+                    measuredTimeLine
+                        .id(SectionID.measurements)
+                    importedTimeLine
+                        .id(SectionID.imported)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 28)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 28)
+            .background(backgroundGradient)
+            .frame(maxWidth: .infinity)
         }
-        .background(backgroundGradient)
-        .frame(maxWidth: .infinity)
     }
     
-    private var heroHeader: some View {
+    private func heroHeader(proxy: ScrollViewProxy) -> some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Your journal")
@@ -49,15 +60,21 @@ struct TracksTabView: View {
                 statCard(title: "History",
                          value: vm.historyTracks.count.formatted(),
                          icon: "road.lanes",
-                         tint: .blue)
+                         tint: .blue) {
+                    scroll(to: .history, proxy: proxy)
+                }
                 statCard(title: "Measurements",
                          value: vm.measuredTracks.count.formatted(),
                          icon: "gauge.with.dots.needle.50percent",
-                         tint: .orange)
+                         tint: .orange) {
+                    scroll(to: .measurements, proxy: proxy)
+                }
                 statCard(title: "Imported",
                          value: vm.importedTracks.count.formatted(),
                          icon: "square.and.arrow.down.on.square",
-                         tint: .green)
+                         tint: .green) {
+                    scroll(to: .imported, proxy: proxy)
+                }
             }
 
 //            HStack(spacing: 12) {
@@ -233,23 +250,27 @@ struct TracksTabView: View {
     private func statCard(title: String,
                           value: String,
                           icon: String,
-                          tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(tint)
-                Text(value)
-                    .font(.system(.title2, design: .rounded, weight: .bold))
+                          tint: Color,
+                          action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Image(systemName: icon)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(tint)
+                    Text(value)
+                        .font(.system(.title2, design: .rounded, weight: .bold))
+                }
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .buttonStyle(.plain)
     }
 
     private func sectionContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -290,6 +311,12 @@ struct TracksTabView: View {
             Color(.systemBackground)
         ], startPoint: .topLeading, endPoint: .bottomTrailing)
         .ignoresSafeArea()
+    }
+
+    private func scroll(to section: SectionID, proxy: ScrollViewProxy) {
+        withAnimation(.smooth(duration: 0.35)) {
+            proxy.scrollTo(section, anchor: .top)
+        }
     }
 
     private func pushTrackHistory() {
