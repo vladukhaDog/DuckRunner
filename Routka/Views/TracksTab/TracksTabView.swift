@@ -107,7 +107,7 @@ struct TracksTabView: View {
     private var importedTimeLine: some View {
         sectionContainer {
             VStack(alignment: .leading, spacing: 16) {
-                sectionHeader(title: "Imported Tracks",
+                sectionHeader(title:"Imported Tracks",
                               subtitle: "Files and external routes you brought into Routka.",
                               icon: "square.and.arrow.down.on.square") {
                     pushImportedTracks()
@@ -131,7 +131,7 @@ struct TracksTabView: View {
         sectionContainer {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeader(title: "History",
-                              subtitle: "Your latest recorded drives, ready for replay or inspection.",
+                              subtitle: "Your latest recorded drives.",
                               icon: "road.lanes") {
                     pushTrackHistory()
                 }
@@ -154,7 +154,7 @@ struct TracksTabView: View {
         sectionContainer {
             VStack(alignment: .leading, spacing: 16) {
                 sectionHeader(title: "Measurements",
-                              subtitle: "Saved benchmark attempts grouped by the goals you were chasing.",
+                              subtitle: "Saved measurements",
                               icon: "gauge.with.dots.needle.50percent") {
                     pushMeasuredTracks()
                 }
@@ -224,8 +224,8 @@ struct TracksTabView: View {
         .contentMargins(.horizontal, 10, for: .scrollContent)
     }
 
-    private func sectionHeader(title: String,
-                               subtitle: String,
+    private func sectionHeader(title: LocalizedStringKey,
+                               subtitle: LocalizedStringKey,
                                icon: String,
                                action: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -247,7 +247,7 @@ struct TracksTabView: View {
         }
     }
 
-    private func statCard(title: String,
+    private func statCard(title: LocalizedStringKey,
                           value: String,
                           icon: String,
                           tint: Color,
@@ -281,9 +281,9 @@ struct TracksTabView: View {
             .shadow(color: .black.opacity(0.15), radius: 8)
     }
 
-    private func emptyStateCard(title: String,
-                                message: String,
-                                buttonTitle: String,
+    private func emptyStateCard(title: LocalizedStringKey,
+                                message: LocalizedStringKey,
+                                buttonTitle: LocalizedStringKey,
                                 systemImage: String,
                                 action: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -350,20 +350,26 @@ struct TracksTabView: View {
 
 @Observable
 private final class PreviewModel: TracksTabViewModelProtocol {
-    var historyTracks: [Track] = [.newFilledTrack(),
-                                  .newFilledTrack(),
-                                  .newFilledTrack(),
-                                  .newFilledTrack(),]
+//    var historyTracks: [Track] = [.newFilledTrack(),
+//                                  .newFilledTrack(),
+//                                  .newFilledTrack(),
+//                                  .newFilledTrack(),]
+//    
+//    var measuredTracks: [MeasuredTrack] = [
+//        .init(id: "", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+//        .init(id: "1", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+//        .init(id: "2", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+//        .init(id: "3", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+//        .init(id: "4", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+//    ]
+//    
+//    var importedTracks: [Track] = [.filledTrack]
+//
+    var historyTracks: [Track] = []
     
-    var measuredTracks: [MeasuredTrack] = [
-        .init(id: "", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
-        .init(id: "1", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
-        .init(id: "2", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
-        .init(id: "3", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
-        .init(id: "4", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
-    ]
+    var measuredTracks: [MeasuredTrack] = []
     
-    var importedTracks: [Track] = [.filledTrack]
+    var importedTracks: [Track] = []
     
     
 }
