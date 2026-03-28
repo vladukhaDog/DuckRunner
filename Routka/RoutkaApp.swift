@@ -7,12 +7,14 @@
 
 import SwiftUI
 import SwiftData
+import vladukhaAlerts
 //internal import MapKit
 
 /// The main app entry point for the Routka application.
 @main
 struct RoutkaApp: App {
     @State var tabRouter: any TabRouterProtocol
+    private let alertController: AlertController = .shared
     private let dependencies: DependencyManager
     private let baseMapViewModel: BaseMapViewModel
     private let tracksTabViewModel: TracksTabViewModel
@@ -54,6 +56,8 @@ struct RoutkaApp: App {
             }
             .disclaimerOnce()
             .fileManager(managedBy: dependencies)
+            .alertable(alertController,
+                       alignment: .top)
         }
     }
 }

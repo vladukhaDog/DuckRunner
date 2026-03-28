@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import Combine
+import vladukhaAlerts
 import MapKit
 
 enum TrackControlMode {
@@ -119,7 +120,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         // Ignore empty tracks which did not record anything
         guard track.points.count > 1 else {
             self.trackRecordingService.clearTrack()
-            //TODO: Show alert explaining that empty tracks are not welcome
+            await showEmptyTrackAlert()
             return
         }
         
@@ -137,7 +138,11 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         track.trackType = .measurement
         let measurementType = self.trackRecordingService.stopPolicy
         
-        guard track.points.isEmpty == false else { return }
+        guard track.points.count > 1 else {
+            self.trackRecordingService.clearTrack()
+            await showEmptyTrackAlert()
+            return
+        }
         
         switch measurementType.type {
         case .manual:
@@ -151,6 +156,14 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
                                                                               measurement: measurementType,
                                                                               track: track))
         }
+    }
+    
+    private func showEmptyTrackAlert() async {
+        await AlertController.shared.showAlert(String(localized: "Empty track not created alert"),
+                                               icon: .angryWarning,
+                                               timeout: 10,
+                                               closable: true,
+                                               feedback: .warning)
     }
     
     /// Handles a new location update by processing the location data,
