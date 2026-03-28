@@ -11,6 +11,7 @@ struct TracksTabView: View {
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     @State private var vm: any TracksTabViewModelProtocol
     private let dependencies: DependencyManager
+
     init(vm: any TracksTabViewModelProtocol,
          dependencies: DependencyManager) {
         self._vm = .init(wrappedValue: vm)
@@ -19,179 +20,294 @@ struct TracksTabView: View {
     
     var body: some View {
         ScrollView {
-            historyTimeLine
-            Divider()
-            measuredTimeLine
-            Divider()
-            importedTimeLine
+            VStack(alignment: .leading, spacing: 24) {
+                heroHeader
+                historyTimeLine
+                measuredTimeLine
+                importedTimeLine
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 28)
         }
-        .contentMargins(.vertical, 10, for: .scrollContent)
+        .background(backgroundGradient)
         .frame(maxWidth: .infinity)
-        
     }
     
+    private var heroHeader: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Your journal")
+                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                Text("Browse recorded runs, compare measurements, and jump back into imported sessions.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            LazyVGrid(columns: [GridItem(.flexible()),
+                                GridItem(.flexible())]) {
+                statCard(title: "History",
+                         value: vm.historyTracks.count.formatted(),
+                         icon: "road.lanes",
+                         tint: .blue)
+                statCard(title: "Measurements",
+                         value: vm.measuredTracks.count.formatted(),
+                         icon: "gauge.with.dots.needle.50percent",
+                         tint: .orange)
+                statCard(title: "Imported",
+                         value: vm.importedTracks.count.formatted(),
+                         icon: "square.and.arrow.down.on.square",
+                         tint: .green)
+            }
+
+//            HStack(spacing: 12) {
+//                Button {
+//                    pushTrackHistory()
+//                } label: {
+//                    Label("Open History", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+//                        .font(.headline)
+//                        .frame(maxWidth: .infinity)
+//                }
+//                .buttonStyle(.borderedProminent)
+//                .tint(.blue)
+//
+//                Button {
+//                    dependencies.trackFileService.showImporter()
+//                } label: {
+//                    Label("Import", systemImage: "square.and.arrow.down")
+//                        .font(.headline)
+//                        .frame(maxWidth: .infinity)
+//                }
+//                .buttonStyle(.bordered)
+//            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: .black.opacity(0.15), radius: 8)
+    }
+
     private var importedTimeLine: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            HStack {
-                Text("Imported Tracks")
-                    .font(.title)
-                Spacer()
-                Button {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                        .importedTracks(vm: ImportedTracksListViewModel(dependencies: dependencies),
-                                        dependencies: dependencies))
-                } label: {
-                    Text("More")
-                        .padding(10)
+        sectionContainer {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader(title: "Imported Tracks",
+                              subtitle: "Files and external routes you brought into Routka.",
+                              icon: "square.and.arrow.down.on.square") {
+                    pushImportedTracks()
                 }
-                .glassEffect()
-            }
-                .padding(.horizontal, 10)
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack {
-                    ForEach(vm.importedTracks) { track in
-                        Button {
-                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                .trackDetail(track: track, dependencies: dependencies))
-                        } label: {
-                            TrackHistoryCellView(track: track,
-                                                 unit: UnitSpeed.byName(speedUnit),
-                                                 dependencies: dependencies)
-                        }
-                        .frame(height: 300)
-                        .containerRelativeFrame(.horizontal)
-                        
+
+                if vm.importedTracks.isEmpty {
+                    emptyStateCard(title: "No imported tracks yet",
+                                   message: "Bring in .routka saved files.",
+                                   buttonTitle: "Import from Files",
+                                   systemImage: "square.and.arrow.down") {
+                        dependencies.trackFileService.showImporter()
                     }
+                } else {
+                    trackCarousel(vm.importedTracks)
                 }
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .contentMargins(.horizontal, 20, for: .scrollContent)
-            if vm.importedTracks.isEmpty {
-                VStack(spacing: 20) {
-                    
-                    Text("You have no imported tracks.")
-                        .font(.title3)
-                        .opacity(0.6)
-                        .transition(.opacity)
-                        .multilineTextAlignment(.center)
-                    Button {
-                        Task {
-                            dependencies.trackFileService.showImporter()
-                        }
-                    } label: {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down")
-                            Text("Import from files")
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
             }
         }
     }
     
     private var historyTimeLine: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            HStack {
-                Text("History")
-                    .font(.title)
-                Spacer()
-                Button {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                        .trackHistory(vm: TrackHistoryViewModel(dependencies: dependencies),
-                                      dependencies: dependencies))
-                } label: {
-                    Text("More")
-                        .padding(10)
+        sectionContainer {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader(title: "History",
+                              subtitle: "Your latest recorded drives, ready for replay or inspection.",
+                              icon: "road.lanes") {
+                    pushTrackHistory()
                 }
-                .glassEffect()
-            }
-                .padding(.horizontal, 10)
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack {
-                    ForEach(vm.historyTracks) { track in
-                        Button {
-                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                .trackDetail(track: track, dependencies: dependencies))
-                        } label: {
-                            TrackHistoryCellView(track: track,
-                                                 unit: UnitSpeed.byName(speedUnit),
-                                                 dependencies: dependencies)
-                        }
-                        .frame(height: 300)
-                        .containerRelativeFrame(.horizontal)
-                        
+
+                if vm.historyTracks.isEmpty {
+                    emptyStateCard(title: "No recorded history",
+                                   message: "Start a run from the map tab and your sessions will appear here with route snapshots and stats.",
+                                   buttonTitle: "Open Map",
+                                   systemImage: "map") {
+                        dependencies.tabRouter.selectedTab = "Map"
                     }
+                } else {
+                    trackCarousel(vm.historyTracks)
                 }
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .contentMargins(.horizontal, 20, for: .scrollContent)
-            if vm.historyTracks.isEmpty {
-                Text("Empty history")
-                    .font(.title3)
-                    .opacity(0.6)
-                    .transition(.opacity)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
             }
         }
     }
     
     private var measuredTimeLine: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            HStack {
-                Text("Measurements")
-                    .font(.title)
-                Spacer()
-                Button {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                        .measuredTracks(vm: MeasuredTrackListViewModel(dependencies: dependencies),
-                                      dependencies: dependencies))
-                } label: {
-                    Text("More")
-                        .padding(10)
+        sectionContainer {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader(title: "Measurements",
+                              subtitle: "Saved benchmark attempts grouped by the goals you were chasing.",
+                              icon: "gauge.with.dots.needle.50percent") {
+                    pushMeasuredTracks()
                 }
-                .glassEffect()
-            }
-                .padding(.horizontal, 10)
-            ScrollView(.horizontal, showsIndicators: false) {
-                let batches = vm.measuredTracks.chunks(of: 3)
-                HStack(alignment: .top) {
-                    ForEach(batches, id: \.hashValue) { batch in
-                        VStack {
-                            ForEach(batch) { measure in
-                                Button {
-                                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                        .measuredTrackDetail(track: measure, dependencies: dependencies))
-                                } label: {
-                                    MeasuredTrackCellView(measured: measure)
-                                        .padding(6)
-                                        .background(Material.thin)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                                }
-                            }
-                        }
-                        .scrollTargetLayout()
+
+                if vm.measuredTracks.isEmpty {
+                    emptyStateCard(title: "No saved measurements",
+                                   message: "Use an auto-stop preset while recording to build a library of comparable timed attempts.",
+                                   buttonTitle: "Open Map",
+                                   systemImage: "dial.high") {
+                        dependencies.tabRouter.selectedTab = "Map"
                     }
+                } else {
+                    measuredCarousel
                 }
-            }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollTargetBehavior(.viewAligned)
-            .contentMargins(.horizontal, 20, for: .scrollContent)
-            if vm.measuredTracks.isEmpty {
-                Text("Empty measurements")
-                    .font(.title3)
-                    .opacity(0.6)
-                    .transition(.opacity)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
             }
         }
+    }
+
+    private var measuredCarousel: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            let batches = vm.measuredTracks.chunks(of: 3)
+            HStack(alignment: .top, spacing: 8) {
+                ForEach(batches, id: \.hashValue) { batch in
+                    VStack(spacing: 10) {
+                        ForEach(batch) { measure in
+                            Button {
+                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                                    .measuredTrackDetail(track: measure, dependencies: dependencies))
+                            } label: {
+                                MeasuredTrackCellView(measured: measure)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .glassEffect(.regular, in: .buttonBorder)
+                            }
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+            }
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .scrollTargetBehavior(.viewAligned)
+        .scrollClipDisabled()
+    }
+
+    private func trackCarousel(_ tracks: [Track]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack() {
+                ForEach(tracks) { track in
+                    Button {
+                        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+                            .trackDetail(track: track, dependencies: dependencies))
+                    } label: {
+                        TrackHistoryCellView(track: track,
+                                             unit: UnitSpeed.byName(speedUnit),
+                                             dependencies: dependencies)
+                    }
+                    .buttonStyle(.plain)
+                    .frame(height: 250)
+                    .containerRelativeFrame(.horizontal)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollClipDisabled()
+        .contentMargins(.horizontal, 10, for: .scrollContent)
+    }
+
+    private func sectionHeader(title: String,
+                               subtitle: String,
+                               icon: String,
+                               action: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 12) {
+                
+                Label(title, systemImage: icon)
+                    .font(.title3.weight(.bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Spacer()
+                Button("More", action: action)
+                    .buttonStyle(.bordered)
+            }
+            Text(subtitle)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+        }
+    }
+
+    private func statCard(title: String,
+                          value: String,
+                          icon: String,
+                          tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(tint)
+                Text(value)
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+            }
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private func sectionContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 0, content: content)
+            .padding(18)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .shadow(color: .black.opacity(0.15), radius: 8)
+    }
+
+    private func emptyStateCard(title: String,
+                                message: String,
+                                buttonTitle: String,
+                                systemImage: String,
+                                action: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundStyle(.tint)
+            Text(title)
+                .font(.title3.weight(.semibold))
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button(buttonTitle, action: action)
+                .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+    }
+
+    private var backgroundGradient: some View {
+        LinearGradient(colors: [
+            Color.blue.opacity(0.12),
+            Color.mint.opacity(0.08),
+            Color(.systemBackground)
+        ], startPoint: .topLeading, endPoint: .bottomTrailing)
+        .ignoresSafeArea()
+    }
+
+    private func pushTrackHistory() {
+        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+            .trackHistory(vm: TrackHistoryViewModel(dependencies: dependencies),
+                          dependencies: dependencies))
+    }
+
+    private func pushMeasuredTracks() {
+        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+            .measuredTracks(vm: MeasuredTrackListViewModel(dependencies: dependencies),
+                            dependencies: dependencies))
+    }
+
+    private func pushImportedTracks() {
+        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
+            .importedTracks(vm: ImportedTracksListViewModel(dependencies: dependencies),
+                            dependencies: dependencies))
     }
 }
 //
@@ -207,11 +323,20 @@ struct TracksTabView: View {
 
 @Observable
 private final class PreviewModel: TracksTabViewModelProtocol {
-    var historyTracks: [Track] = []
+    var historyTracks: [Track] = [.newFilledTrack(),
+                                  .newFilledTrack(),
+                                  .newFilledTrack(),
+                                  .newFilledTrack(),]
     
-    var measuredTracks: [MeasuredTrack] = []
+    var measuredTracks: [MeasuredTrack] = [
+        .init(id: "", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "1", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "2", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "3", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+        .init(id: "4", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
+    ]
     
-    var importedTracks: [Track] = []
+    var importedTracks: [Track] = [.filledTrack]
     
     
 }
