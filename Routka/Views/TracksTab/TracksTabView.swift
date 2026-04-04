@@ -124,26 +124,31 @@ struct TracksTabView: View {
                     sectionHeader(title:"Imported Tracks",
                                   subtitle: "Files and external routes you brought into Routka.",
                                   icon: "square.and.arrow.down.on.square",
-                                  showLink: vm.importedTracks.count > vm.showLimit) {
+                                  showLink: vm.importedTracks.count >= vm.showLimit) {
                         pushImportedTracks()
                     }
                 }
 
-                if vm.importedTracks.isEmpty {
-                    emptyStateCard(title: "No imported tracks yet",
-                                   message: "Bring in .routka saved files.",
-                                   buttonTitle: "Import from Files",
-                                   systemImage: "square.and.arrow.down") {
-                        dependencies.trackFileService.showImporter()
+                ZStack {
+                    if vm.importedTracks.isEmpty {
+                        emptyStateCard(title: "No imported tracks yet",
+                                       message: "Bring in .routka saved files.",
+                                       buttonTitle: "Import from Files",
+                                       systemImage: "square.and.arrow.down") {
+                            dependencies.trackFileService.showImporter()
+                        }
                     }
-                } else {
-                    Button {
-                        dependencies.trackFileService.showImporter()
-                    } label: {
-                        Label("Import from Files", systemImage: "square.and.arrow.down")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Button {
+                            dependencies.trackFileService.showImporter()
+                        } label: {
+                            Label("Import from Files", systemImage: "square.and.arrow.down")
+                        }
+                        .buttonStyle(.glass)
+                        .opacity(vm.importedTracks.isEmpty ? 0 : 1)
+                        trackCarousel(vm.importedTracks)
                     }
-                    .buttonStyle(.glass)
-                    trackCarousel(vm.importedTracks)
+                    
                 }
             }
         }
@@ -155,19 +160,21 @@ struct TracksTabView: View {
                 sectionHeader(title: "History",
                               subtitle: "Your latest recorded drives.",
                               icon: "road.lanes",
-                              showLink: vm.historyTracks.count > vm.showLimit) {
+                              showLink: vm.historyTracks.count >= vm.showLimit) {
                     pushTrackHistory()
                 }
 
-                if vm.historyTracks.isEmpty {
-                    emptyStateCard(title: "No recorded history",
-                                   message: "Start a run from the map tab and your sessions will appear here with route snapshots and stats.",
-                                   buttonTitle: "Open Map",
-                                   systemImage: "map") {
-                        dependencies.tabRouter.selectedTab = "Map"
-                    }
-                } else {
+                ZStack {
                     trackCarousel(vm.historyTracks)
+                    if vm.historyTracks.isEmpty {
+                        emptyStateCard(title: "No recorded history",
+                                       message: "Start a run from the map tab and your sessions will appear here with route snapshots and stats.",
+                                       buttonTitle: "Open Map",
+                                       systemImage: "map") {
+                            dependencies.tabRouter.selectedTab = "Map"
+                        }
+                    }
+                    
                 }
             }
         }
@@ -179,18 +186,19 @@ struct TracksTabView: View {
                 sectionHeader(title: "Measurements",
                               subtitle: "Saved measurements",
                               icon: "gauge.with.dots.needle.50percent",
-                              showLink: vm.measuredTracks.count > vm.showLimit) {
+                              showLink: vm.measuredTracks.count >= vm.showLimit) {
                     pushMeasuredTracks()
                 }
 
-                if vm.measuredTracks.isEmpty {
-                    emptyStateCard(title: "No saved measurements",
-                                   message: "Use an auto-stop preset while recording to build a library of comparable timed attempts.",
-                                   buttonTitle: "Open Map",
-                                   systemImage: "dial.high") {
-                        dependencies.tabRouter.selectedTab = "Map"
+                ZStack {
+                    if vm.measuredTracks.isEmpty {
+                        emptyStateCard(title: "No saved measurements",
+                                       message: "Use an auto-stop preset while recording to build a library of comparable timed attempts.",
+                                       buttonTitle: "Open Map",
+                                       systemImage: "dial.high") {
+                            dependencies.tabRouter.selectedTab = "Map"
+                        }
                     }
-                } else {
                     measuredCarousel
                 }
             }
@@ -243,9 +251,9 @@ struct TracksTabView: View {
             }
             .scrollTargetLayout()
         }
-        .scrollTargetBehavior(.viewAligned)
+        .scrollTargetBehavior(.viewAligned(anchor: .leading))
         .scrollClipDisabled()
-        .contentMargins(.trailing, 10, for: .scrollContent)
+        .contentMargins(.trailing, 15, for: .scrollContent)
     }
 
     private func sectionHeader(title: LocalizedStringKey,
@@ -302,7 +310,7 @@ struct TracksTabView: View {
 
     private func sectionContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 0, content: content)
-            .padding(12)
+            .padding(18)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
             .shadow(color: .black.opacity(0.15), radius: 8)
@@ -371,10 +379,10 @@ struct TracksTabView: View {
 private final class PreviewModel: TracksTabViewModelProtocol {
     var showLimit: Int = 2
     
-//    var historyTracks: [Track] = [.newFilledTrack(),
-//                                  .newFilledTrack(),
-//                                  .newFilledTrack(),
-//                                  .newFilledTrack(),]
+    var historyTracks: [Track] = [.newFilledTrack(),
+                                  .newFilledTrack(),
+                                  .newFilledTrack(),
+                                  .newFilledTrack(),]
 //    
 //    var measuredTracks: [MeasuredTrack] = [
 //        .init(id: "", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
@@ -387,7 +395,7 @@ private final class PreviewModel: TracksTabViewModelProtocol {
     var importedTracks: [Track] = [.filledTrack,
                                    .newFilledTrack()]
 
-    var historyTracks: [Track] = []
+//    var historyTracks: [Track] = []
     
     var measuredTracks: [MeasuredTrack] = []
     
