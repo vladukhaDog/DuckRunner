@@ -76,12 +76,17 @@ struct MeasuredTrackDetailView: View {
     
     private var baseTrackInfo: some View {
         VStack(spacing: 8) {
-            MapSnippetView(mapSnippetCache: dependencies.mapSnippetCache,
-                           mapSnapshotGenerator: dependencies.mapSnapshotGenerator,
-                           track: measuredTrack.track)
-                .frame(height: 200)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
+            Button {
+                dependencies.routers[dependencies.tabRouter.selectedTab]?
+                    .push(.mapTrackDetail(track: measuredTrack.track, dependencies: dependencies))
+            } label: {
+                MapSnippetView(mapSnippetCache: dependencies.mapSnippetCache,
+                               mapSnapshotGenerator: dependencies.mapSnapshotGenerator,
+                               track: measuredTrack.track)
+                    .frame(height: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
+            }
             mainStat
         }
     }
