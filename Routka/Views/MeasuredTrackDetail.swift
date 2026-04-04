@@ -69,6 +69,7 @@ struct MeasuredTrackDetailView: View {
                     .foregroundStyle(.red)
             }
         }
+        .defaultBackground()
         .navigationTitle(measuredTrack.measurement.name)
         .navigationBarTitleDisplayMode(.large)
     }

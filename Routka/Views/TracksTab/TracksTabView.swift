@@ -40,7 +40,7 @@ struct TracksTabView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 28)
             }
-            .background(backgroundGradient)
+            .defaultBackground()
             .frame(maxWidth: .infinity)
         }
     }
@@ -332,16 +332,6 @@ struct TracksTabView: View {
         .padding(10)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
-
-    private var backgroundGradient: some View {
-        LinearGradient(colors: [
-            Color.blue.opacity(0.12),
-            Color.mint.opacity(0.08),
-            Color(.systemBackground)
-        ], startPoint: .topLeading, endPoint: .bottomTrailing)
-        .ignoresSafeArea()
-    }
-
     private func scroll(to section: SectionID, proxy: ScrollViewProxy) {
         withAnimation(.smooth(duration: 0.35)) {
             proxy.scrollTo(section, anchor: .top)

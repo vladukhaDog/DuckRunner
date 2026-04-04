@@ -90,7 +90,7 @@ struct ImportedTracksListView: View {
                 emptyTag
             }
         }
-        .background(Color.cyan.gradient.opacity(0.05))
+        .defaultBackground()
     }
     
     private var emptyTag: some View {

@@ -68,7 +68,8 @@ struct MeasuredTrackListView: View {
             }
         })
         .navigationTitle("Measured Tracks")
-        .background(Color.cyan.gradient.opacity(0.05))
+        .defaultBackground()
+        .scrollContentBackground(.hidden)
     }
 
     private func delete(at offsets: IndexSet) {

@@ -129,6 +129,8 @@ struct TrackDetailView: View {
                 }
             }
         }
+        .defaultBackground()
+        .scrollContentBackground(.hidden)
     }
     
     private var replaySection: some View {
