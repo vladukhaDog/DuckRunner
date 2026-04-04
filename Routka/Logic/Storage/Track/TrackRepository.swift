@@ -15,6 +15,10 @@ let trackRepositoryLogger = MainLogger("TrackRepository")
 
 let publicContainer = {
     let container = NSPersistentContainer(name: "CoreDataStorage")
+    container.persistentStoreDescriptions.forEach {
+        $0.shouldMigrateStoreAutomatically = true
+        $0.shouldInferMappingModelAutomatically = true
+    }
     container.loadPersistentStores { _, error in
         if let error {
             trackRepositoryLogger.log("Failed loading container", message: "\(error)", .error)
@@ -109,6 +113,7 @@ final class TrackRepository: TrackStorageProtocol {
                 do {
                     if let item = try context.fetch(request).first {
                         item.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
+                        item.custom_name = track.custom_name
                         item.parentID = track.parentID
                         item.trackType = track.trackType.rawValue
                         item.replayMode = track.replayMode.rawValue

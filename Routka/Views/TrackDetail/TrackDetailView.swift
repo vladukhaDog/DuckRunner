@@ -114,7 +114,7 @@ struct TrackDetailView: View {
         .onAppear(perform: {
             self.vm.calculateAverageSpeed()
         })
-        .navigationTitle("\(vm.track.startDate.toString(style: .medium)) Track")
+        .navigationTitle(vm.track.displayTitle)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             if vm.showExportButton {

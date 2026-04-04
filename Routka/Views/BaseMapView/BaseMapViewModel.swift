@@ -129,6 +129,7 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
             track.parentID = self.replayValidator?.track.id
             track.replayMode = .replay
         }
+        track.custom_name = generatedTrackName(for: track.startDate)
         
         try await self.trackStorageService.addTrack(track)
     }
@@ -164,6 +165,29 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
                                                timeout: 10,
                                                closable: true,
                                                feedback: .warning)
+    }
+
+    private func generatedTrackName(for date: Date) -> String {
+        let hour = Calendar.current.component(.hour, from: date)
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.setLocalizedDateFormatFromTemplate("d MMM")
+        let formattedDate = formatter.string(from: date)
+
+        switch hour {
+        case 5..<12:
+            return String(localized: "Morning route \(formattedDate)",
+                          comment: "Generated default name for a track recorded in the morning. Argument is the localized short date.")
+        case 12..<17:
+            return String(localized: "Afternoon route \(formattedDate)",
+                          comment: "Generated default name for a track recorded in the afternoon. Argument is the localized short date.")
+        case 17..<22:
+            return String(localized: "Evening route \(formattedDate)",
+                          comment: "Generated default name for a track recorded in the evening. Argument is the localized short date.")
+        default:
+            return String(localized: "Night route \(formattedDate)",
+                          comment: "Generated default name for a track recorded at night. Argument is the localized short date.")
+        }
     }
     
     /// Handles a new location update by processing the location data,
@@ -293,4 +317,3 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
     }
     
 }
-

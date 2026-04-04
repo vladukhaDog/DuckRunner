@@ -8,6 +8,7 @@
         <relationship name="track" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="TrackDTO" inverseName="measure" inverseEntity="TrackDTO"/>
     </entity>
     <entity name="TrackDTO" representedClassName="TrackDTO" syncable="YES" codeGenerationType="class">
+        <attribute name="custom_name" optional="YES" attributeType="String"/>
         <attribute name="id" attributeType="String"/>
         <attribute name="parentID" optional="YES" attributeType="String"/>
         <attribute name="replayMode" optional="YES" attributeType="String"/>

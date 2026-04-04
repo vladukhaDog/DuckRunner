@@ -65,7 +65,8 @@ final class TrackFileService: TrackFileServiceProtocol {
     func exportTrackToFile(track: Track) -> URL? {
         do {
             let data = try JSONEncoder().encode(track)
-            let filename = "Track_\(track.id).routka"
+            let baseName = sanitizedFileName(for: track)
+            let filename = "\(baseName).routka"
             let tempDirectory = FileManager.default.temporaryDirectory
             let fileURL = tempDirectory.appendingPathComponent(filename)
             try data.write(to: fileURL, options: .atomic)
@@ -74,6 +75,22 @@ final class TrackFileService: TrackFileServiceProtocol {
             print("Failed to export .routka file: \(error)")
             return nil
         }
+    }
+
+    private func sanitizedFileName(for track: Track) -> String {
+        var customName: String
+        if let source = track.custom_name?.trimmingCharacters(in: .whitespacesAndNewlines){
+            let invalidCharacters = CharacterSet(charactersIn: "/\\?%*|\"<>:")
+            let components = source.components(separatedBy: invalidCharacters)
+            let sanitized = components.joined(separator: "_")
+                .replacingOccurrences(of: "\n", with: " ")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            customName = sanitized
+        } else {
+            customName = track.id
+        }
+
+        return customName
     }
     
 }

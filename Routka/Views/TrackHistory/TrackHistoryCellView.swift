@@ -25,12 +25,7 @@ struct TrackHistoryCellView: View {
     
     var body: some View {
         VStack() {
-            HStack {
-                date
-                Spacer()
-            }
-            time
-                .frame(maxWidth: .infinity, alignment: .leading)
+            header
             mapSnippet
             HStack {
                 CompactTrackDistanceView(distance: track.points.totalDistance(),
@@ -53,19 +48,30 @@ struct TrackHistoryCellView: View {
         .padding()
         .glassEffect(in: RoundedRectangle(cornerRadius: 15))
     }
-    
-    private var time: some View {
-        Text(track.startDate.toString(format: "EEE HH:mm"))
-            .font(.caption)
-            .fontWeight(.semibold)
-            .opacity(0.7)
-    }
-    
-    private var date: some View {
-        let date = track.startDate.toString(style: .medium)
-        return Text(date)
-            .font(.title2)
-            .bold()
+
+    @ViewBuilder
+    private var header: some View {
+        if let customName = track.custom_name {
+            HStack {
+                Text(customName)
+                    .font(.title2)
+                    .bold()
+                    .multilineTextAlignment(.leading)
+                Spacer()
+            }
+        } else {
+            HStack {
+                Text(track.startDate.toString(style: .medium))
+                    .font(.title2)
+                    .bold()
+                Spacer()
+            }
+            Text(track.startDate.toString(format: "EEE HH:mm"))
+                .font(.caption)
+                .fontWeight(.semibold)
+                .opacity(0.7)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
     
     private var mapSnippet: some View {

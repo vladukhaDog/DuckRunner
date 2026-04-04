@@ -22,6 +22,7 @@ extension Track {
         self.points = points
             .sorted(by: {$0.date < $1.date})
         self.id = track.id ?? UUID().uuidString
+        self.custom_name = track.custom_name
         self.parentID = track.parentID
         if let mode = track.replayMode,
            let modeEnum = ReplayMode(rawValue: mode) {
@@ -58,6 +59,7 @@ extension TrackDTO {
         self.init(context: context)
         self.id = track.id
         self.points = NSSet(array: track.points.map({TrackPointDTO(context: context, $0)}))
+        self.custom_name = track.custom_name
         self.parentID = track.parentID
         self.startDate = track.startDate
         self.replayMode = track.replayMode.rawValue

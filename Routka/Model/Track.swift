@@ -19,6 +19,7 @@ struct Track: Codable, Hashable, Identifiable {
         case id
         case points
         case _isStopped
+        case custom_name
         case parentID
         case replayMode
         case trackType
@@ -42,6 +43,8 @@ struct Track: Codable, Hashable, Identifiable {
     }
     
     var _isStopped: Bool = false
+    
+    var custom_name: String?
     
     /// Identifier of a parent track, if any.
     var parentID: String?
@@ -78,9 +81,14 @@ struct Track: Codable, Hashable, Identifiable {
         id = try container.decode(String.self, forKey: .id)
         points = try container.decode([TrackPoint].self, forKey: .points)
         _isStopped = try container.decodeIfPresent(Bool.self, forKey: ._isStopped) ?? false
+        custom_name = try container.decodeIfPresent(String.self, forKey: .custom_name)
         parentID = try container.decodeIfPresent(String.self, forKey: .parentID)
         replayMode = try container.decodeIfPresent(ReplayMode.self, forKey: .replayMode) ?? .classical
         trackType = try container.decodeIfPresent(TrackType.self, forKey: .trackType) ?? .record
+    }
+
+    var displayTitle: String {
+        custom_name ?? startDate.toString(style: .medium)
     }
 }
 
