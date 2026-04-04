@@ -15,6 +15,15 @@ import CoreData
 /// 
 /// Use this model to manage and store track data captured during a route recording session.
 struct Track: Codable, Hashable, Identifiable {
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case points
+        case _isStopped
+        case parentID
+        case replayMode
+        case trackType
+    }
+
     /// Unique identifier for the track.
     let id: String
     
@@ -32,7 +41,7 @@ struct Track: Codable, Hashable, Identifiable {
         return self.points.last?.date
     }
     
-    var _isStopped = false
+    var _isStopped: Bool = false
     
     /// Identifier of a parent track, if any.
     var parentID: String?
@@ -63,6 +72,16 @@ struct Track: Codable, Hashable, Identifiable {
         self.id = id
         self.parentID = parentID
     }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        points = try container.decode([TrackPoint].self, forKey: .points)
+        _isStopped = try container.decodeIfPresent(Bool.self, forKey: ._isStopped) ?? false
+        parentID = try container.decodeIfPresent(String.self, forKey: .parentID)
+        replayMode = try container.decodeIfPresent(ReplayMode.self, forKey: .replayMode) ?? .classical
+        trackType = try container.decodeIfPresent(TrackType.self, forKey: .trackType) ?? .record
+    }
 }
 
 /// A model for a single recorded location point on a track.
@@ -91,4 +110,3 @@ struct TrackPoint: Codable, Equatable, Hashable {
         self.date = date
     }
 }
-
