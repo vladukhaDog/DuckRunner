@@ -53,7 +53,7 @@ final class StoredAppLog {
         self.category = category
     }
 
-    convenience init(_ record: CreateAppLogRequest) {
+    convenience init(_ record: CreateAppLog) {
         self.init(
             id: record.id,
             sessionID: record.sessionID,
@@ -65,12 +65,12 @@ final class StoredAppLog {
             deviceType: record.deviceType,
             region: record.region,
             locale: record.locale,
-            type: record.type,
+            type: record._type,
             category: record.category
         )
     }
 
-    var record: CreateAppLogRequest {
+    var record: CreateAppLog {
         .init(
             id: id,
             sessionID: sessionID,
@@ -82,7 +82,7 @@ final class StoredAppLog {
             deviceType: deviceType,
             region: region,
             locale: locale,
-            type: type,
+            _type: type,
             category: category
         )
     }

@@ -10,10 +10,10 @@ import SwiftData
 import LogService
 
 protocol LogStorageProtocol: AnyObject {
-    func addLog(_ log: CreateAppLogRequest) async throws
+    func addLog(_ log: CreateAppLog) async throws
     func deleteLog(id: String) async throws
     func deleteLogs(ids: [String]) async throws
-    func fetchOldestLogs(limit: Int) async throws -> [CreateAppLogRequest]
+    func fetchOldestLogs(limit: Int) async throws -> [CreateAppLog]
 }
 
 actor LogStorage: LogStorageProtocol {
@@ -24,7 +24,7 @@ actor LogStorage: LogStorageProtocol {
         self.container = container
     }
 
-    func addLog(_ log: CreateAppLogRequest) async throws {
+    func addLog(_ log: CreateAppLog) async throws {
         let context = ModelContext(container)
         context.insert(StoredAppLog(log))
         try context.save()
@@ -65,7 +65,7 @@ actor LogStorage: LogStorageProtocol {
         try context.save()
     }
 
-    func fetchOldestLogs(limit: Int = 50) async throws -> [CreateAppLogRequest] {
+    func fetchOldestLogs(limit: Int = 50) async throws -> [CreateAppLog] {
         var descriptor = FetchDescriptor<StoredAppLog>(
             sortBy: [SortDescriptor(\.creationDate, order: .forward)]
         )

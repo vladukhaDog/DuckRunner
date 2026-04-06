@@ -107,7 +107,7 @@ final class LogService {
                                            deviceType: deviceType,
                                            region: region,
                                            locale: locale,
-                                           type: type,
+                                           _type: type,
                                            category: category))
         } catch {
             print("Failed creating log: \(error)")
@@ -133,7 +133,8 @@ final class LogService {
             try? await Task.sleep(for: .seconds(5))
             return
         }
-        try await logSender.createLogs(.batch(logs))
-        
+        let _ = try await logSender.createLogs(logs)
+        print("logs sent", logs.count)
+        try? await logRepo.deleteLogs(ids: logs.map(\.id))
     }
 }
