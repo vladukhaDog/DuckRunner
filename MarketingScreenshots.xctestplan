@@ -20,6 +20,7 @@
   },
   "testTargets" : [
     {
+      "parallelizable" : true,
       "target" : {
         "containerPath" : "container:Routka.xcodeproj",
         "identifier" : "61E99E202F85B1140087320E",

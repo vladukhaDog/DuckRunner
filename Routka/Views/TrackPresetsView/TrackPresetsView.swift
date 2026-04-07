@@ -56,6 +56,7 @@ struct TrackPresetsView: View {
                 
                 .padding(4)
             }
+            .accessibilityIdentifier("PresetButton\(preset.preset.name)")
         
     }
     

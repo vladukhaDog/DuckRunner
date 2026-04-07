@@ -36,20 +36,71 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         XCUIDevice.goTo(startingPoint)
 
         app.buttons["startRecordingButton"].tap()
-//        
-//        var previousPoint = startingPoint
-//        for point in track {
-//            let delay = max(0, point.date.timeIntervalSince(previousPoint.date))
-//            if delay > 0 {
-//                try? await Task.sleep(for: .seconds(delay))
-//            }
-//
-//            XCUIDevice.goTo(point)
-//            previousPoint = point
-//        }
+        
+        var previousPoint = startingPoint
+        for point in track {
+            let delay = max(0, point.date.timeIntervalSince(previousPoint.date))
+            if delay > 0 {
+                try? await Task.sleep(for: .seconds(delay))
+            }
+
+            XCUIDevice.goTo(point)
+            previousPoint = point
+        }
 
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-        attachment.name = "\(localeIdentifier) 1 Regular track Recording"
+        attachment.name = "\(localeIdentifier).1 Regular track Recording"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+    
+    @MainActor
+    func test_generateMeasurementRecordedScreen() async throws {
+        var track = try self.loadTrack(named: "FreewayDrive").points
+        XCTAssertFalse(track.isEmpty)
+
+        let app = XCUIApplication()
+        app.launch()
+        
+        let startingPoint = track.removeFirst()
+        XCUIDevice.goTo(startingPoint)
+        
+        let selectorButton = app.buttons["measuredTracksSelector"]
+        XCTAssertTrue(selectorButton.waitForExistence(timeout: 5))
+        selectorButton.tap()
+
+        XCTAssertTrue(app.staticTexts["measurementPresetsTitle"].waitForExistence(timeout: 5))
+
+        app.buttons["PresetButton1/2 mile"].tap()
+        
+        let startingLocation = CLLocation(
+            latitude: startingPoint.position.latitude,
+            longitude: startingPoint.position.longitude
+        )
+        let halfMileInMeters = Measurement(value: 0.5, unit: UnitLength.miles)
+            .converted(to: .meters)
+            .value
+        var previousPoint = startingPoint
+        for point in track {
+            let delay = max(0, point.date.timeIntervalSince(previousPoint.date))
+            if delay > 0 {
+                try? await Task.sleep(for: .seconds(delay))
+            }
+
+            XCUIDevice.goTo(point)
+            previousPoint = point
+
+            let currentLocation = CLLocation(
+                latitude: point.position.latitude,
+                longitude: point.position.longitude
+            )
+            if startingLocation.distance(from: currentLocation) >= halfMileInMeters {
+                break
+            }
+        }
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "\(localeIdentifier).3 Measurement done"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
@@ -66,7 +117,7 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["measurementPresetsTitle"].waitForExistence(timeout: 5))
 
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-        attachment.name = "\(localeIdentifier) 2 Preset selector"
+        attachment.name = "\(localeIdentifier).2 Preset selector"
         attachment.lifetime = .keepAlways
         add(attachment)
     }
