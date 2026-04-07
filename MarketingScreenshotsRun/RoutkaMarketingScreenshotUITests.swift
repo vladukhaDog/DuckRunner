@@ -36,17 +36,17 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         XCUIDevice.goTo(startingPoint)
 
         app.buttons["startRecordingButton"].tap()
-        
-        var previousPoint = startingPoint
-        for point in track {
-            let delay = max(0, point.date.timeIntervalSince(previousPoint.date))
-            if delay > 0 {
-                try? await Task.sleep(for: .seconds(delay))
-            }
-
-            XCUIDevice.goTo(point)
-            previousPoint = point
-        }
+//        
+//        var previousPoint = startingPoint
+//        for point in track {
+//            let delay = max(0, point.date.timeIntervalSince(previousPoint.date))
+//            if delay > 0 {
+//                try? await Task.sleep(for: .seconds(delay))
+//            }
+//
+//            XCUIDevice.goTo(point)
+//            previousPoint = point
+//        }
 
         let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         attachment.name = "\(localeIdentifier) 1 Regular track Recording"
@@ -54,6 +54,23 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         add(attachment)
     }
 
+    @MainActor
+    func test_generatePresetSelector() async throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let selectorButton = app.buttons["measuredTracksSelector"]
+        XCTAssertTrue(selectorButton.waitForExistence(timeout: 5))
+        selectorButton.tap()
+
+        XCTAssertTrue(app.staticTexts["measurementPresetsTitle"].waitForExistence(timeout: 5))
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "\(localeIdentifier) 2 Preset selector"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+    
     @MainActor
     private func loadTrack(named name: String) throws -> Track {
         let bundle = Bundle(for: Self.self)

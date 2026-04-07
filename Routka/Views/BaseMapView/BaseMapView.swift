@@ -215,6 +215,7 @@ struct BaseMapView: View {
         }
         .glassEffect(.clear
             .interactive(), in: Circle())
+        .accessibilityIdentifier("measuredTracksSelector")
     }
     
     private var startStopButton: some View {

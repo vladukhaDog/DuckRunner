@@ -67,6 +67,7 @@ struct TrackPresetsView: View {
                     .multilineTextAlignment(.leading)
                     .bold()
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("measurementPresetsTitle")
                 Text("measurements_presets_hint")
                     .font(.caption)
                     .multilineTextAlignment(.leading)
