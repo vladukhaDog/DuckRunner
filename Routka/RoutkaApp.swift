@@ -32,23 +32,37 @@ struct RoutkaApp: App {
     var body: some Scene {
         WindowGroup {
             TabView(selection: $tabRouter.selectedTab) {
+                Tab("Map", systemImage: "map", value: "map") {
+                    BaseMapView(vm: baseMapViewModel,
+                                dependencies: dependencies)
+                }
                 
-                BaseMapView(vm: baseMapViewModel,
-                            dependencies: dependencies)
-                .tabItem {
-                    Label("Map", systemImage: "map")
-                }
-                .tag("Map")
+//                BaseMapView(vm: baseMapViewModel,
+//                            dependencies: dependencies)
+//                .tabItem {
+//                    Label("Map", systemImage: "map")
+//                        .accessibilityIdentifier("map")
+//                        .accessibilityAddTraits(.isButton)
+//                }
+//                .tag("Map")
                 if let router = dependencies.routers["Tracks"] {
-                    NavigatableView(router) {
-                        TracksTabView(vm: tracksTabViewModel, dependencies: dependencies)
+                    Tab("Tracks", systemImage: "book.pages", value: "Tracks") {
+                        NavigatableView(router) {
+                            TracksTabView(vm: tracksTabViewModel, dependencies: dependencies)
+                        }
                     }
-                    .tabItem {
-                        Label("Tracks", systemImage: "book.pages")
-                    }
-                    .tag("Tracks")
+                    .accessibilityIdentifier("tracksTab")
+//                    NavigatableView(router) {
+//                        TracksTabView(vm: tracksTabViewModel, dependencies: dependencies)
+//                    }
+//                    .tabItem {
+//                        Label("Tracks", systemImage: "book.pages")
+//                            .accessibilityIdentifier("tracksTab")
+//                            .accessibilityAddTraits(.isButton)
+//                    }
+//                    .tag("Tracks")
                 }
-              
+//              
 //                SettingsView(dependencies: dependencies)
 //                .tabItem {
 //                    Label("Settings", systemImage: "gear")

@@ -121,6 +121,51 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
     }
+
+    @MainActor
+    func test_journal() async throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let tracksTab = app.tabBars.firstMatch.buttons.allElementsBoundByIndex[1]
+        XCTAssertTrue(tracksTab.waitForExistence(timeout: 5))
+        sleep(2)
+        tracksTab.tap()
+
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "\(localeIdentifier).4 Review Journal"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
+    @MainActor
+    func test_trackStats() async throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        let tracksTab = app.tabBars.firstMatch.buttons.allElementsBoundByIndex[1]
+        XCTAssertTrue(tracksTab.waitForExistence(timeout: 5))
+        sleep(2)
+        tracksTab.tap()
+
+        let firstHistoryTrack = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "historyTrackButton_")
+        ).firstMatch
+        XCTAssertTrue(firstHistoryTrack.waitForExistence(timeout: 5))
+        firstHistoryTrack.tap()
+
+        let replayHint = app.staticTexts["replayHint"]
+        XCTAssertTrue(replayHint.waitForExistence(timeout: 5))
+
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.75))
+        start.press(forDuration: 2, thenDragTo: end)
+        
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "\(localeIdentifier).5 Track stats"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
     
     @MainActor
     private func loadTrack(named name: String) throws -> Track {

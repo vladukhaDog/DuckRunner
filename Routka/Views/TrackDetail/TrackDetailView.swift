@@ -148,6 +148,7 @@ struct TrackDetailView: View {
             }
             .font(.caption)
             .opacity(0.7)
+            .accessibilityIdentifier("replayHint")
             Button {
                 Task {
                     await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)

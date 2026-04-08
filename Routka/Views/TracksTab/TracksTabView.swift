@@ -244,7 +244,7 @@ struct TracksTabView: View {
                                              unit: UnitSpeed.byName(speedUnit),
                                              dependencies: dependencies)
                     }
-                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("historyTrackButton_\(track.id)")
                     .frame(height: 250)
                     .containerRelativeFrame(.horizontal)
                 }
