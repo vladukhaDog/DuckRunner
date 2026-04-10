@@ -49,11 +49,11 @@ struct BaseMapView: View {
             
             if let startPoint = vm.replayValidator?.startReplayCheckpoint?.point,
                vm.showStartPoint {
-                MapContents.startPoint(startPoint)
+                MapContents.startCheckPoint(startPoint)
             }
             
             if let stopPoint = vm.replayValidator?.stopReplayCheckpoint?.point {
-                MapContents.stopPoint(stopPoint)
+                MapContents.stopCheckPoint(stopPoint)
             }
             
         }

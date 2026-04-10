@@ -1,53 +1,50 @@
 //
-//  StartPoint.swift
+//  StartPointView.swift
 //  Routka
 //
-//  Created by vladukha on 26.02.2026.
+//  Created by vladukha on 10.04.2026.
 //
+
+
 import SwiftUI
 import MapKit
 
 extension MapContents {
-    /// Start checkpoint
+    /// Start point of a track
     @MapContentBuilder
     static public func startPoint(_ trackPoint: TrackPoint) -> some MapContent {
         
         Annotation(coordinate: trackPoint.position,
                    anchor: .bottom) {
-            StartPointView(startPoint: trackPoint)
+            StartPointView()
         } label: {
         }
 
     }
 }
 
-private struct StartPointView: View {
-    let startPoint: TrackPoint
-
-    
+struct StartPointView: View {
     var body: some View {
-        VStack(spacing: 4) {
-            Text("START")
-                .font(.caption)
-                .foregroundStyle(Color.white)
-                .stroke(color: .black, width: 0.5)
-            .bold()
-            let unFilledAmount = 0.75
-            let degree = (180 - (360 - (360 * (unFilledAmount)))) / 2
-            ZStack {
-                Circle()
-                   .trim(from: 0.0,
-                         to: unFilledAmount)
-                   .stroke(Color.green.gradient.opacity(0.8),
-                           style: .init(lineWidth: 4,
-                                        lineCap: .round))
-                   .rotationEffect(.degrees(180))
-                   .rotationEffect(.degrees((-degree)))
-            }
-               .frame(width: 20)
+        VStack(spacing: 2) {
+            Text(verbatim: "START")
+                .font(.caption.weight(.bold))
+                .tracking(0.8)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(
+                    Capsule()
+                        .fill(.green.gradient)
+                )
+            Triangle()
+                .fill(.green.gradient)
+                .frame(width: 12, height: 10)
+                .stroke(color: .white.opacity(0.7))
         }
     }
 }
+
+
 
 #Preview {
     VStack {
@@ -58,5 +55,5 @@ private struct StartPointView: View {
     }
 }
 #Preview("Inside View") {
-    StartPointView(startPoint: Track.filledTrack.points.first!)
+    StartPointView()
 }

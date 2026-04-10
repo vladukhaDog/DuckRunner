@@ -7,6 +7,7 @@
 
 
 import MapKit
+import SwiftUI
 
 let mapSnapshotGeneratorLogger = MainLogger("MapSnapshotGenerator")
 
@@ -259,52 +260,39 @@ final class MapSnapshotGenerator: MapSnapshotGeneratorProtocol {
         title: String,
         in context: UIGraphicsImageRendererContext
     ) {
+        let markerView = markerView(for: title)
+            .fixedSize()
 
-        let pinSize: CGFloat = 22
-        let textOffset: CGFloat = 4
-        let strokeWidth: CGFloat = 8
+        let renderer = ImageRenderer(content: markerView)
+        let transform = context.cgContext.ctm
+        renderer.scale = max(abs(transform.a), abs(transform.d))
 
-        let fillColor = UIColor.white
-        let strokeColor = UIColor.black
+        renderer.render { size, renderInContext in
+            let drawOrigin = CGPoint(
+                x: point.x - size.width / 2,
+                y: point.y - size.height
+            )
 
-        // ---- Draw SF Symbol pin ----
-        let config = UIImage.SymbolConfiguration(paletteColors: [UIColor.black, UIColor.systemMint])
-        let sizeConfig = UIImage.SymbolConfiguration(pointSize: pinSize, weight: .bold)
-        config.applying(sizeConfig)
-        if let pinImage = UIImage( systemName: "mappin.circle.fill",
-                                   withConfiguration: config ){
-            let pinOrigin = CGPoint( x: point.x - pinSize / 2, y: point.y - pinSize )
-            pinImage.draw(in: CGRect(origin: pinOrigin, size: CGSize(width: pinSize, height: pinSize)) )
+            let cgContext = context.cgContext
+            cgContext.saveGState()
+            cgContext.translateBy(x: drawOrigin.x, y: drawOrigin.y)
+            cgContext.translateBy(x: 0, y: size.height)
+            cgContext.scaleBy(x: 1, y: -1)
+            renderInContext(cgContext)
+            cgContext.restoreGState()
         }
+    }
 
-        let font = UIFont.systemFont(ofSize: 15, weight: .bold)
-
-        // ---- Stroke pass ----
-        let strokeAttributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: UIColor.clear,
-            .strokeColor: strokeColor,
-            .strokeWidth: strokeWidth   // POSITIVE = stroke only
-        ]
-
-        // ---- Fill pass ----
-        let fillAttributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: fillColor
-        ]
-
-        let textSize = title.size(withAttributes: fillAttributes)
-
-        let textPoint = CGPoint(
-            x: point.x - textSize.width / 2,
-            y: point.y + textOffset
-        )
-
-        // Draw stroke first
-        title.draw(at: textPoint, withAttributes: strokeAttributes)
-
-        // Draw fill on top
-        title.draw(at: textPoint, withAttributes: fillAttributes)
+    @ViewBuilder
+    private func markerView(for title: String) -> some View {
+        switch title {
+        case "Start":
+            StartPointView()
+        case "Stop":
+            StopPointView()
+        default:
+            EmptyView()
+        }
     }
 
 

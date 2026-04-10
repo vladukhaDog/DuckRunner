@@ -1,58 +1,61 @@
 //
-//  StopPoint.swift
+//  StartPointView 2.swift
 //  Routka
 //
-//  Created by vladukha on 26.02.2026.
+//  Created by vladukha on 10.04.2026.
 //
-import MapKit
+
+
+
 import SwiftUI
+import MapKit
 
 extension MapContents {
-    /// Stop checkpoint
+    /// Start point of a track
     @MapContentBuilder
     static public func stopPoint(_ trackPoint: TrackPoint) -> some MapContent {
         
         Annotation(coordinate: trackPoint.position,
                    anchor: .bottom) {
-            StopPointView(trackPoint: trackPoint)
+            StopPointView()
         } label: {
         }
 
     }
 }
 
-private struct StopPointView: View {
-    let trackPoint: TrackPoint
-    
-    private var icon: some View {
-        Image(systemName: "flag.pattern.checkered.2.crossed")
-            .resizable()
-            .scaledToFit()
-            .foregroundStyle(Color.green)
-            .stroke(color: .black, width: 0.2)
-    }
-    
+struct StopPointView: View {
     var body: some View {
-        VStack(spacing: 0) {
-            Text("FINISH")
-                .font(.caption)
-                .foregroundStyle(Color.white)
-                .stroke(color: .black, width: 0.5)
-            .bold()
-            icon
+        VStack(spacing: 2) {
+            Text(verbatim: "STOP")
+                .font(.caption.weight(.bold))
+                .tracking(0.8)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(
+                    Capsule()
+                        .fill(.mint.gradient)
+                )
+            Triangle()
+                .fill(.mint.gradient)
+                .frame(width: 12, height: 10)
+                .stroke(color: .orange.opacity(0.7))
         }
+        
     }
 }
+
+
 
 #Preview {
     VStack {
         Map() {
             MapContents.speedTrack(.filledTrack)
-            MapContents.stopPoint(Track.filledTrack.points.first!)
+            MapContents.stopPoint(Track.filledTrack.points.last!)
         }
     }
 }
-
 #Preview("Inside View") {
-    StopPointView(trackPoint: Track.filledTrack.points.first!)
+    StopPointView()
 }
