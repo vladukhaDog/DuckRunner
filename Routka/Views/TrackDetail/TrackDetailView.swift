@@ -171,7 +171,7 @@ struct TrackDetailView: View {
                     }
                 })) {
                     ForEach([ReplayMode.classical, .speedtrap], id: \.rawValue) { type in
-                        Text(type.rawValue.capitalized)
+                        Text(LocalizedStringKey(type.rawValue))
                             .tag(type)
                     }
                 }
