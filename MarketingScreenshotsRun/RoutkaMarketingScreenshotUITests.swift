@@ -192,7 +192,7 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
     }
     
     @MainActor
-    func test_TrackEdit() async throws {
+    func deprecated_TrackEdit() async throws {
         let app = XCUIApplication()
         app.launchArguments.append("UITestingDarkModeEnabled")
         app.launch()
@@ -228,6 +228,35 @@ final class RoutkaMarketingScreenshotUITests: XCTestCase {
         
                 let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
                 attachment.name = "\(localeIdentifier).6 Track edit"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+    }
+    
+    @MainActor
+    func test_TrackMap() async throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("UITestingDarkModeEnabled")
+        app.launchArguments.append("CreateSpeedCheckpointsForUITest")
+        app.launch()
+        await self.dismissDisclaimerIfPresent(onApp: app)
+
+        let tracksTab = app.tabBars.firstMatch.buttons.allElementsBoundByIndex[1]
+        XCTAssertTrue(tracksTab.waitForExistence(timeout: 5))
+        sleep(2)
+        tracksTab.tap()
+
+        let firstHistoryTrack = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH %@", "historyTrackButton_")
+        ).firstMatch
+        XCTAssertTrue(firstHistoryTrack.waitForExistence(timeout: 5))
+        firstHistoryTrack.tap()
+        
+
+        app.buttons["mapDetailButton"].tap()
+
+        app.rotate(.pi + (.pi / 6), withVelocity: 1)
+                let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+                attachment.name = "\(localeIdentifier).6 Track Map View"
                 attachment.lifetime = .keepAlways
                 add(attachment)
     }

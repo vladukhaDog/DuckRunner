@@ -41,55 +41,68 @@ struct TrackMapDetailView: View {
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     let track: Track
     let dependencies: DependencyManager
+    @State private var coordinate: CGPoint = .zero
     var body: some View {
-        MapReader { proxy in
-            MapView(mode: .free(track), dependencies: dependencies) {
-                MapContents.speedTrack(track)
-                if let start = track.points.first {
-                    MapContents.startPoint(start)
-                }
-                if let last = track.points.last {
-                    MapContents.stopPoint(last)
-                }
-                
-                ForEach(undoableList.state, id: \.position) { point in
+        ZStack {
+            MapReader { proxy in
+                MapView(mode: .free(track), dependencies: dependencies) {
+                    MapContents.speedTrack(track)
+                    if let start = track.points.first {
+                        MapContents.startPoint(start)
+                    }
+                    if let last = track.points.last {
+                        MapContents.stopPoint(last)
+                    }
                     
-                    Annotation(coordinate: point.position,
-                               anchor: .bottom) {
-                        SpeedPointView(point)
-                            .transition(.opacity)
-                        .onTapGesture {
-                            undoableList.removeElement(point)
+                    ForEach(undoableList.state, id: \.position) { point in
+                        
+                        Annotation(coordinate: point.position,
+                                   anchor: .bottom) {
+                            SpeedPointView(point)
+                                .transition(.opacity)
+                            .onTapGesture {
+                                undoableList.removeElement(point)
+                            }
+                        } label: {
+                            EmptyView()
                         }
-                    } label: {
-                        EmptyView()
                     }
                 }
-            }
-            .overlay(alignment: .bottomTrailing, content: {
-                controls
-            })
-            .animation(.bouncy, value: undoableList.state)
-            .onAppear {
-                guard self.trackBounds == nil else { return }
-                let region = self.track.points.regionOfATrack()
-                self.trackBounds = .init(region: region)
-            }
-            .onTapGesture { tapPoint in
-                Task.detached {
-                    guard let tapPointCoordinate = proxy.convert(tapPoint, from: .local) else { return }
-                    let tapAsMapPoint = MKMapPoint(tapPointCoordinate)
-                    // Skip finding closest speed point if the tap is outside the track bounds, helps with optimization
-                    guard let trackBounds = await trackBounds,
-                          trackBounds.contains(tapAsMapPoint) else { return }
-                    guard let closestPoint = closestTrackPoint(to: tapAsMapPoint) else { return }
-                    guard let pointOnScreen = proxy.convert(closestPoint.position, to: .local) else { return }
-                    // limiting tap to some are around the found point
-                    guard abs(tapPoint.x - pointOnScreen.x) < 18,
-                          abs(tapPoint.y - tapPoint.y) < 18 else { return }
-                    await MainActor.run {
-                        withAnimation {
-                            undoableList.addElement(closestPoint)
+                .overlay(alignment: .bottomTrailing, content: {
+                    controls
+                })
+                .animation(.bouncy, value: undoableList.state)
+                .onAppear {
+                    guard self.trackBounds == nil else { return }
+                    let region = self.track.points.regionOfATrack()
+                    self.trackBounds = .init(region: region)
+                    if ProcessInfo.processInfo.arguments.contains("CreateSpeedCheckpointsForUITest") {
+                        let totalCount = self.track.points.count
+                        let step = totalCount / 4
+                        let stride: StrideTo<Int> = stride(from: step, to: totalCount - step, by: step)
+                        for index in stride {
+                            let point = self.track.points[index]
+                            self.undoableList.addElement(point)
+                        }
+                    }
+                }
+                .onTapGesture { tapPoint in
+                    print("TappedPoint", tapPoint)
+                    Task.detached {
+                        guard let tapPointCoordinate = proxy.convert(tapPoint, from: .local) else { return }
+                        let tapAsMapPoint = MKMapPoint(tapPointCoordinate)
+                        // Skip finding closest speed point if the tap is outside the track bounds, helps with optimization
+                        guard let trackBounds = await trackBounds,
+                              trackBounds.contains(tapAsMapPoint) else { return }
+                        guard let closestPoint = closestTrackPoint(to: tapAsMapPoint) else { return }
+                        guard let pointOnScreen = proxy.convert(closestPoint.position, to: .local) else { return }
+                        // limiting tap to some are around the found point
+                        guard abs(tapPoint.x - pointOnScreen.x) < 18,
+                              abs(tapPoint.y - tapPoint.y) < 18 else { return }
+                        await MainActor.run {
+                            withAnimation {
+                                undoableList.addElement(closestPoint)
+                            }
                         }
                     }
                 }

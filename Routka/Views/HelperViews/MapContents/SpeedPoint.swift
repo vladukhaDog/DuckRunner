@@ -31,20 +31,27 @@ struct SpeedPointView: View {
     }
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            let unit = UnitSpeed.byName(speedUnit)
-            let speed = SpeedConverter(speed: point.speed).getSpeed(unit)
+           
             // Reserve space for cool layout
-            Text(verbatim: "\(speed.description) \(unit.symbol)")
+            text
                 .opacity(0)
             Triangle()
                 .fill(.orange.gradient)
                 .frame(width: 15, height: 12)
                 .stroke(color: .teal)
-            Text(verbatim: "\(speed.description) \(unit.symbol)")
+            text
             
         }
         .font(.headline)
         
+    }
+    
+    private var text: some View {
+        let unit = UnitSpeed.byName(speedUnit)
+        let speed = SpeedConverter(speed: point.speed).getSpeed(unit)
+        return Text(verbatim: "\(speed.description) \(unit.symbol)")
+            .padding(.horizontal, 5)
+            .glassEffect(in: Capsule())
     }
 }
 
