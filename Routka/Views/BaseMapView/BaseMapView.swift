@@ -7,6 +7,38 @@
 
 import SwiftUI
 import MapKit
+import NeedleFoundation
+
+protocol BaseMapDependency: Dependency {
+    var trackReplayCoordinator: any TrackReplayCoordinatorProtocol { get }
+    var locationService: any LocationServiceProtocol { get }
+    var storageService: any TrackStorageProtocol { get }
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
+}
+
+nonisolated
+final class BaseMapComponent: Component<BaseMapDependency> {
+    
+    @MainActor
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent {
+        TrackPresetsComponent(parent: self,
+                              startTrack: startTrack)
+    }
+    
+    @MainActor
+    var viewModel: any BaseMapViewModelProtocol{
+        BaseMapViewModel(trackReplayCoordinator: dependency.trackReplayCoordinator,
+                         locationService: dependency.locationService,
+                         storageService: dependency.storageService,
+                         measuredTrackStorageService: dependency.measuredTrackStorageService,
+                         component: self)
+    }
+    
+    @MainActor
+    var view: BaseMapView {
+        BaseMapView(vm: viewModel)
+    }
+}
 
 /// View for displaying an interactive map and current tracking information, including speed and live track data.
 /// Hosts overlays for live speed and track info, and manages user tracking controls.
@@ -20,11 +52,9 @@ struct BaseMapView: View {
     
     @Namespace var animationNamespace
     
-    private let dependencies: DependencyManager
+    
     /// Creates a new map view bound to the provided view model instance.
-    init(vm: any BaseMapViewModelProtocol,
-         dependencies: DependencyManager) {
-        self.dependencies = dependencies
+    init(vm: any BaseMapViewModelProtocol) {
         self._vm = State(wrappedValue: vm)
     }
     
@@ -32,33 +62,32 @@ struct BaseMapView: View {
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        #warning("MapView is not implemented")
-        Text("")
-//        MapView(mode: vm.mapMode, dependencies: dependencies) {
-//            UserAnnotation()
-//            if let replayTrack = vm.replayValidator?.track {
-//                MapContents.replayTrack(replayTrack)
-//            }
-//            if let currentTrack = vm.trackRecordingService.currentTrack {
-//                MapContents.liveTrack(currentTrack)
-//            }
-//            let checkPoints = vm.replayValidator?.checkpoints
-//                .map({$0.value})
-//            
-//            ForEach(checkPoints ?? [], id: \.id) { checkpoint in
-//                MapContents.checkPoint(checkpoint)
-//            }
-//            
-//            if let startPoint = vm.replayValidator?.startReplayCheckpoint?.point,
-//               vm.showStartPoint {
-//                MapContents.startCheckPoint(startPoint)
-//            }
-//            
-//            if let stopPoint = vm.replayValidator?.stopReplayCheckpoint?.point {
-//                MapContents.stopCheckPoint(stopPoint)
-//            }
-//            
-//        }
+        MapView(vm: .init(mode: vm.mapMode,
+                          locationService: vm.locationService)) {
+            UserAnnotation()
+            if let replayTrack = vm.replayValidator?.track {
+                MapContents.replayTrack(replayTrack)
+            }
+            if let currentTrack = vm.trackRecordingService.currentTrack {
+                MapContents.liveTrack(currentTrack)
+            }
+            let checkPoints = vm.replayValidator?.checkpoints
+                .map({$0.value})
+            
+            ForEach(checkPoints ?? [], id: \.id) { checkpoint in
+                MapContents.checkPoint(checkpoint)
+            }
+            
+            if let startPoint = vm.replayValidator?.startReplayCheckpoint?.point,
+               vm.showStartPoint {
+                MapContents.startCheckPoint(startPoint)
+            }
+            
+            if let stopPoint = vm.replayValidator?.stopReplayCheckpoint?.point {
+                MapContents.stopCheckPoint(stopPoint)
+            }
+            
+        }
         .overlay(alignment: .top) {
             if let currentSpeed = vm.currentSpeed {
                 SpeedometerView(currentSpeed, displayUnit: unitSpeed)
@@ -81,8 +110,8 @@ struct BaseMapView: View {
         .animation(.bouncy, value: vm.trackRecordingService.currentTrack != nil)
         .animation(.default, value: vm.replayValidator?.track != nil)
         .sheet(isPresented: $showMeasuredTracksSelector) {
-            TrackPresetsView(vm: TrackPresetsViewModel(baseMapVM: vm,
-                                                       dependencies: dependencies))
+            vm.presetsComponent?
+                .view
             .navigationTransition(.zoom(sourceID: "measure_presets_transition", in: animationNamespace))
         }
     }

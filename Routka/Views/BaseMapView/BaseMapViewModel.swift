@@ -19,6 +19,8 @@ enum TrackControlMode {
 /// including track recording, location updates handling, and track replay management.
 @Observable
 final class BaseMapViewModel: BaseMapViewModelProtocol {
+    
+    
     // MARK: - UI show parameters
     var showStartPoint: Bool {
         trackRecordingService.isRecording != true
@@ -282,15 +284,22 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
         }
     }
     
+    var presetsComponent: TrackPresetsComponent?
+    
     
     // MARK: - Init
-    init(dependencies: DependencyManager, trackRecordingService: any TrackRecordingServiceProtocol = TrackRecordingService()) {
-        self.trackReplayCoordinator = dependencies.trackReplayCoordinator
+    init(trackRecordingService: any TrackRecordingServiceProtocol = TrackRecordingService(),
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
+         locationService: any LocationServiceProtocol,
+         storageService: any TrackStorageProtocol,
+         measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+         component: BaseMapComponent) {
+        self.trackReplayCoordinator = trackReplayCoordinator
         self.trackRecordingService = trackRecordingService
-        self.locationService = dependencies.locationService
-        self.trackStorageService = dependencies.storageService
-        self.measuredTrackStorageService = dependencies.measuredTrackStorageService
-        
+        self.locationService = locationService
+        self.trackStorageService = storageService
+        self.measuredTrackStorageService = measuredTrackStorageService
+        self.presetsComponent = component.presetsComponent(self.startTrack(_:))
         self.trackReplayCoordinator
             .selectedTrackPublisher
             .receive(on: RunLoop.main)

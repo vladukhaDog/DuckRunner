@@ -18,6 +18,9 @@ protocol BaseMapViewModelProtocol: Observable, LocationAccessViewModelProtocol {
     var showControls: Bool { get } // trackControlMode != .hidden
     var showMeasureTrackSelectorButton: Bool { get } //isRecordingTrack() == false
     var recordingButtonIsRecording: Bool { get }
+    var presetsComponent: TrackPresetsComponent? { get }
+    
+    var locationService: any LocationServiceProtocol { get }
     
     var mapMode: MapViewMode { get }
     var trackControlMode: TrackControlMode { get }

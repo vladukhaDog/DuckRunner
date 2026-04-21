@@ -44,6 +44,41 @@ private class RootDependency3944cc797a4a88956fb5Provider: RootDependency {
 private func factory264bfc4d4cb6b0629b40f47b58f8f304c97af4d5(_ component: NeedleFoundation.Scope) -> AnyObject {
     return RootDependency3944cc797a4a88956fb5Provider(appComponent: parent1(component) as! AppComponent)
 }
+private class TrackPresetsDependencyd183b1fd1768001f1320Provider: TrackPresetsDependency {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->BaseMapComponent->TrackPresetsComponent
+private func factoryc54fb74f56d2e8aeb21eb2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackPresetsDependencyd183b1fd1768001f1320Provider(appComponent: parent3(component) as! AppComponent)
+}
+private class BaseMapDependency7bbe6ed5fa952cf4f036Provider: BaseMapDependency {
+    var trackReplayCoordinator: any TrackReplayCoordinatorProtocol {
+        return appComponent.trackReplayCoordinator
+    }
+    var locationService: any LocationServiceProtocol {
+        return appComponent.locationService
+    }
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->BaseMapComponent
+private func factorybcfd2fbfb73eaddf911db7304b634b3e62c64b3c(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return BaseMapDependency7bbe6ed5fa952cf4f036Provider(appComponent: parent2(component) as! AppComponent)
+}
 private class TrackMapDependencyb7df5df670b4876115d1Provider: TrackMapDependency {
     var locationService: any LocationServiceProtocol {
         return mockTrackMapDetailParentComponent.locationService
@@ -140,6 +175,7 @@ extension AppComponent: NeedleFoundation.Registration {
         localTable["cacheFileManager-any CacheFileManagerProtocol"] = { [unowned self] in self.cacheFileManager as Any }
         localTable["tabRouter-any TabRouterProtocol"] = { [unowned self] in self.tabRouter as Any }
         localTable["locationService-any LocationServiceProtocol"] = { [unowned self] in self.locationService as Any }
+        localTable["measuredTrackStorageService-any MeasuredTrackStorageProtocol"] = { [unowned self] in self.measuredTrackStorageService as Any }
         localTable["mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"] = { [unowned self] in self.mapSnapshotGenerator as Any }
     }
 }
@@ -147,6 +183,20 @@ extension RootComponent: NeedleFoundation.Registration {
     public func registerItems() {
         keyPathToName[\RootDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
         keyPathToName[\RootDependency.routers] = "routers-[String: Router]"
+
+    }
+}
+extension TrackPresetsComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackPresetsDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+    }
+}
+extension BaseMapComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\BaseMapDependency.trackReplayCoordinator] = "trackReplayCoordinator-any TrackReplayCoordinatorProtocol"
+        keyPathToName[\BaseMapDependency.locationService] = "locationService-any LocationServiceProtocol"
+        keyPathToName[\BaseMapDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\BaseMapDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
 
     }
 }
@@ -202,6 +252,8 @@ private func registerProviderFactory(_ componentPath: String, _ factory: @escapi
 @inline(never) private func register1() {
     registerProviderFactory("^->AppComponent", factoryEmptyDependencyProvider)
     registerProviderFactory("^->AppComponent->RootComponent", factory264bfc4d4cb6b0629b40f47b58f8f304c97af4d5)
+    registerProviderFactory("^->AppComponent->RootComponent->BaseMapComponent->TrackPresetsComponent", factoryc54fb74f56d2e8aeb21eb2702fa908b4cedb8464)
+    registerProviderFactory("^->AppComponent->RootComponent->BaseMapComponent", factorybcfd2fbfb73eaddf911db7304b634b3e62c64b3c)
     registerProviderFactory("^->MockTrackMapDetailParentComponent->TrackMapComponent", factory6c4694b1def835eff0108adf4a46b14b88d9ed11)
     registerProviderFactory("^->AppComponent->RootComponent->TrackDetailComponent->TrackMapComponent", factory92921049afcc56cdfef9b2702fa908b4cedb8464)
     registerProviderFactory("^->MockTrackMapDetailParentComponent", factoryEmptyDependencyProvider)

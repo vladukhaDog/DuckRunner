@@ -53,6 +53,11 @@ class AppComponent: BootstrapComponent {
         shared { LocationService() }
     }
     
+    @MainActor
+    public var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        shared { MeasuredTrackRepository() }
+    }
+    
     #warning("Move lower to TrackTabComponent")
     @MainActor
     public var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
@@ -91,6 +96,11 @@ final class RootComponent: Component<RootDependency> {
     var trackDetail: TrackDetailComponent {
         TrackDetailComponent(parent: self, track: .filledTrack)
     }
+    
+    @MainActor
+    var map: BaseMapComponent {
+        BaseMapComponent(parent: self)
+    }
 }
 
 
@@ -112,6 +122,9 @@ final class RootViewModel {
     var trackDetailView: some View {
         self.component.trackDetail.view
     }
+    var mapView: some View {
+        self.component.map.view
+    }
 }
 
 struct RootView: View {
@@ -122,9 +135,7 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $vm.tabRouter.selectedTab) {
             Tab("Map", systemImage: "map", value: "map") {
-                EmptyView()
-//                BaseMapView(vm: baseMapViewModel,
-//                            dependencies: dependencies)
+                vm.mapView
             }
             if let router = vm.routers["Tracks"] {
                 Tab("Tracks", systemImage: "book.pages", value: "Tracks") {

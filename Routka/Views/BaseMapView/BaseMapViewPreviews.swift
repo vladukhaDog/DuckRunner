@@ -6,6 +6,7 @@
 //
 import CoreLocation
 import SwiftUI
+import NeedleFoundation
 
 fileprivate enum PreviewState: String, CaseIterable {
     case readyToRecord
@@ -16,23 +17,23 @@ fileprivate enum PreviewState: String, CaseIterable {
 }
 
 #Preview(PreviewState.readyToRecord.rawValue) {
-    BaseMapView(vm: PreviewModel(.readyToRecord), dependencies: .mock())
+    BaseMapView(vm: PreviewModel(.readyToRecord))
 }
 
 #Preview(PreviewState.unknownAuthorization.rawValue) {
-    BaseMapView(vm: PreviewModel(.unknownAuthorization), dependencies: .mock())
+    BaseMapView(vm: PreviewModel(.unknownAuthorization))
 }
 
 #Preview(PreviewState.currentyRecordingClean.rawValue) {
-    BaseMapView(vm: PreviewModel(.currentyRecordingClean), dependencies: .mock())
+    BaseMapView(vm: PreviewModel(.currentyRecordingClean))
 }
 
 #Preview(PreviewState.currentlyRecordingMeasurement.rawValue) {
-    BaseMapView(vm: PreviewModel(.currentlyRecordingMeasurement), dependencies: .mock())
+    BaseMapView(vm: PreviewModel(.currentlyRecordingMeasurement))
 }
 
 #Preview(PreviewState.recordedMeasurement.rawValue) {
-    BaseMapView(vm: PreviewModel(.recordedMeasurement), dependencies: .mock())
+    BaseMapView(vm: PreviewModel(.recordedMeasurement))
 }
 
 
@@ -73,6 +74,27 @@ private final class MockTrackRecorder: TrackRecordingServiceProtocol {
 
 @Observable
 private final class PreviewModel: BaseMapViewModelProtocol {
+    var presetsComponent: TrackPresetsComponent? {
+        MockComponent().trackComponent
+    }
+    
+    var locationService: any LocationServiceProtocol = DependencyManager.MockLocationService()
+    
+    nonisolated
+    class MockComponent: BootstrapComponent {
+        @MainActor
+        public var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+            DependencyManager.MockMeasuredTrackStorageService()
+        }
+        
+        
+        
+        @MainActor
+        var trackComponent: TrackPresetsComponent {
+            TrackPresetsComponent(parent: self, startTrack: {_ in})
+        }
+    }
+    
     var showStartPoint: Bool = true
     var showDeselectReplayButton: Bool = true
     var showMeasuringProgress: Bool = true
