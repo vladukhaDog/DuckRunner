@@ -6,21 +6,45 @@
 //
 
 import SwiftUI
+import NeedleFoundation
+
+nonisolated
+final class TrackHistoryCellComponent: Component<EmptyDependency> {
+    private let track: Track
+    private let unitSpeed: UnitSpeed
+    init(parent: Scope,
+         track: Track,
+         unitSpeed: UnitSpeed) {
+        self.track = track
+        self.unitSpeed = unitSpeed
+        super.init(parent: parent)
+    }
+    
+    @MainActor
+    var mapSnippet: MapSnippetComponent {
+        MapSnippetComponent(parent: self, track: track)
+    }
+    
+    @MainActor
+    var view: TrackHistoryCellView {
+        TrackHistoryCellView(track: track,
+                             unit: unitSpeed,
+                             mapSnippetComponent: mapSnippet)
+    }
+}
 
 /// View Cell of a Track in history list
 struct TrackHistoryCellView: View {
     let track: Track
     let unit: UnitSpeed
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol
-    
+    let mapSnippetComponent: MapSnippetComponent
     /// Initializes the history view with the given view model.
-    init(track: Track, unit: UnitSpeed,
-         dependencies: DependencyManager) {
+    init(track: Track,
+         unit: UnitSpeed,
+         mapSnippetComponent: MapSnippetComponent) {
         self.track = track
         self.unit = unit
-        self.mapSnippetCache = dependencies.mapSnippetCache
-        self.mapSnapshotGenerator = dependencies.mapSnapshotGenerator
+        self.mapSnippetComponent = mapSnippetComponent
     }
     
     var body: some View {
@@ -75,26 +99,47 @@ struct TrackHistoryCellView: View {
     }
     
     private var mapSnippet: some View {
-        MapSnippetView(mapSnippetCache: mapSnippetCache,
-                       mapSnapshotGenerator: mapSnapshotGenerator,
-                       track: track)
+        mapSnippetComponent.mapSnippet
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 0)
             
     }
 }
 
-
+private class PreviewBox {
+    nonisolated
+    fileprivate class MockComponent: BootstrapComponent {
+        @MainActor
+        public var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+            DependencyManager.MockTrackMapSnippetCache()
+        }
+        @MainActor
+        public var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+            MapSnapshotGenerator()
+        }
+        
+        
+        @MainActor
+        var mapComponent: MapSnippetComponent {
+            MapSnippetComponent(parent: self, track: .filledTrack)
+        }
+        
+        @MainActor
+        func trackCell(unit: UnitSpeed) -> TrackHistoryCellComponent {
+            TrackHistoryCellComponent(parent: self, track: .filledTrack, unitSpeed: unit)
+        }
+    }
+}
 #Preview {
+    
     ZStack {
 //        Color.cyan.opacity(0.3)
+        let component = PreviewBox.MockComponent()
         VStack {
-            TrackHistoryCellView(track: .filledTrack,
-                                 unit: .kilometersPerHour,
-                                 dependencies: .mock())
-            TrackHistoryCellView(track: .filledTrack,
-                                 unit: .milesPerHour,
-                                 dependencies: .mock())
+            
+            component.trackCell(unit: .kilometersPerHour).view
+            component.trackCell(unit: .milesPerHour).view
+            
         }
     }
 }

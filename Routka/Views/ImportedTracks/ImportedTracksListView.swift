@@ -55,9 +55,11 @@ struct ImportedTracksListView: View {
 //                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
 //                                    .trackDetail(track: track, dependencies: dependencies))
                             } label: {
-                                TrackHistoryCellView(track: track,
-                                                     unit: UnitSpeed.byName(speedUnit),
-                                                     dependencies: dependencies)
+                                #warning("Fix cell view")
+                                Text("No Cell")
+//                                TrackHistoryCellView(track: track,
+//                                                     unit: UnitSpeed.byName(speedUnit),
+//                                                     dependencies: dependencies)
                                 .containerRelativeFrame([.horizontal, .vertical]) { size, axis in
                                     if axis == .vertical {
                                         return size * 0.4

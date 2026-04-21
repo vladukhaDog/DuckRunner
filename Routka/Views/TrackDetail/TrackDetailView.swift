@@ -68,6 +68,28 @@ nonisolated final class TrackDetailComponent: Component<TrackDetailDependency> {
         TrackMapComponent(parent: self, track: track)
     }
     
+    @MainActor
+    var route: any Route {
+        RouteBuilder(component: self)
+    }
+    
+    @MainActor
+    struct RouteBuilder: Route {
+        static func == (lhs: RouteBuilder, rhs: RouteBuilder) -> Bool {
+            lhs.component.track == rhs.component.track
+        }
+        
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(component.track)
+        }
+        
+        let component: TrackDetailComponent
+
+        func build() -> AnyView {
+            AnyView(component.view)
+        }
+    }
+    
 }
 
 

@@ -93,8 +93,8 @@ final class RootComponent: Component<RootDependency> {
     }
     
     @MainActor
-    var trackDetail: TrackDetailComponent {
-        TrackDetailComponent(parent: self, track: .filledTrack)
+    var tracksTab: TracksTabComponent {
+        TracksTabComponent(parent: self)
     }
     
     @MainActor
@@ -119,8 +119,8 @@ final class RootViewModel {
         self.component = component
     }
     
-    var trackDetailView: some View {
-        self.component.trackDetail.view
+    var tracksTabView: some View {
+        self.component.tracksTab.view
     }
     var mapView: some View {
         self.component.map.view
@@ -140,8 +140,7 @@ struct RootView: View {
             if let router = vm.routers["Tracks"] {
                 Tab("Tracks", systemImage: "book.pages", value: "Tracks") {
                     NavigatableView(router) {
-                        vm.trackDetailView
-//                        TracksTabView(vm: tracksTabViewModel, dependencies: dependencies)
+                        vm.tracksTabView
                     }
                 }
                 .accessibilityIdentifier("tracksTab")

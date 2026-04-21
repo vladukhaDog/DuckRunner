@@ -9,27 +9,78 @@ import Combine
 
 @Observable
 final class TracksTabViewModel: TracksTabViewModelProtocol {
+    func openTrack(_ track: Track) {
+        let trackDetailRoute = component.trackDetailComponent(track: track).route
+        routers[tabRouter.selectedTab]?.push(trackDetailRoute)
+    }
+    
+    
+    func trackHistoryCellComponent(track: Track, unitSpeed: UnitSpeed) -> TrackHistoryCellComponent {
+        self.component.trackHistoryCell(track: track, unitSpeed: unitSpeed)
+    }
+    
+    func openImportedTracks() {
+        #warning("fix navigation")
+//        .routers[tabRouter.selectedTab]?.push(
+//            .importedTracks(vm: ImportedTracksListViewModel(dependencies: dependencies),
+//                            dependencies: dependencies))
+    }
+    func openMeasuredTracks() {
+#warning("fix navigation")
+//        routers[tabRouter.selectedTab]?.push(
+//            .measuredTracks(vm: MeasuredTrackListViewModel(dependencies: dependencies),
+//                            dependencies: dependencies))
+    }
+    func openTrackHistory() {
+#warning("fix navigation")
+//        routers[tabRouter.selectedTab]?.push(
+//            .trackHistory(vm: TrackHistoryViewModel(dependencies: dependencies),
+//                          dependencies: dependencies))
+    }
+    func openMeasuredTrack(_ measure: MeasuredTrack) {
+#warning("fix navigation")
+//        routers[tabRouter.selectedTab]?.push(
+//            .measuredTrackDetail(track: measure, dependencies: dependencies))
+    }
+    func openMap() {
+        tabRouter.selectedTab = "Map"
+    }
+    
+    func showImporter() {
+        trackFileService.showImporter()
+    }
+    
     let showLimit = 6
     
     var historyTracks: [Track] = []
     var measuredTracks: [MeasuredTrack] = []
     var importedTracks: [Track] = []
     
-    private let dependencies: DependencyManager
     private var cancellables: Set<AnyCancellable> = []
+    private let tabRouter: any TabRouterProtocol
+    private let routers: [String: Router]
+    private let trackFileService: any TrackFileServiceProtocol
+    private let component: TracksTabComponent
     
-    init(dependencies: DependencyManager) {
-        self.dependencies = dependencies
-        
+    init(storageService: any TrackStorageProtocol,
+         measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+         tabRouter: any TabRouterProtocol,
+         routers: [String: Router],
+         trackFileService: any TrackFileServiceProtocol,
+         component: TracksTabComponent) {
+        self.component = component
+        self.tabRouter = tabRouter
+        self.routers = routers
+        self.trackFileService = trackFileService
         Task {
-            let historyTracks = await dependencies.storageService
+            let historyTracks = await storageService
                 .getAllTracks(ofType: .record, limit: showLimit)
             withAnimation {
                 self.historyTracks = historyTracks
             }
         }
         Task {
-            let importedTracks = await dependencies.storageService
+            let importedTracks = await storageService
                 .getAllTracks(ofType: .import, limit: showLimit)
             withAnimation {
                 self.importedTracks = importedTracks
@@ -37,20 +88,20 @@ final class TracksTabViewModel: TracksTabViewModelProtocol {
         }
         
         Task {
-            let measuredTracks = await dependencies.measuredTrackStorageService
+            let measuredTracks = await measuredTrackStorageService
                 .getMeasuredTracks(limit: showLimit)
             withAnimation {
                 self.measuredTracks = measuredTracks
             }
         }
         
-        self.dependencies.storageService
+        storageService
             .actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)
             }
             .store(in: &cancellables)
-        self.dependencies.measuredTrackStorageService
+        measuredTrackStorageService
             .actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)

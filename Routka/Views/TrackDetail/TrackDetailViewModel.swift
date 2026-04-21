@@ -55,7 +55,7 @@ final class TrackDetailViewModel {
     private let routers: [String: Router]
     private let trackFileService: any TrackFileServiceProtocol
     private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
-    private weak let component: TrackDetailComponent?
+    private let component: TrackDetailComponent
     private var cancellables: Set<AnyCancellable> = []
     
     /// Initializes the view model with a specific track.
@@ -144,7 +144,6 @@ final class TrackDetailViewModel {
     }
     
     func openTrackMap() {
-        guard let component else { return }
         let trackMap = component.trackMapComponent.route
         routers[tabRouter.selectedTab]?
             .push(trackMap)
