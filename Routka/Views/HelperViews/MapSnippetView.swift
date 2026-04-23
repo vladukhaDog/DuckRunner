@@ -23,7 +23,7 @@ final class MapSnippetComponent: Component<MapSnippetDependency> {
     }
     
     @MainActor
-    var mapSnippet: some View {
+    var view: some View {
         MapSnippetView(mapSnippetCache: dependency.mapSnippetCache,
                        mapSnapshotGenerator: dependency.mapSnapshotGenerator,
                        track: track)
@@ -118,6 +118,6 @@ class MockMapSnippetParentComponent: BootstrapComponent {
 #Preview {
     Group {
         let component = MockMapSnippetParentComponent()
-        return component.mapComponent.mapSnippet
+        return component.mapComponent.view
     }
 }

@@ -156,7 +156,7 @@ struct TrackDetailView: View {
                 vm.openTrackMap()
             } label: {
                 Group {
-                    vm.mapSnippetComponent.mapSnippet
+                    vm.mapSnippet.view
                 }
                 .frame(height: 200)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
