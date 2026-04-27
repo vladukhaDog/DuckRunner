@@ -15,6 +15,7 @@ protocol TracksTabDependency: Dependency {
     var tabRouter: any TabRouterProtocol { get }
     var routers: [String: Router] { get }
     var trackFileService: any TrackFileServiceProtocol { get }
+    var trackDetailBuilder: any TrackDetailBuilder { get }
 }
 
 /// Component that manages dependency and linking between all TracksTab Services
@@ -114,7 +115,7 @@ private final class TracksTabComponentsFactoryImpl: TracksTabComponentsFactory {
 extension TracksTabComponent {
     @MainActor
     func trackDetailComponent(track: Track) -> TrackDetailComponent {
-        TrackDetailComponent(parent: self, track: track)
+        dependency.trackDetailBuilder.trackDetail(track)
     }
     
     @MainActor

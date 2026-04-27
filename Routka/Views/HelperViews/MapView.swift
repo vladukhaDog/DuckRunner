@@ -150,11 +150,11 @@ struct MapView<Content: MapContent>: View {
     }
 }
 
-#warning("fix preview")
-//#Preview {
-//    MapView(mode: .trackUser, dependencies: .mock()) {
-//        UserAnnotation()
-//        MapContents.speedTrack(.filledTrack)
-//        MapContents.fantomTrack(.filledTrack)
-//    }
-//}
+
+#Preview {
+    MapView(vm: .init(mode: .trackUser, locationService: DependencyManager.MockLocationService())) {
+        UserAnnotation()
+        MapContents.speedTrack(.filledTrack)
+        MapContents.fantomTrack(.filledTrack)
+    }
+}

@@ -15,6 +15,7 @@ protocol TrackDetailDependency: Dependency {
     var routers: [String: Router] { get }
     var trackFileService: any TrackFileServiceProtocol { get }
     var trackReplayCoordinator: any TrackReplayCoordinatorProtocol { get }
+    var trackDetailBuilder: any TrackDetailBuilder { get }
 }
 
 
@@ -146,16 +147,11 @@ final class TrackDetailNavigator: TrackDetailRouting {
 extension TrackDetailComponent {
     @MainActor
     func trackDetail(_ track: Track) -> TrackDetailComponent {
-        TrackDetailComponent(parent: self, track: track)
+        dependency.trackDetailBuilder.trackDetail(track)
     }
     
     @MainActor
     func trackMap(_ track: Track) -> TrackMapComponent {
-        TrackMapComponent(parent: self, track: track)
-    }
-    
-    @MainActor
-    var trackMapComponent: TrackMapComponent {
         TrackMapComponent(parent: self, track: track)
     }
 }

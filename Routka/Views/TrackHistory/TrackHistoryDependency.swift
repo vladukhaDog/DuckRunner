@@ -14,6 +14,7 @@ protocol TrackHistoryDependency: Dependency {
     var storageService: any TrackStorageProtocol { get }
     var tabRouter: any TabRouterProtocol { get }
     var routers: [String: Router] { get }
+    var trackDetailBuilder: any TrackDetailBuilder { get }
 }
 
 nonisolated
@@ -91,7 +92,7 @@ private final class TrackHistoryComponentsFactoryImpl: TrackHistoryComponentsFac
 extension TrackHistoryComponent {
     @MainActor
     func trackDetailComponent(track: Track) -> TrackDetailComponent {
-        TrackDetailComponent(parent: self, track: track)
+        dependency.trackDetailBuilder.trackDetail(track)
     }
     
     

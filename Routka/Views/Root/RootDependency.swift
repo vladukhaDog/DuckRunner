@@ -18,6 +18,11 @@ nonisolated
 final class RootComponent: Component<RootDependency> {
     
     @MainActor
+    public var trackDetailBuilder: any TrackDetailBuilder {
+        shared { TrackDetailBuilderImpl(component: self) }
+    }
+    
+    @MainActor
     var viewModel: RootViewModel {
         RootViewModel(tabRouter: dependency.tabRouter,
                       routers: dependency.routers,
@@ -53,6 +58,8 @@ final class RootComponent: Component<RootDependency> {
                                     routers: dependency.routers)
     }
 }
+
+
 
 final class FileServiceWrapperNavigator: FileServiceWrapperRouting {
     
