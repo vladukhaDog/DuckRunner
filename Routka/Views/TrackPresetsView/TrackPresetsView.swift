@@ -8,10 +8,12 @@
 import SwiftUI
 import NeedleFoundation
 
+// MARK: - List of Dependencies
 protocol TrackPresetsDependency: Dependency {
     var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
 }
 
+// MARK: - Main Component Creation
 nonisolated
 final class TrackPresetsComponent: Component<TrackPresetsDependency> {
     private let startTrack: (RecordingAutoStopPolicy) -> Void
@@ -34,6 +36,7 @@ final class TrackPresetsComponent: Component<TrackPresetsDependency> {
     }
 }
 
+// MARK: - View
 struct TrackPresetsView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var vm: any TrackPresetsViewModelProtocol

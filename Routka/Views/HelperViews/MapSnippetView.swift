@@ -8,11 +8,13 @@
 import SwiftUI
 import NeedleFoundation
 
+// MARK: - List of Dependencies
 protocol MapSnippetDependency: Dependency {
     var mapSnippetCache: any TrackMapSnippetCacheProtocol { get }
     var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol { get }
 }
 
+// MARK: - Main Component
 nonisolated
 final class MapSnippetComponent: Component<MapSnippetDependency> {
     private let track: Track
@@ -30,6 +32,7 @@ final class MapSnippetComponent: Component<MapSnippetDependency> {
     }
 }
 
+// MARK: - View
 struct MapSnippetView: View {
     let mapSnippetCache: any TrackMapSnippetCacheProtocol
     let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol

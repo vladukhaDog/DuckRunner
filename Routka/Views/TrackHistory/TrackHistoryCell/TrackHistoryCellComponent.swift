@@ -8,7 +8,7 @@
 
 import NeedleFoundation
 import Foundation
-
+// MARK: - Main Component Creation
 nonisolated
 final class TrackHistoryCellComponent: Component<EmptyDependency> {
     private let track: Track
@@ -34,6 +34,7 @@ final class TrackHistoryCellComponent: Component<EmptyDependency> {
     }
 }
 
+// MARK: - Mock Cell Component Maker
 nonisolated
 class TrackHistoryCellMockComponentProvider: BootstrapComponent {
     @MainActor

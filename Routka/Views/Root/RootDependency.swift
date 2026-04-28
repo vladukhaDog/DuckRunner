@@ -7,13 +7,14 @@
 import NeedleFoundation
 import Foundation
 
+// MARK: - List of dependencies
 protocol RootDependency: Dependency {
     var tabRouter: any TabRouterProtocol { get }
     var routers: [String: Router] { get }
     var trackFileService: any TrackFileServiceProtocol { get }
 }
 
-
+// MARK: - Main Component creation
 nonisolated
 final class RootComponent: Component<RootDependency> {
     
@@ -60,7 +61,7 @@ final class RootComponent: Component<RootDependency> {
 }
 
 
-
+// MARK: - FileService Navigator
 final class FileServiceWrapperNavigator: FileServiceWrapperRouting {
     
     private let component: RootComponent

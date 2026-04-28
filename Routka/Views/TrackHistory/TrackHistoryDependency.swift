@@ -10,6 +10,7 @@ import NeedleFoundation
 import SimpleRouter
 import SwiftUI
 
+// MARK: - List of Dependencies
 protocol TrackHistoryDependency: Dependency {
     var storageService: any TrackStorageProtocol { get }
     var tabRouter: any TabRouterProtocol { get }
@@ -17,6 +18,7 @@ protocol TrackHistoryDependency: Dependency {
     var trackDetailBuilder: any TrackDetailBuilder { get }
 }
 
+// MARK: - Main Component Creation
 nonisolated
 final class TrackHistoryComponent: Component<TrackHistoryDependency> {
     private let id: UUID = .init()
@@ -68,6 +70,8 @@ final class TrackHistoryComponent: Component<TrackHistoryDependency> {
     }
 }
 
+// MARK: - Components Factory
+
 /// Factory for creating child components from viewmodel -> component
 @MainActor
 protocol TrackHistoryComponentsFactory: AnyObject {
@@ -88,6 +92,7 @@ private final class TrackHistoryComponentsFactoryImpl: TrackHistoryComponentsFac
 }
 
 
+// MARK: - Dependant Components creation
 /// Factory for child components of TracksTab for navigation uses
 extension TrackHistoryComponent {
     @MainActor
@@ -105,6 +110,7 @@ extension TrackHistoryComponent {
     }
 }
 
+// MARK: - Navigation Module
 /// Navigation connecting layer for viewmodel <-> component
 @MainActor
 protocol TrackHistoryRouting: AnyObject {

@@ -64,6 +64,7 @@ final class MeasuredTracksComponent: Component<MeasuredTracksDependency> {
 }
 
 
+// MARK: - Components Factory
 /// Factory for child components of module for navigation uses
 extension MeasuredTracksComponent {
     @MainActor

@@ -8,6 +8,7 @@
 import NeedleFoundation
 import Foundation
 
+// MARK: - List of Dependencies
 /// Dependencies needed for TracksTabView and ViewModel
 protocol TracksTabDependency: Dependency {
     var storageService: any TrackStorageProtocol { get }
@@ -18,6 +19,7 @@ protocol TracksTabDependency: Dependency {
     var trackDetailBuilder: any TrackDetailBuilder { get }
 }
 
+// MARK: - Main Component Creation
 /// Component that manages dependency and linking between all TracksTab Services
 nonisolated
 final class TracksTabComponent: Component<TracksTabDependency> {
@@ -47,6 +49,18 @@ final class TracksTabComponent: Component<TracksTabDependency> {
     var view: TracksTabView {
         TracksTabView(vm: viewModel)
     }
+}
+
+// MARK: - Navigation Module
+/// Navigation connecting layer for viewmodel <-> component
+@MainActor
+protocol TracksTabRouting: AnyObject {
+    func openTrack(_ track: Track)
+    func openImportedTracks()
+    func openMeasuredTracks()
+    func openTrackHistory()
+    func openMeasuredTrack(_ measure: MeasuredTrack)
+    func openMap()
 }
 
 /// Navigator that created child components and resolves navigation using them
@@ -93,6 +107,13 @@ private final class TracksTabNavigator: TracksTabRouting {
     }
 }
 
+// MARK: - Child Components Factory
+/// Factory for creating child components from viewmodel -> component
+@MainActor
+protocol TracksTabComponentsFactory: AnyObject {
+    func trackHistoryCell(track: Track, unitSpeed: UnitSpeed) -> TrackHistoryCellComponent
+}
+
 /// Factory creating components that are needed inside TracksTabView
 private final class TracksTabComponentsFactoryImpl: TracksTabComponentsFactory {
     private let component: TracksTabComponent
@@ -106,7 +127,7 @@ private final class TracksTabComponentsFactoryImpl: TracksTabComponentsFactory {
     }
 }
 
-
+// MARK: - Child Components creation 
 /// Factory for child components of TracksTab for navigation uses
 extension TracksTabComponent {
     @MainActor

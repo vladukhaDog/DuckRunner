@@ -10,10 +10,12 @@ import MapKit
 import SimpleRouter
 import NeedleFoundation
 
+// MARK: - list of Dependencies
 protocol TrackMapDependency: Dependency {
     var locationService: any LocationServiceProtocol { get }
 }
 
+// MARK: - Main Component Creation
 nonisolated
 final class TrackMapComponent: Component<TrackMapDependency> {
     private let track: Track
@@ -57,6 +59,7 @@ final class TrackMapComponent: Component<TrackMapDependency> {
     }
 }
 
+// MARK: - View
 struct TrackMapDetailView: View {
     @State private var undoableList: UndoService<TrackPoint> = .init()
     @State private var trackBounds: MKMapRect?

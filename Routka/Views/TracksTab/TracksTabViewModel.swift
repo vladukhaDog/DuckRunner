@@ -7,23 +7,6 @@
 import SwiftUI
 import Combine
 
-/// Navigation connecting layer for viewmodel <-> component
-@MainActor
-protocol TracksTabRouting: AnyObject {
-    func openTrack(_ track: Track)
-    func openImportedTracks()
-    func openMeasuredTracks()
-    func openTrackHistory()
-    func openMeasuredTrack(_ measure: MeasuredTrack)
-    func openMap()
-}
-
-/// Factory for creating child components from viewmodel -> component
-@MainActor
-protocol TracksTabComponentsFactory: AnyObject {
-    func trackHistoryCell(track: Track, unitSpeed: UnitSpeed) -> TrackHistoryCellComponent
-}
-
 @Observable
 final class TracksTabViewModel: TracksTabViewModelProtocol {
     func openTrack(_ track: Track) {

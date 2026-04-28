@@ -9,6 +9,7 @@ import SwiftUI
 import MapKit
 import NeedleFoundation
 
+// MARK: - List of dependencies
 protocol BaseMapDependency: Dependency {
     var trackReplayCoordinator: any TrackReplayCoordinatorProtocol { get }
     var locationService: any LocationServiceProtocol { get }
@@ -16,6 +17,7 @@ protocol BaseMapDependency: Dependency {
     var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
 }
 
+// MARK: - Main Component
 nonisolated
 final class BaseMapComponent: Component<BaseMapDependency> {
     
@@ -40,6 +42,8 @@ final class BaseMapComponent: Component<BaseMapDependency> {
     }
 }
 
+
+// MARK: - Base Map View
 /// View for displaying an interactive map and current tracking information, including speed and live track data.
 /// Hosts overlays for live speed and track info, and manages user tracking controls.
 struct BaseMapView: View {

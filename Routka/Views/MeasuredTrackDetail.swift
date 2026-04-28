@@ -9,12 +9,14 @@ import CoreLocation
 import SimpleRouter
 import NeedleFoundation
 
+// MARK: - list of dependencies
 protocol MeasuredTrackDetail: Dependency {
     var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
     var tabRouter: any TabRouterProtocol { get }
     var routers: [String: Router] { get }
 }
 
+// MARK: - Main Component Creation
 nonisolated
 final class MeasuredTrackDetailComponent: Component<MeasuredTrackDetail> {
     private let measuredTrack: MeasuredTrack
@@ -67,6 +69,7 @@ final class MeasuredTrackDetailComponent: Component<MeasuredTrackDetail> {
     }
 }
 
+// MARK: - View
 struct MeasuredTrackDetailView: View {
 
     /// User preference stored for the speed unit (e.g., km/h or mph).
