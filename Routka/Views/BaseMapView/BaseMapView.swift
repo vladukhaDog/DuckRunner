@@ -33,12 +33,34 @@ final class BaseMapComponent: Component<BaseMapDependency> {
                          locationService: dependency.locationService,
                          storageService: dependency.storageService,
                          measuredTrackStorageService: dependency.measuredTrackStorageService,
-                         component: self)
+                         componentsFactory: componentsFactory)
     }
     
     @MainActor
     var view: BaseMapView {
         BaseMapView(vm: viewModel)
+    }
+    
+    @MainActor
+    var componentsFactory: BaseMapComponentsFactory {
+        BaseMapComponentsFactoryImpl(component: self)
+    }
+}
+
+protocol BaseMapComponentsFactory {
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent
+}
+
+nonisolated
+final class BaseMapComponentsFactoryImpl: BaseMapComponentsFactory {
+    private let component: BaseMapComponent
+    init(component: BaseMapComponent) {
+        self.component = component
+    }
+    
+    @MainActor
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent {
+        component.presetsComponent(startTrack)
     }
 }
 

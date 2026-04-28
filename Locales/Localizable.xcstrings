@@ -431,22 +431,6 @@
         }
       }
     },
-    "Import from Files" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import from Files"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Загрузить из файлов"
-          }
-        }
-      }
-    },
     "Imported" : {
       "localizations" : {
         "en" : {

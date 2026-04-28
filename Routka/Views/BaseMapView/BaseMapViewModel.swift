@@ -293,13 +293,13 @@ final class BaseMapViewModel: BaseMapViewModelProtocol {
          locationService: any LocationServiceProtocol,
          storageService: any TrackStorageProtocol,
          measuredTrackStorageService: any MeasuredTrackStorageProtocol,
-         component: BaseMapComponent) {
+         componentsFactory: (any BaseMapComponentsFactory)?) {
         self.trackReplayCoordinator = trackReplayCoordinator
         self.trackRecordingService = trackRecordingService
         self.locationService = locationService
         self.trackStorageService = storageService
         self.measuredTrackStorageService = measuredTrackStorageService
-        self.presetsComponent = component.presetsComponent(self.startTrack(_:))
+        self.presetsComponent = componentsFactory?.presetsComponent(self.startTrack(_:))
         self.trackReplayCoordinator
             .selectedTrackPublisher
             .receive(on: RunLoop.main)

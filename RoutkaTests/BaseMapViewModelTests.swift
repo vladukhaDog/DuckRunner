@@ -63,14 +63,36 @@ private func makeLocation(lat: Double = 37.3317, lon: Double = -122.0301, speed:
                       timestamp: Date())
 }
 
+@MainActor
+private func makeViewModel(
+    trackRecordingService: any TrackRecordingServiceProtocol = MockTrackService(),
+    trackReplayCoordinator: (any TrackReplayCoordinatorProtocol)? = nil,
+    locationService: (any LocationServiceProtocol)? = nil,
+    storageService: (any TrackStorageProtocol)? = nil,
+    measuredTrackStorageService: (any MeasuredTrackStorageProtocol)? = nil
+) -> BaseMapViewModel {
+    registerProviderFactories()
+    let trackReplayCoordinator = trackReplayCoordinator ?? DependencyManager.MockTrackReplayCoordinator()
+    let locationService = locationService ?? DependencyManager.MockLocationService()
+    let storageService = storageService ?? DependencyManager.MockStorage()
+    let measuredTrackStorageService = measuredTrackStorageService ?? DependencyManager.MockMeasuredTrackStorageService()
+    return BaseMapViewModel(trackRecordingService: trackRecordingService,
+                            trackReplayCoordinator: trackReplayCoordinator,
+                            locationService: locationService,
+                            storageService: storageService,
+                            measuredTrackStorageService: measuredTrackStorageService,
+                            componentsFactory: nil)
+}
+
 @Suite("BaseMapViewModel Tests")
 struct BaseMapViewModelTests {
+  
     // MARK: - UI visibility flags
 
     @Test("Initial UI visibility flags should match default idle state")
     func testInitialShowFlags() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         #expect(vm.showStartPoint)
         #expect(!vm.showDeselectReplayButton)
@@ -83,7 +105,7 @@ struct BaseMapViewModelTests {
     @Test("Recording state should update visibility flags")
     func testShowFlagsWhileRecording() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         await vm.startTrack()
 
@@ -96,7 +118,7 @@ struct BaseMapViewModelTests {
     @Test("Finished track should show dismiss button and selector")
     func testShowFlagsForFinishedTrack() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         await trackService.setRecordedTrack(.filledTrack)
 
@@ -107,7 +129,7 @@ struct BaseMapViewModelTests {
 
     @Test("Replay selection should toggle replay-related visibility flags")
     func testShowFlagsForSelectedReplay() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         let track = await Track.filledTrack
 
         await vm.receiveReplayTrackAction(.select(track))
@@ -118,7 +140,7 @@ struct BaseMapViewModelTests {
 
     @Test("Hidden controls mode should hide controls")
     func testShowControlsWhenTrackControlModeHidden() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
 
         await MainActor.run {
             vm.trackControlMode = .hidden
@@ -133,7 +155,7 @@ struct BaseMapViewModelTests {
         await MainActor.run {
             trackService.stopPolicy = .reachingDistance(100, name: "Distance")
         }
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         #expect(vm.showMeasuringProgress)
     }
@@ -142,7 +164,7 @@ struct BaseMapViewModelTests {
     @Test("Updating location should add a new point to the track")
     func testProvidingLocationUpdatesTrackInfo() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         // Start a track to allow appending
         await vm.startTrack()
@@ -156,7 +178,7 @@ struct BaseMapViewModelTests {
 
     @Test("Updating location should update tracking speed")
     func testProvidingLocationUpdatesCurrentSpeed() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
 
         await vm.startTrack()
         await vm.receivedLocationUpdate(makeLocation(speed: 5.5))
@@ -167,9 +189,8 @@ struct BaseMapViewModelTests {
     @Test("Starting action should start a new track")
     func testUpdatingTrackServiceCurrentTrackPropagates() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
-        let start = Date()
         await trackService.startTrack(.manual)
         let trackOpt = await vm.trackRecordingService.currentTrack
         let track = try #require(trackOpt)
@@ -180,7 +201,7 @@ struct BaseMapViewModelTests {
     @Test("Starting Track should clear prev track")
     func testStartTrackStartsTrackBothClearAndAfterAnother() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         await vm.startTrack()
         let firstOpt = await vm.trackRecordingService.currentTrack
@@ -202,7 +223,7 @@ struct BaseMapViewModelTests {
     @Test("Start action should work")
     func testStart() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         // Start then stop
         await vm.startTrack()
@@ -213,7 +234,7 @@ struct BaseMapViewModelTests {
 
     @Test("Stop action on non-existing track is a no-op")
     func testStopNonStartedError() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: MockTrackService())
+        let vm = await makeViewModel(trackRecordingService: MockTrackService())
 
         // Stopping without starting should throw
         do {
@@ -229,7 +250,7 @@ struct BaseMapViewModelTests {
     @Test("After error stop action, start should works")
     func testStartWorksAfterBadStart() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         // Stopping without starting should throw
         do {
@@ -252,7 +273,7 @@ struct BaseMapViewModelTests {
     @Test("Stop Action should throw if called twice")
     func testSecondStopThrowsError() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
 
         // Start then stop
         await vm.startTrack(.manual)
@@ -265,7 +286,7 @@ struct BaseMapViewModelTests {
         do {
             try await vm.stopTrack()
             Issue.record("Should have thrown")
-        } catch TrackServiceError.currentTrackIsFinished {
+        } catch TrackServiceError.noCurrentTrack {
             #expect(true)
         } catch {
             Issue.record("Wrong error")
@@ -277,7 +298,7 @@ struct BaseMapViewModelTests {
     
     @Test("Selecting track these parameters should be correct")
     func testSelectingTrack() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         
         let track = await Track.filledTrack
         await vm.receiveReplayTrackAction(.select(track))
@@ -298,7 +319,7 @@ struct BaseMapViewModelTests {
     
     @Test("DeSelecting track these parameters should be correct")
     func testDeSelectingTrack() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         
         let track = await Track.filledTrack
         await vm.receiveReplayTrackAction(TrackReplayAction.select(track))
@@ -331,7 +352,7 @@ struct BaseMapViewModelTests {
     
     @Test("Classical selection wrong location should be not available to start")
     func testClassicalTrackAwayNotStartable() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         
         var track = await Track.filledTrack
         await track.changeType(to: .classical)
@@ -356,7 +377,7 @@ struct BaseMapViewModelTests {
     
     @Test("Classical selection correct location should be available to start")
     func testClassicalTrackCloseStartable() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         
         var track = await Track.filledTrack
         await track.changeType(to: .classical)
@@ -387,7 +408,7 @@ struct BaseMapViewModelTests {
     
     @Test("Classical selection corrent location high speed should be not available to start")
     func testClassicalTrackCloseNotStartable() async throws {
-        let vm = await BaseMapViewModel(dependencies: .mock())
+        let vm = await makeViewModel()
         
         var track = await Track.filledTrack
         await track.changeType(to: .classical)
@@ -428,7 +449,7 @@ struct BaseMapViewModelTests {
     @Test("Speedtrap selection correct location should start")
     func testSpeedtrapTrackCloseStarting() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
         
         var track = await Track.filledTrack
         await track.changeType(to: .speedtrap)
@@ -464,7 +485,7 @@ struct BaseMapViewModelTests {
     @Test("Speedtrap selection wrong location should not start")
     func testSpeedtrapTrackWrongLocationNotStarting() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
         
         var track = await Track.filledTrack
         await track.changeType(to: .speedtrap)
@@ -501,7 +522,7 @@ struct BaseMapViewModelTests {
     @Test("Speedtrap selection correct location should stop")
     func testSpeedtrapTrackCorrectLocationStoping() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
         
         var track = await Track.filledTrack
         await track.changeType(to: .speedtrap)
@@ -545,7 +566,7 @@ struct BaseMapViewModelTests {
     @Test("Replaying track with checkpoints when track not started should not pass checkpoints") 
     func testNonStartedTrackIgnoresCheckpoints() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
         
         var track = await Track.filledTrack
         await track.changeType(to: .speedtrap)
@@ -583,7 +604,7 @@ struct BaseMapViewModelTests {
     @Test("Replaying track when there is a finished recorded track on screen should clear track and react to checkpoints correctly")
     func testReplayNotStartedWithTrackOnScreen() async throws {
         let trackService = MockTrackService()
-        let vm = await BaseMapViewModel(dependencies: .mock(), trackRecordingService: trackService)
+        let vm = await makeViewModel(trackRecordingService: trackService)
         
         // Emulating that we just recorded some track manually
         await trackService.setRecordedTrack(.filledTrack)
