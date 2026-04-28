@@ -26,6 +26,9 @@ struct RootView: View {
                 }
                 .accessibilityIdentifier("tracksTab")
             }
+            Tab("Settings", systemImage: "gear", value: "Settings") {
+                vm.settingsView
+            }
         }
         .disclaimerOnce()
         .fileManager(trackFileService: vm.fileService,

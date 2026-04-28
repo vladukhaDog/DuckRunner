@@ -37,4 +37,8 @@ final class RootViewModel {
     var mapView: some View {
         self.component.map.view
     }
+    
+    var settingsView: some View {
+        self.component.settings.view
+    }
 }

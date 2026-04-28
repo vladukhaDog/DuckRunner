@@ -58,6 +58,22 @@ private class MeasuredTracksDependency0946abd535ee62ac90abProvider: MeasuredTrac
 private func factory0a6a6cfd2ada66f582b9b2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
     return MeasuredTracksDependency0946abd535ee62ac90abProvider(appComponent: parent3(component) as! AppComponent)
 }
+private class SettingsDependency04144c4f9f66bb6c6e1cProvider: SettingsDependency {
+    var cacheFileManager: any CacheFileManagerProtocol {
+        return appComponent.cacheFileManager
+    }
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return appComponent.mapSnippetCache
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->SettingsComponent
+private func factory77801784d4cc4aab7c4cb7304b634b3e62c64b3c(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return SettingsDependency04144c4f9f66bb6c6e1cProvider(appComponent: parent2(component) as! AppComponent)
+}
 private class ImportedTracksDependencyb3b29f643364f67807e3Provider: ImportedTracksDependency {
     var storageService: any TrackStorageProtocol {
         return appComponent.storageService
@@ -439,6 +455,12 @@ extension MeasuredTracksComponent: NeedleFoundation.Registration {
 
     }
 }
+extension SettingsComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\SettingsDependency.cacheFileManager] = "cacheFileManager-any CacheFileManagerProtocol"
+        keyPathToName[\SettingsDependency.mapSnippetCache] = "mapSnippetCache-any TrackMapSnippetCacheProtocol"
+    }
+}
 extension ImportedTracksComponent: NeedleFoundation.Registration {
     public func registerItems() {
         keyPathToName[\ImportedTracksDependency.storageService] = "storageService-any TrackStorageProtocol"
@@ -586,6 +608,7 @@ private func registerProviderFactory(_ componentPath: String, _ factory: @escapi
 @inline(never) private func register1() {
     registerProviderFactory("^->AppComponent", factoryEmptyDependencyProvider)
     registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent", factory0a6a6cfd2ada66f582b9b2702fa908b4cedb8464)
+    registerProviderFactory("^->AppComponent->RootComponent->SettingsComponent", factory77801784d4cc4aab7c4cb7304b634b3e62c64b3c)
     registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent", factory240837757afea43380779c42af08cd83fca49735)
     registerProviderFactory("^->AppComponent->RootComponent->BaseMapComponent->TrackPresetsComponent", factoryc54fb74f56d2e8aeb21eb2702fa908b4cedb8464)
     registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent", factoryacee5c99c52fa1d62301dcf48a1f915cc592a56e)

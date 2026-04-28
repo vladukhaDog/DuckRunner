@@ -12,12 +12,19 @@ import UIKit
 nonisolated let trackMapSnippetCacheLogger = MainLogger("TrackMapSnippetCache")
 
 
+struct StorageInfo: Sendable {
+    let availableSpaceBytes: Int64
+    let tmpFolderSizeBytes: Int64
+    let tmpFolderFileCount: Int
+}
+
 protocol CacheFileManagerProtocol: Actor {
     func fileExists(atPath path: String) -> Bool
     func contents(atPath path: String) -> Data?
     func createFile(atPath path: String, contents data: Data?, attributes attr: [Data.WritingOptions]?)
     func removeItem(atPath path: String)
     func fileNames(atPath path: String, containing substring: String) -> [String]
+    func storageInfo() -> StorageInfo
     func removeAllTrackMapCacheFiles() async
 }
 
@@ -85,6 +92,44 @@ final actor CacheFileManager: CacheFileManagerProtocol {
                                        .error)
             return []
         }
+    }
+
+    func storageInfo() -> StorageInfo {
+        let tmpURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        let availableSpaceBytes = Int64((try? tmpURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]))
+            .flatMap(\.volumeAvailableCapacityForImportantUsage) ?? 0)
+
+        let (tmpFolderSizeBytes, tmpFolderFileCount): (Int64, Int) = {
+            guard let enumerator = fileManager.enumerator(
+                at: tmpURL,
+                includingPropertiesForKeys: [.isRegularFileKey, .fileSizeKey],
+                options: [.skipsHiddenFiles]
+            ) else {
+                return (0, 0)
+            }
+
+            var totalSize: Int64 = 0
+            var fileCount = 0
+
+            for case let fileURL as URL in enumerator {
+                guard let values = try? fileURL.resourceValues(forKeys: [.isRegularFileKey, .fileSizeKey]),
+                      values.isRegularFile == true
+                else {
+                    continue
+                }
+
+                fileCount += 1
+                totalSize += Int64(values.fileSize ?? 0)
+            }
+
+            return (totalSize, fileCount)
+        }()
+
+        return StorageInfo(
+            availableSpaceBytes: availableSpaceBytes,
+            tmpFolderSizeBytes: tmpFolderSizeBytes,
+            tmpFolderFileCount: tmpFolderFileCount
+        )
     }
     
     func removeAllTrackMapCacheFiles() async {

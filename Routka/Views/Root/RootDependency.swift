@@ -48,6 +48,11 @@ final class RootComponent: Component<RootDependency> {
     }
     
     @MainActor
+    var settings: SettingsComponent {
+        SettingsComponent(parent: self)
+    }
+    
+    @MainActor
     func trackDetail(_ track: Track) -> TrackDetailComponent {
         TrackDetailComponent(parent: self, track: track)
     }

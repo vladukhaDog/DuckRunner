@@ -118,23 +118,27 @@ extension DependencyManager {
     final actor MockCacheFileManager: CacheFileManagerProtocol {
         func removeAllTrackMapCacheFiles() async {
         }
-        
+
         func fileNames(atPath path: String, containing substring: String) -> [String] {
             return []
         }
-        
+
         func fileExists(atPath path: String) -> Bool {
             return false
         }
-        
+
         func contents(atPath path: String) -> Data? {
             return nil
         }
-        
+
         func createFile(atPath path: String, contents data: Data?, attributes attr: [Data.WritingOptions]?) {
         }
-        
+
         func removeItem(atPath path: String) {
+        }
+
+        func storageInfo() -> StorageInfo {
+            StorageInfo(availableSpaceBytes: 0, tmpFolderSizeBytes: 0, tmpFolderFileCount: 0)
         }
     }
     
