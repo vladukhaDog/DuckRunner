@@ -12,15 +12,7 @@
 
 import SwiftUI
 import MapKit
-import SimpleRouter
 
-extension Route where Self == TrackDetailView.RouteBuilder {
-    /// View of a detailed track info
-    static func trackDetail(track: Track,
-                            dependencies: DependencyManager) -> TrackDetailView.RouteBuilder {
-        TrackDetailView.RouteBuilder(track: track, dependencies: dependencies)
-    }
-}
 
 
 /// A detailed view presenting comprehensive information about a finished track.
@@ -28,39 +20,16 @@ extension Route where Self == TrackDetailView.RouteBuilder {
 /// and serves as a detail/history screen displaying time, speed, distance,
 /// and a map snippet of the track route.
 struct TrackDetailView: View {
-    struct RouteBuilder: Route {
-        static func == (lhs: TrackDetailView.RouteBuilder, rhs: TrackDetailView.RouteBuilder) -> Bool {
-            lhs.track == rhs.track
-        }
-        
-        public func hash(into hasher: inout Hasher) {
-            hasher.combine(track)
-        }
-        
-        let track: Track
-        let dependencies: DependencyManager
-
-        func build() -> AnyView {
-            AnyView(TrackDetailView(track: track,
-                                    dependencies: dependencies))
-        }
-    }
-    
     
     /// View model instance managing the track data and logic.
-    @State private var vm: TrackDetailViewModel
-    
+    @State private var vm: any TrackDetailViewModelProtocol
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     
-    private let dependencies: DependencyManager
-    
     /// Creates the detail view with the given track.
     /// - Parameter track: The track to be detailed.
-    init(track: Track,
-         dependencies: DependencyManager) {
-        self._vm = .init(wrappedValue: .init(track: track, dependencies: dependencies))
-        self.dependencies = dependencies
+    init(vm: any TrackDetailViewModelProtocol) {
+        self._vm = .init(initialValue: vm)
     }
     
     var body: some View {
@@ -73,9 +42,9 @@ struct TrackDetailView: View {
             }
             
             Section {
-                if let parentTrack = vm.parentTrack {
+                if vm.parentTrack != nil {
                     Button("Original route") {
-                        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: parentTrack, dependencies: dependencies))
+                        vm.openOriginalRoute()
                     }
                 }
                 TrackSpeedStatsView(track: vm.track, parentTrack: vm.parentTrack)
@@ -87,9 +56,7 @@ struct TrackDetailView: View {
             }
             if vm.showDeleteTrackButton {
                 Button(role: .destructive) {
-                    Task {
-                        await dependencies.storageService.deleteTrack(vm.track)
-                    }
+                    vm.deleteTrack()
                 } label: {
                     Label("Delete track", systemImage: "trash")
                         .foregroundStyle(.red)
@@ -101,7 +68,7 @@ struct TrackDetailView: View {
                 Section("Replays") {
                     ForEach(vm.children, id: \.id) { track in
                         Button {
-                            dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: track, dependencies: dependencies))
+                            vm.openChildTrack(track)
                         } label: {
                             let date = track.startDate.toString(format: "EEE HH:mm")
                             Text("Replay as of \(date)")
@@ -120,9 +87,7 @@ struct TrackDetailView: View {
             if vm.showExportButton {
                 ToolbarItem(placement: .navigationBarTrailing) { // Specify placement
                     Button {
-                        Task {
-                            dependencies.trackFileService.exportTrack(vm.track)
-                        }
+                        vm.exportTrack()
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -150,10 +115,7 @@ struct TrackDetailView: View {
             .opacity(0.7)
             .accessibilityIdentifier("replayHint")
             Button {
-                Task {
-                    await dependencies.trackReplayCoordinator.selectTrackToReplay(vm.track)
-                }
-                dependencies.tabRouter.selectedTab = "map"
+                vm.replayTrack()
             } label: {
                 Label("Replay the track", systemImage: "repeat")
             }
@@ -179,9 +141,7 @@ struct TrackDetailView: View {
             
             if vm.showTrimButton {
                 Button {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?
-                        .push(.trackTrim(track: vm.track,
-                                         dependencies: dependencies))
+                    vm.openTrackTrim()
                 } label: {
                     Label("Edit track", systemImage: "timeline.selection")
                 }
@@ -193,15 +153,14 @@ struct TrackDetailView: View {
     private var baseTrackInfo: some View {
         VStack(spacing: 8) {
             Button {
-                dependencies.routers[dependencies.tabRouter.selectedTab]?
-                    .push(.mapTrackDetail(track: vm.track, dependencies: dependencies))
+                vm.openTrackMap()
             } label: {
-                MapSnippetView(mapSnippetCache: dependencies.mapSnippetCache,
-                               mapSnapshotGenerator: dependencies.mapSnapshotGenerator,
-                               track: vm.track)
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
+                Group {
+                    vm.mapSnippet.view
+                }
+                .frame(height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
             }
             .accessibilityIdentifier("mapDetailButton")
             mainStat
@@ -249,12 +208,67 @@ struct TrackDetailView: View {
     }
 }
 
+@Observable
+fileprivate final class PreviewModel: TrackDetailViewModelProtocol {
+    var showReplayButton: Bool = true
+    
+    var showEditSection: Bool = true
+    
+    var showDeleteTrackButton: Bool = true
+    
+    var showReplaysSection: Bool = true
+    
+    var showExportButton: Bool = true
+    
+    var showModeEditButton: Bool = true
+    
+    var showTrimButton: Bool = true
+    
+    var averageSpeed: CLLocationSpeed? = 13.4
+    
+    var parentTrack: Track? = .filledTrack
+    
+    var children: [Track] = [.filledTrack, .newFilledTrack()]
+    
+    var track: Track = .newFilledTrack()
+    
+    var mapSnippet: MapSnippetComponent = {
+        MockMapSnippetParentComponent().mapComponent
+    } ()
+    
+    func openOriginalRoute() {
+    }
+    
+    func openChildTrack(_ child: Track) {
+    }
+    
+    func exportTrack() {
+    }
+    
+    func deleteTrack() {
+    }
+    
+    func openTrackMap() {
+    }
+    
+    func openTrackTrim() {
+    }
+    
+    func replayTrack() {
+    }
+    
+    func updateTrackType(to type: ReplayMode) async {
+    }
+    
+    func calculateAverageSpeed() {
+    }
+    
+    
+}
 
 
 #Preview {
     NavigationView {
-        var track = Track(id: "", points: .roadInSPB, parentID: nil)
-        track.replayMode = .classical
-        return TrackDetailView(track: track, dependencies: .mock())
+        TrackDetailView(vm: PreviewModel())
     }
 }

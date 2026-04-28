@@ -1,0 +1,629 @@
+
+
+import Combine
+import CoreLocation
+import Foundation
+import MapKit
+import NeedleFoundation
+import SimpleRouter
+import SwiftData
+import SwiftUI
+import vladukhaAlerts
+
+// swiftlint:disable unused_declaration
+private let needleDependenciesHash : String? = nil
+
+// MARK: - Traversal Helpers
+
+private func parent1(_ component: NeedleFoundation.Scope) -> NeedleFoundation.Scope {
+    return component.parent
+}
+
+private func parent2(_ component: NeedleFoundation.Scope) -> NeedleFoundation.Scope {
+    return component.parent.parent
+}
+
+private func parent3(_ component: NeedleFoundation.Scope) -> NeedleFoundation.Scope {
+    return component.parent.parent.parent
+}
+
+private func parent4(_ component: NeedleFoundation.Scope) -> NeedleFoundation.Scope {
+    return component.parent.parent.parent.parent
+}
+
+private func parent5(_ component: NeedleFoundation.Scope) -> NeedleFoundation.Scope {
+    return component.parent.parent.parent.parent.parent
+}
+
+// MARK: - Providers
+
+#if !NEEDLE_DYNAMIC
+
+private class MeasuredTracksDependency0946abd535ee62ac90abProvider: MeasuredTracksDependency {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent
+private func factory0a6a6cfd2ada66f582b9b2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MeasuredTracksDependency0946abd535ee62ac90abProvider(appComponent: parent3(component) as! AppComponent)
+}
+private class ImportedTracksDependencyb3b29f643364f67807e3Provider: ImportedTracksDependency {
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackDetailBuilder: any TrackDetailBuilder {
+        return rootComponent.trackDetailBuilder
+    }
+    var trackFileService: any TrackFileServiceProtocol {
+        return appComponent.trackFileService
+    }
+    private let appComponent: AppComponent
+    private let rootComponent: RootComponent
+    init(appComponent: AppComponent, rootComponent: RootComponent) {
+        self.appComponent = appComponent
+        self.rootComponent = rootComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent
+private func factory240837757afea43380779c42af08cd83fca49735(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return ImportedTracksDependencyb3b29f643364f67807e3Provider(appComponent: parent3(component) as! AppComponent, rootComponent: parent2(component) as! RootComponent)
+}
+private class TrackPresetsDependencyd183b1fd1768001f1320Provider: TrackPresetsDependency {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->BaseMapComponent->TrackPresetsComponent
+private func factoryc54fb74f56d2e8aeb21eb2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackPresetsDependencyd183b1fd1768001f1320Provider(appComponent: parent3(component) as! AppComponent)
+}
+private class TracksTabDependencyb619f7697985d5911ed1Provider: TracksTabDependency {
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackFileService: any TrackFileServiceProtocol {
+        return appComponent.trackFileService
+    }
+    var trackDetailBuilder: any TrackDetailBuilder {
+        return rootComponent.trackDetailBuilder
+    }
+    private let appComponent: AppComponent
+    private let rootComponent: RootComponent
+    init(appComponent: AppComponent, rootComponent: RootComponent) {
+        self.appComponent = appComponent
+        self.rootComponent = rootComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent
+private func factoryacee5c99c52fa1d62301dcf48a1f915cc592a56e(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TracksTabDependencyb619f7697985d5911ed1Provider(appComponent: parent2(component) as! AppComponent, rootComponent: parent1(component) as! RootComponent)
+}
+private class TrackHistoryDependency73d3e5fbcd00513f8959Provider: TrackHistoryDependency {
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackDetailBuilder: any TrackDetailBuilder {
+        return rootComponent.trackDetailBuilder
+    }
+    private let appComponent: AppComponent
+    private let rootComponent: RootComponent
+    init(appComponent: AppComponent, rootComponent: RootComponent) {
+        self.appComponent = appComponent
+        self.rootComponent = rootComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryComponent
+private func factoryc63576fc92cbe40690f69c42af08cd83fca49735(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackHistoryDependency73d3e5fbcd00513f8959Provider(appComponent: parent3(component) as! AppComponent, rootComponent: parent2(component) as! RootComponent)
+}
+private class MeasuredTrackDetail926cc7f058f45362082bProvider: MeasuredTrackDetail {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent->MeasuredTrackDetailComponent
+private func factory091b526ec27f26cec9937586110118823dea9ff0(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MeasuredTrackDetail926cc7f058f45362082bProvider(appComponent: parent4(component) as! AppComponent)
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->MeasuredTrackDetailComponent
+private func factory091b526ec27f26cec993b2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MeasuredTrackDetail926cc7f058f45362082bProvider(appComponent: parent3(component) as! AppComponent)
+}
+private class MeasuredTrackDetail6ddb30dff0e32a3e5166Provider: MeasuredTrackDetail {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return mockMeasuredTrackDetailComponent.measuredTrackStorageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return mockMeasuredTrackDetailComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return mockMeasuredTrackDetailComponent.routers
+    }
+    private let mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent
+    init(mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent) {
+        self.mockMeasuredTrackDetailComponent = mockMeasuredTrackDetailComponent
+    }
+}
+/// ^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent
+private func factoryd2934ab103e0e67efe9f1ae3ea56d9e8d2e5cbf8(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MeasuredTrackDetail6ddb30dff0e32a3e5166Provider(mockMeasuredTrackDetailComponent: parent1(component) as! MockMeasuredTrackDetailComponent)
+}
+private class TrackTrimDependency2eaafee369ddc5ba5a09Provider: TrackTrimDependency {
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackDetailBuilder: any TrackDetailBuilder {
+        return rootComponent.trackDetailBuilder
+    }
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var locationService: any LocationServiceProtocol {
+        return appComponent.locationService
+    }
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return appComponent.mapSnippetCache
+    }
+    private let appComponent: AppComponent
+    private let rootComponent: RootComponent
+    init(appComponent: AppComponent, rootComponent: RootComponent) {
+        self.appComponent = appComponent
+        self.rootComponent = rootComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TrackDetailComponent->TrackTrimComponent
+private func factoryf2a6c8b36c71ec13df0e9c42af08cd83fca49735(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackTrimDependency2eaafee369ddc5ba5a09Provider(appComponent: parent3(component) as! AppComponent, rootComponent: parent2(component) as! RootComponent)
+}
+private class RootDependency3944cc797a4a88956fb5Provider: RootDependency {
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackFileService: any TrackFileServiceProtocol {
+        return appComponent.trackFileService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent
+private func factory264bfc4d4cb6b0629b40f47b58f8f304c97af4d5(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return RootDependency3944cc797a4a88956fb5Provider(appComponent: parent1(component) as! AppComponent)
+}
+private class BaseMapDependency7bbe6ed5fa952cf4f036Provider: BaseMapDependency {
+    var trackReplayCoordinator: any TrackReplayCoordinatorProtocol {
+        return appComponent.trackReplayCoordinator
+    }
+    var locationService: any LocationServiceProtocol {
+        return appComponent.locationService
+    }
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        return appComponent.measuredTrackStorageService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->BaseMapComponent
+private func factorybcfd2fbfb73eaddf911db7304b634b3e62c64b3c(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return BaseMapDependency7bbe6ed5fa952cf4f036Provider(appComponent: parent2(component) as! AppComponent)
+}
+private class TrackMapDependencyeb6f1e5522bf17722abbProvider: TrackMapDependency {
+    var locationService: any LocationServiceProtocol {
+        return appComponent.locationService
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent->MeasuredTrackDetailComponent->TrackMapComponent
+private func factoryd78d785f699294e804569bb8c877c472a171438a(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackMapDependencyeb6f1e5522bf17722abbProvider(appComponent: parent5(component) as! AppComponent)
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->MeasuredTrackDetailComponent->TrackMapComponent
+private func factoryd78d785f699294e804567586110118823dea9ff0(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackMapDependencyeb6f1e5522bf17722abbProvider(appComponent: parent4(component) as! AppComponent)
+}
+/// ^->AppComponent->RootComponent->TrackDetailComponent->TrackMapComponent
+private func factoryd78d785f699294e80456b2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackMapDependencyeb6f1e5522bf17722abbProvider(appComponent: parent3(component) as! AppComponent)
+}
+private class TrackMapDependency3e941799218268f4a302Provider: TrackMapDependency {
+    var locationService: any LocationServiceProtocol {
+        return mockMeasuredTrackDetailComponent.locationService
+    }
+    private let mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent
+    init(mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent) {
+        self.mockMeasuredTrackDetailComponent = mockMeasuredTrackDetailComponent
+    }
+}
+/// ^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent->TrackMapComponent
+private func factorya6144c18161a70cca3b636bfaaf810d08cc605e1(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackMapDependency3e941799218268f4a302Provider(mockMeasuredTrackDetailComponent: parent2(component) as! MockMeasuredTrackDetailComponent)
+}
+private class TrackMapDependencyb7df5df670b4876115d1Provider: TrackMapDependency {
+    var locationService: any LocationServiceProtocol {
+        return mockTrackMapDetailParentComponent.locationService
+    }
+    private let mockTrackMapDetailParentComponent: MockTrackMapDetailParentComponent
+    init(mockTrackMapDetailParentComponent: MockTrackMapDetailParentComponent) {
+        self.mockTrackMapDetailParentComponent = mockTrackMapDetailParentComponent
+    }
+}
+/// ^->MockTrackMapDetailParentComponent->TrackMapComponent
+private func factory6c4694b1def835eff0108adf4a46b14b88d9ed11(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackMapDependencyb7df5df670b4876115d1Provider(mockTrackMapDetailParentComponent: parent1(component) as! MockTrackMapDetailParentComponent)
+}
+private class TrackDetailDependencyddd498ef0007fd5f0f2dProvider: TrackDetailDependency {
+    var storageService: any TrackStorageProtocol {
+        return appComponent.storageService
+    }
+    var tabRouter: any TabRouterProtocol {
+        return appComponent.tabRouter
+    }
+    var routers: [String: Router] {
+        return appComponent.routers
+    }
+    var trackFileService: any TrackFileServiceProtocol {
+        return appComponent.trackFileService
+    }
+    var trackReplayCoordinator: any TrackReplayCoordinatorProtocol {
+        return appComponent.trackReplayCoordinator
+    }
+    var trackDetailBuilder: any TrackDetailBuilder {
+        return rootComponent.trackDetailBuilder
+    }
+    private let appComponent: AppComponent
+    private let rootComponent: RootComponent
+    init(appComponent: AppComponent, rootComponent: RootComponent) {
+        self.appComponent = appComponent
+        self.rootComponent = rootComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TrackDetailComponent
+private func factory6a7786d3f8384db89491dcf48a1f915cc592a56e(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return TrackDetailDependencyddd498ef0007fd5f0f2dProvider(appComponent: parent2(component) as! AppComponent, rootComponent: parent1(component) as! RootComponent)
+}
+private class MapSnippetDependency42f73db0c6681668e132Provider: MapSnippetDependency {
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return appComponent.mapSnippetCache
+    }
+    var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        return appComponent.mapSnapshotGenerator
+    }
+    private let appComponent: AppComponent
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+    }
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent->TrackHistoryCellComponent->MapSnippetComponent
+private func factory8550a7da04e73b174ce69bb8c877c472a171438a(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency42f73db0c6681668e132Provider(appComponent: parent5(component) as! AppComponent)
+}
+/// ^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryCellComponent->MapSnippetComponent
+private func factory8550a7da04e73b174ce67586110118823dea9ff0(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency42f73db0c6681668e132Provider(appComponent: parent4(component) as! AppComponent)
+}
+/// ^->AppComponent->RootComponent->TrackDetailComponent->MapSnippetComponent
+private func factory8550a7da04e73b174ce6b2702fa908b4cedb8464(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency42f73db0c6681668e132Provider(appComponent: parent3(component) as! AppComponent)
+}
+private class MapSnippetDependency4bf09a63114e68842453Provider: MapSnippetDependency {
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return trackHistoryCellMockComponentProvider.mapSnippetCache
+    }
+    var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        return trackHistoryCellMockComponentProvider.mapSnapshotGenerator
+    }
+    private let trackHistoryCellMockComponentProvider: TrackHistoryCellMockComponentProvider
+    init(trackHistoryCellMockComponentProvider: TrackHistoryCellMockComponentProvider) {
+        self.trackHistoryCellMockComponentProvider = trackHistoryCellMockComponentProvider
+    }
+}
+/// ^->TrackHistoryCellMockComponentProvider->TrackHistoryCellComponent->MapSnippetComponent
+private func factory53a35471829210219a555df56f610f4d5e4f12ec(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency4bf09a63114e68842453Provider(trackHistoryCellMockComponentProvider: parent2(component) as! TrackHistoryCellMockComponentProvider)
+}
+private class MapSnippetDependency1304440067d32f406655Provider: MapSnippetDependency {
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return mockMeasuredTrackDetailComponent.mapSnippetCache
+    }
+    var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        return mockMeasuredTrackDetailComponent.mapSnapshotGenerator
+    }
+    private let mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent
+    init(mockMeasuredTrackDetailComponent: MockMeasuredTrackDetailComponent) {
+        self.mockMeasuredTrackDetailComponent = mockMeasuredTrackDetailComponent
+    }
+}
+/// ^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent->MapSnippetComponent
+private func factory6081436e1e1e99cf7f9b36bfaaf810d08cc605e1(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency1304440067d32f406655Provider(mockMeasuredTrackDetailComponent: parent2(component) as! MockMeasuredTrackDetailComponent)
+}
+private class MapSnippetDependency352f54f750948a40ed7bProvider: MapSnippetDependency {
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        return mockMapSnippetParentComponent.mapSnippetCache
+    }
+    var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        return mockMapSnippetParentComponent.mapSnapshotGenerator
+    }
+    private let mockMapSnippetParentComponent: MockMapSnippetParentComponent
+    init(mockMapSnippetParentComponent: MockMapSnippetParentComponent) {
+        self.mockMapSnippetParentComponent = mockMapSnippetParentComponent
+    }
+}
+/// ^->MockMapSnippetParentComponent->MapSnippetComponent
+private func factory8866217649a5eb73d4929ff55ac03fada00284bc(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return MapSnippetDependency352f54f750948a40ed7bProvider(mockMapSnippetParentComponent: parent1(component) as! MockMapSnippetParentComponent)
+}
+
+#else
+extension AppComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+
+        localTable["routers-[String: Router]"] = { [unowned self] in self.routers as Any }
+        localTable["storageService-any TrackStorageProtocol"] = { [unowned self] in self.storageService as Any }
+        localTable["mapSnippetCache-any TrackMapSnippetCacheProtocol"] = { [unowned self] in self.mapSnippetCache as Any }
+        localTable["trackFileService-any TrackFileServiceProtocol"] = { [unowned self] in self.trackFileService as Any }
+        localTable["trackReplayCoordinator-any TrackReplayCoordinatorProtocol"] = { [unowned self] in self.trackReplayCoordinator as Any }
+        localTable["cacheFileManager-any CacheFileManagerProtocol"] = { [unowned self] in self.cacheFileManager as Any }
+        localTable["tabRouter-any TabRouterProtocol"] = { [unowned self] in self.tabRouter as Any }
+        localTable["locationService-any LocationServiceProtocol"] = { [unowned self] in self.locationService as Any }
+        localTable["measuredTrackStorageService-any MeasuredTrackStorageProtocol"] = { [unowned self] in self.measuredTrackStorageService as Any }
+        localTable["mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"] = { [unowned self] in self.mapSnapshotGenerator as Any }
+    }
+}
+extension MeasuredTracksComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\MeasuredTracksDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+        keyPathToName[\MeasuredTracksDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\MeasuredTracksDependency.routers] = "routers-[String: Router]"
+
+    }
+}
+extension ImportedTracksComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\ImportedTracksDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\ImportedTracksDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\ImportedTracksDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\ImportedTracksDependency.trackDetailBuilder] = "trackDetailBuilder-any TrackDetailBuilder"
+        keyPathToName[\ImportedTracksDependency.trackFileService] = "trackFileService-any TrackFileServiceProtocol"
+
+    }
+}
+extension TrackPresetsComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackPresetsDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+    }
+}
+extension TracksTabComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TracksTabDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\TracksTabDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+        keyPathToName[\TracksTabDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\TracksTabDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\TracksTabDependency.trackFileService] = "trackFileService-any TrackFileServiceProtocol"
+        keyPathToName[\TracksTabDependency.trackDetailBuilder] = "trackDetailBuilder-any TrackDetailBuilder"
+
+    }
+}
+extension TrackHistoryCellComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+
+
+    }
+}
+extension TrackHistoryCellMockComponentProvider: NeedleFoundation.Registration {
+    public func registerItems() {
+
+        localTable["mapSnippetCache-any TrackMapSnippetCacheProtocol"] = { [unowned self] in self.mapSnippetCache as Any }
+        localTable["mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"] = { [unowned self] in self.mapSnapshotGenerator as Any }
+    }
+}
+extension TrackHistoryComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackHistoryDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\TrackHistoryDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\TrackHistoryDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\TrackHistoryDependency.trackDetailBuilder] = "trackDetailBuilder-any TrackDetailBuilder"
+
+    }
+}
+extension MeasuredTrackDetailComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\MeasuredTrackDetail.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+        keyPathToName[\MeasuredTrackDetail.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\MeasuredTrackDetail.routers] = "routers-[String: Router]"
+
+    }
+}
+extension MockMeasuredTrackDetailComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+
+        localTable["locationService-any LocationServiceProtocol"] = { [unowned self] in self.locationService as Any }
+        localTable["measuredTrackStorageService-any MeasuredTrackStorageProtocol"] = { [unowned self] in self.measuredTrackStorageService as Any }
+        localTable["tabRouter-any TabRouterProtocol"] = { [unowned self] in self.tabRouter as Any }
+        localTable["routers-[String: Router]"] = { [unowned self] in self.routers as Any }
+        localTable["mapSnippetCache-any TrackMapSnippetCacheProtocol"] = { [unowned self] in self.mapSnippetCache as Any }
+        localTable["mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"] = { [unowned self] in self.mapSnapshotGenerator as Any }
+    }
+}
+extension TrackTrimComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackTrimDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\TrackTrimDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\TrackTrimDependency.trackDetailBuilder] = "trackDetailBuilder-any TrackDetailBuilder"
+        keyPathToName[\TrackTrimDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\TrackTrimDependency.locationService] = "locationService-any LocationServiceProtocol"
+        keyPathToName[\TrackTrimDependency.mapSnippetCache] = "mapSnippetCache-any TrackMapSnippetCacheProtocol"
+    }
+}
+extension RootComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\RootDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\RootDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\RootDependency.trackFileService] = "trackFileService-any TrackFileServiceProtocol"
+        localTable["trackDetailBuilder-any TrackDetailBuilder"] = { [unowned self] in self.trackDetailBuilder as Any }
+    }
+}
+extension BaseMapComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\BaseMapDependency.trackReplayCoordinator] = "trackReplayCoordinator-any TrackReplayCoordinatorProtocol"
+        keyPathToName[\BaseMapDependency.locationService] = "locationService-any LocationServiceProtocol"
+        keyPathToName[\BaseMapDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\BaseMapDependency.measuredTrackStorageService] = "measuredTrackStorageService-any MeasuredTrackStorageProtocol"
+
+    }
+}
+extension TrackMapComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackMapDependency.locationService] = "locationService-any LocationServiceProtocol"
+    }
+}
+extension MockTrackMapDetailParentComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+
+        localTable["locationService-any LocationServiceProtocol"] = { [unowned self] in self.locationService as Any }
+    }
+}
+extension TrackDetailComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\TrackDetailDependency.storageService] = "storageService-any TrackStorageProtocol"
+        keyPathToName[\TrackDetailDependency.tabRouter] = "tabRouter-any TabRouterProtocol"
+        keyPathToName[\TrackDetailDependency.routers] = "routers-[String: Router]"
+        keyPathToName[\TrackDetailDependency.trackFileService] = "trackFileService-any TrackFileServiceProtocol"
+        keyPathToName[\TrackDetailDependency.trackReplayCoordinator] = "trackReplayCoordinator-any TrackReplayCoordinatorProtocol"
+        keyPathToName[\TrackDetailDependency.trackDetailBuilder] = "trackDetailBuilder-any TrackDetailBuilder"
+
+    }
+}
+extension MapSnippetComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+        keyPathToName[\MapSnippetDependency.mapSnippetCache] = "mapSnippetCache-any TrackMapSnippetCacheProtocol"
+        keyPathToName[\MapSnippetDependency.mapSnapshotGenerator] = "mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"
+    }
+}
+extension MockMapSnippetParentComponent: NeedleFoundation.Registration {
+    public func registerItems() {
+
+        localTable["mapSnippetCache-any TrackMapSnippetCacheProtocol"] = { [unowned self] in self.mapSnippetCache as Any }
+        localTable["mapSnapshotGenerator-any MapSnapshotGeneratorProtocol"] = { [unowned self] in self.mapSnapshotGenerator as Any }
+    }
+}
+
+
+#endif
+
+private func factoryEmptyDependencyProvider(_ component: NeedleFoundation.Scope) -> AnyObject {
+    return EmptyDependencyProvider(component: component)
+}
+
+// MARK: - Registration
+private func registerProviderFactory(_ componentPath: String, _ factory: @escaping (NeedleFoundation.Scope) -> AnyObject) {
+    __DependencyProviderRegistry.instance.registerDependencyProviderFactory(for: componentPath, factory)
+}
+
+#if !NEEDLE_DYNAMIC
+
+@inline(never) private func register1() {
+    registerProviderFactory("^->AppComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent", factory0a6a6cfd2ada66f582b9b2702fa908b4cedb8464)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent", factory240837757afea43380779c42af08cd83fca49735)
+    registerProviderFactory("^->AppComponent->RootComponent->BaseMapComponent->TrackPresetsComponent", factoryc54fb74f56d2e8aeb21eb2702fa908b4cedb8464)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent", factoryacee5c99c52fa1d62301dcf48a1f915cc592a56e)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent->TrackHistoryCellComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryCellComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->TrackHistoryCellMockComponentProvider->TrackHistoryCellComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryComponent->TrackHistoryCellComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->TrackHistoryCellMockComponentProvider", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryComponent", factoryc63576fc92cbe40690f69c42af08cd83fca49735)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent->MeasuredTrackDetailComponent", factory091b526ec27f26cec9937586110118823dea9ff0)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTrackDetailComponent", factory091b526ec27f26cec993b2702fa908b4cedb8464)
+    registerProviderFactory("^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent", factoryd2934ab103e0e67efe9f1ae3ea56d9e8d2e5cbf8)
+    registerProviderFactory("^->MockMeasuredTrackDetailComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TrackDetailComponent->TrackTrimComponent", factoryf2a6c8b36c71ec13df0e9c42af08cd83fca49735)
+    registerProviderFactory("^->AppComponent->RootComponent", factory264bfc4d4cb6b0629b40f47b58f8f304c97af4d5)
+    registerProviderFactory("^->AppComponent->RootComponent->BaseMapComponent", factorybcfd2fbfb73eaddf911db7304b634b3e62c64b3c)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent->MeasuredTrackDetailComponent->TrackMapComponent", factoryd78d785f699294e804569bb8c877c472a171438a)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTrackDetailComponent->TrackMapComponent", factoryd78d785f699294e804567586110118823dea9ff0)
+    registerProviderFactory("^->AppComponent->RootComponent->TrackDetailComponent->TrackMapComponent", factoryd78d785f699294e80456b2702fa908b4cedb8464)
+    registerProviderFactory("^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent->TrackMapComponent", factorya6144c18161a70cca3b636bfaaf810d08cc605e1)
+    registerProviderFactory("^->MockTrackMapDetailParentComponent->TrackMapComponent", factory6c4694b1def835eff0108adf4a46b14b88d9ed11)
+    registerProviderFactory("^->MockTrackMapDetailParentComponent", factoryEmptyDependencyProvider)
+    registerProviderFactory("^->AppComponent->RootComponent->TrackDetailComponent", factory6a7786d3f8384db89491dcf48a1f915cc592a56e)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->ImportedTracksComponent->TrackHistoryCellComponent->MapSnippetComponent", factory8550a7da04e73b174ce69bb8c877c472a171438a)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryCellComponent->MapSnippetComponent", factory8550a7da04e73b174ce67586110118823dea9ff0)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->TrackHistoryComponent->TrackHistoryCellComponent->MapSnippetComponent", factory8550a7da04e73b174ce69bb8c877c472a171438a)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTracksComponent->MeasuredTrackDetailComponent->MapSnippetComponent", factory8550a7da04e73b174ce69bb8c877c472a171438a)
+    registerProviderFactory("^->AppComponent->RootComponent->TracksTabComponent->MeasuredTrackDetailComponent->MapSnippetComponent", factory8550a7da04e73b174ce67586110118823dea9ff0)
+    registerProviderFactory("^->AppComponent->RootComponent->TrackDetailComponent->MapSnippetComponent", factory8550a7da04e73b174ce6b2702fa908b4cedb8464)
+    registerProviderFactory("^->TrackHistoryCellMockComponentProvider->TrackHistoryCellComponent->MapSnippetComponent", factory53a35471829210219a555df56f610f4d5e4f12ec)
+    registerProviderFactory("^->MockMeasuredTrackDetailComponent->MeasuredTrackDetailComponent->MapSnippetComponent", factory6081436e1e1e99cf7f9b36bfaaf810d08cc605e1)
+    registerProviderFactory("^->MockMapSnippetParentComponent->MapSnippetComponent", factory8866217649a5eb73d4929ff55ac03fada00284bc)
+    registerProviderFactory("^->MockMapSnippetParentComponent", factoryEmptyDependencyProvider)
+}
+#endif
+
+public func registerProviderFactories() {
+#if !NEEDLE_DYNAMIC
+    register1()
+#endif
+}

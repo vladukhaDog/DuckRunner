@@ -13,17 +13,15 @@ final class TrackPresetsViewModel: TrackPresetsViewModelProtocol {
     var presets: [(preset: RecordingAutoStopPolicy, time: TimeInterval?)] = TrackPresetsViewModel.allPresets.map({($0, nil)})
     
     
-    private let baseMapVM: any BaseMapViewModelProtocol
-    private let dependencies: DependencyManager
+    private let startTrack: (RecordingAutoStopPolicy) -> Void
 
-    init(baseMapVM: any BaseMapViewModelProtocol, dependencies: DependencyManager) {
-        self.baseMapVM = baseMapVM
-        self.dependencies = dependencies
+    init(startTrack: @escaping (RecordingAutoStopPolicy) -> Void,
+         measuredTrackStorageService: any MeasuredTrackStorageProtocol) {
+        self.startTrack = startTrack
         Task {
             let enumer = presets.enumerated()
             for (index, preset) in enumer {
-                guard let track = await dependencies
-                    .measuredTrackStorageService
+                guard let track = await measuredTrackStorageService
                     .getShortestMeasuredTrack(named: preset.preset.name)?
                     .track else {
                     continue
@@ -37,7 +35,7 @@ final class TrackPresetsViewModel: TrackPresetsViewModelProtocol {
     }
 
     func startTrack(_ mode: RecordingAutoStopPolicy) {
-        baseMapVM.startTrack(mode)
+        startTrack(mode)
     }
 
 //    func getShortestHalfMile() async -> MeasuredTrack? {

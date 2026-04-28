@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import NeedleFoundation
 
 struct TracksTabView: View {
     private enum SectionID: Hashable {
@@ -16,12 +17,9 @@ struct TracksTabView: View {
 
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     @State private var vm: any TracksTabViewModelProtocol
-    private let dependencies: DependencyManager
 
-    init(vm: any TracksTabViewModelProtocol,
-         dependencies: DependencyManager) {
+    init(vm: any TracksTabViewModelProtocol) {
         self._vm = .init(wrappedValue: vm)
-        self.dependencies = dependencies
     }
     
     var body: some View {
@@ -125,7 +123,7 @@ struct TracksTabView: View {
                                   subtitle: "Files and external routes you brought into Routka.",
                                   icon: "square.and.arrow.down.on.square",
                                   showLink: vm.importedTracks.count >= vm.showLimit) {
-                        pushImportedTracks()
+                        vm.openImportedTracks()
                     }
                 }
 
@@ -133,16 +131,16 @@ struct TracksTabView: View {
                     if vm.importedTracks.isEmpty {
                         emptyStateCard(title: "No imported tracks yet",
                                        message: "Bring in .routka saved files.",
-                                       buttonTitle: "Import from Files",
+                                       buttonTitle: "Import from files",
                                        systemImage: "square.and.arrow.down") {
-                            dependencies.trackFileService.showImporter()
+                            vm.showImporter()
                         }
                     }
                     VStack(alignment: .leading, spacing: 8) {
                         Button {
-                            dependencies.trackFileService.showImporter()
+                            vm.showImporter()
                         } label: {
-                            Label("Import from Files", systemImage: "square.and.arrow.down")
+                            Label("Import from files", systemImage: "square.and.arrow.down")
                         }
                         .buttonStyle(.glass)
                         .opacity(vm.importedTracks.isEmpty ? 0 : 1)
@@ -161,7 +159,7 @@ struct TracksTabView: View {
                               subtitle: "Your latest recorded drives.",
                               icon: "road.lanes",
                               showLink: vm.historyTracks.count >= vm.showLimit) {
-                    pushTrackHistory()
+                    vm.openTrackHistory()
                 }
 
                 ZStack {
@@ -171,7 +169,7 @@ struct TracksTabView: View {
                                        message: "Start a run from the map tab and your sessions will appear here with route snapshots and stats.",
                                        buttonTitle: "Open Map",
                                        systemImage: "map") {
-                            dependencies.tabRouter.selectedTab = "Map"
+                            vm.openMap()
                         }
                     }
                     
@@ -187,7 +185,7 @@ struct TracksTabView: View {
                               subtitle: "Saved measurements",
                               icon: "gauge.with.dots.needle.50percent",
                               showLink: vm.measuredTracks.count >= vm.showLimit) {
-                    pushMeasuredTracks()
+                    vm.openMeasuredTracks()
                 }
 
                 ZStack {
@@ -196,7 +194,7 @@ struct TracksTabView: View {
                                        message: "Use an auto-stop preset while recording to build a library of comparable timed attempts.",
                                        buttonTitle: "Open Map",
                                        systemImage: "dial.high") {
-                            dependencies.tabRouter.selectedTab = "Map"
+                            vm.openMap()
                         }
                     }
                     measuredCarousel
@@ -213,8 +211,7 @@ struct TracksTabView: View {
                     VStack(spacing: 10) {
                         ForEach(batch) { measure in
                             Button {
-                                dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                                    .measuredTrackDetail(track: measure, dependencies: dependencies))
+                                vm.openMeasuredTrack(measure)
                             } label: {
                                 MeasuredTrackCellView(measured: measure)
                                     .padding(.horizontal, 14)
@@ -237,12 +234,11 @@ struct TracksTabView: View {
             HStack() {
                 ForEach(tracks) { track in
                     Button {
-                        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-                            .trackDetail(track: track, dependencies: dependencies))
+                        vm.openTrack(track)
                     } label: {
-                        TrackHistoryCellView(track: track,
-                                             unit: UnitSpeed.byName(speedUnit),
-                                             dependencies: dependencies)
+                        vm.trackHistoryCellComponent(track: track,
+                                                     unitSpeed: UnitSpeed.byName(speedUnit))
+                        .view
                     }
                     .accessibilityIdentifier("historyTrackButton_\(track.id)")
                     .frame(height: 250)
@@ -345,24 +341,6 @@ struct TracksTabView: View {
             proxy.scrollTo(section, anchor: .top)
         }
     }
-
-    private func pushTrackHistory() {
-        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-            .trackHistory(vm: TrackHistoryViewModel(dependencies: dependencies),
-                          dependencies: dependencies))
-    }
-
-    private func pushMeasuredTracks() {
-        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-            .measuredTracks(vm: MeasuredTrackListViewModel(dependencies: dependencies),
-                            dependencies: dependencies))
-    }
-
-    private func pushImportedTracks() {
-        dependencies.routers[dependencies.tabRouter.selectedTab]?.push(
-            .importedTracks(vm: ImportedTracksListViewModel(dependencies: dependencies),
-                            dependencies: dependencies))
-    }
 }
 //
 //let measureds: [MeasuredTrack] = [
@@ -377,13 +355,37 @@ struct TracksTabView: View {
 
 @Observable
 private final class PreviewModel: TracksTabViewModelProtocol {
+    func openTrack(_ track: Track) {
+    }
+    func trackHistoryCellComponent(track: Track, unitSpeed: UnitSpeed) -> TrackHistoryCellComponent {
+        TrackHistoryCellMockComponentProvider().trackCell(track: track, unit: unitSpeed)
+    }
+    
+    func showImporter() {
+    }
+    
+    func openMap() {
+    }
+    
+    func openMeasuredTrack(_ measure: MeasuredTrack) {
+    }
+    
+    func openTrackHistory() {
+    }
+    
+    func openMeasuredTracks() {
+    }
+    
+    func openImportedTracks() {
+    }
+    
     var showLimit: Int = 2
     
-    var historyTracks: [Track] = [.newFilledTrack(),
+    var historyTracks: [Track] = [/*.newFilledTrack(),
                                   .newFilledTrack(),
                                   .newFilledTrack(),
-                                  .newFilledTrack(),]
-//    
+                                  .newFilledTrack(),*/]
+//
 //    var measuredTracks: [MeasuredTrack] = [
 //        .init(id: "", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
 //        .init(id: "1", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
@@ -392,8 +394,8 @@ private final class PreviewModel: TracksTabViewModelProtocol {
 //        .init(id: "4", measurement: .reachingDistance(30, name: "1/2 mile"), track: .filledTrack),
 //    ]
 
-    var importedTracks: [Track] = [.filledTrack,
-                                   .newFilledTrack()]
+    var importedTracks: [Track] = [/*.filledTrack,
+                                   .newFilledTrack()*/]
 
 //    var historyTracks: [Track] = []
     
@@ -405,5 +407,6 @@ private final class PreviewModel: TracksTabViewModelProtocol {
 }
 
 #Preview {
-    TracksTabView(vm: PreviewModel(), dependencies: .mock())
+    TracksTabView(vm: PreviewModel())
+        .environment(\.locale, .init(identifier: "en"))
 }

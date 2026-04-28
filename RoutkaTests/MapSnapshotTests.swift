@@ -10,6 +10,9 @@ import Testing
 internal import MapKit
 
 struct MapSnapshotTests {
+    /*
+     With VPN, Apple maps may not load correctly thus throwing Error Domain=MKErrorDomain Code=2 "(null)
+     */
 
     @Test func testImageGeneration() async throws {
         let mapSnapshotClass = await MapSnapshotGenerator()

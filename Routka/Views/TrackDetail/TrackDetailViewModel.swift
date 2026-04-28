@@ -10,11 +10,12 @@ import SwiftUI
 import MapKit
 import Combine
 import SimpleRouter
+import NeedleFoundation
 
 /// View model responsible for managing and providing detailed track data 
 /// for presentation in the TrackDetailView.
 @Observable
-final class TrackDetailViewModel {
+final class TrackDetailViewModel: TrackDetailViewModelProtocol {
     var showReplayButton: Bool {
         track.parentID == nil
     }
@@ -47,17 +48,26 @@ final class TrackDetailViewModel {
     /// The track instance whose details are displayed.
     private(set) var track: Track
     private let storageService: any TrackStorageProtocol
-    
-    
+    private let trackFileService: any TrackFileServiceProtocol
+    private let trackReplayCoordinator: any TrackReplayCoordinatorProtocol
     private var cancellables: Set<AnyCancellable> = []
-    private let dependencies: DependencyManager
+    private let routing: any TrackDetailRouting
+    private let componentsFactory: any TrackDetailComponentsFactory
     /// Initializes the view model with a specific track.
     /// - Parameter track: The track to present.
     init(track: Track,
-         dependencies: DependencyManager) {
+         storageService: any TrackStorageProtocol,
+         trackFileService: any TrackFileServiceProtocol,
+         trackReplayCoordinator: any TrackReplayCoordinatorProtocol,
+         routing: any TrackDetailRouting,
+         componentsFactory: any TrackDetailComponentsFactory) {
         self.track = track
-        self.storageService = dependencies.storageService
-        self.dependencies = dependencies
+        self.storageService = storageService
+        self.trackFileService = trackFileService
+        self.trackReplayCoordinator = trackReplayCoordinator
+        self.routing = routing
+        self.componentsFactory = componentsFactory
+        
         self.storageService.actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)
@@ -84,8 +94,7 @@ final class TrackDetailViewModel {
             switch action {
             case .deleted(let track):
                 if track.id == self.track.id {
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?
-                        .pop()
+                    routing.popBack()
                 }
                 self.children.removeAll(where: {$0.id == track.id})
             case .updated(let track):
@@ -101,6 +110,45 @@ final class TrackDetailViewModel {
                 }
             }
         }
+    }
+    
+    var mapSnippet: MapSnippetComponent {
+        self.componentsFactory.trackMapSnippet(track)
+    }
+    
+    func openOriginalRoute() {
+        guard let parentTrack else { return }
+        routing.openTrack(parentTrack)
+        
+    }
+    
+    func openChildTrack(_ child: Track) {
+        routing.openTrack(child)
+    }
+    
+    func exportTrack() {
+        trackFileService.exportTrack(track)
+    }
+    
+    func deleteTrack() {
+        Task {
+            await storageService.deleteTrack(track)
+        }
+    }
+    
+    func openTrackMap() {
+        routing.openTrackMap(track)
+    }
+    
+    func openTrackTrim() {
+        routing.openTrackTrim(track)
+    }
+    
+    func replayTrack() {
+        Task {
+            await trackReplayCoordinator.selectTrackToReplay(track)
+        }
+        routing.openMap()
     }
     
     func updateTrackType(to type: ReplayMode) async {

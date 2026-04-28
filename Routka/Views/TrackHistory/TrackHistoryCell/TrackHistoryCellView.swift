@@ -7,20 +7,19 @@
 
 import SwiftUI
 
+
 /// View Cell of a Track in history list
 struct TrackHistoryCellView: View {
     let track: Track
     let unit: UnitSpeed
-    let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
-    let mapSnippetCache: any TrackMapSnippetCacheProtocol
-    
+    let mapSnippetComponent: MapSnippetComponent
     /// Initializes the history view with the given view model.
-    init(track: Track, unit: UnitSpeed,
-         dependencies: DependencyManager) {
+    init(track: Track,
+         unit: UnitSpeed,
+         mapSnippetComponent: MapSnippetComponent) {
         self.track = track
         self.unit = unit
-        self.mapSnippetCache = dependencies.mapSnippetCache
-        self.mapSnapshotGenerator = dependencies.mapSnapshotGenerator
+        self.mapSnippetComponent = mapSnippetComponent
     }
     
     var body: some View {
@@ -75,9 +74,7 @@ struct TrackHistoryCellView: View {
     }
     
     private var mapSnippet: some View {
-        MapSnippetView(mapSnippetCache: mapSnippetCache,
-                       mapSnapshotGenerator: mapSnapshotGenerator,
-                       track: track)
+        mapSnippetComponent.view
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 0)
             
@@ -88,13 +85,12 @@ struct TrackHistoryCellView: View {
 #Preview {
     ZStack {
 //        Color.cyan.opacity(0.3)
+        let component = TrackHistoryCellMockComponentProvider()
         VStack {
-            TrackHistoryCellView(track: .filledTrack,
-                                 unit: .kilometersPerHour,
-                                 dependencies: .mock())
-            TrackHistoryCellView(track: .filledTrack,
-                                 unit: .milesPerHour,
-                                 dependencies: .mock())
+            
+            component.trackCell(track: .filledTrack, unit: .kilometersPerHour).view
+            component.trackCell(track: .filledTrack, unit: .milesPerHour).view
+            
         }
     }
 }

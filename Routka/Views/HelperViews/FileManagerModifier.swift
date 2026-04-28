@@ -12,21 +12,29 @@ import vladukhaAlerts
 
 let fileTransferUILogger = MainLogger("FileTransferUI")
 
+protocol FileServiceWrapperRouting: AnyObject {
+    func openTrack(_ track: Track)
+}
+
 extension View {
     
-    func fileManager(managedBy dependencies: DependencyManager) -> some View {
-        self.modifier(FileServiceViewWrapper(dependencies: dependencies))
+    func fileManager(trackFileService: any TrackFileServiceProtocol,
+                     routing: any FileServiceWrapperRouting) -> some View {
+        self.modifier(FileServiceViewWrapper(trackFileService: trackFileService,
+                                             routing: routing))
            
     }
 }
 
-
 private struct FileServiceViewWrapper: ViewModifier {
     @State var service: any TrackFileServiceProtocol
-    let dependencies: DependencyManager
-    init(dependencies: DependencyManager) {
-        self._service = .init(wrappedValue: dependencies.trackFileService)
-        self.dependencies = dependencies
+    private let routing: any FileServiceWrapperRouting
+    
+    init(trackFileService: any TrackFileServiceProtocol,
+         routing: any FileServiceWrapperRouting) {
+        self._service = .init(wrappedValue: trackFileService)
+        self.routing = routing
+        
     }
     
     func importFromURL(url: URL) {
@@ -52,9 +60,7 @@ private struct FileServiceViewWrapper: ViewModifier {
                                                  .error)
                         return
                     }
-                    dependencies.tabRouter.selectedTab = "Tracks"
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.popToRoot()
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.push(.trackDetail(track: track, dependencies: dependencies))
+                    routing.openTrack(track)
                 }
             }
             .fileImporter(
@@ -71,8 +77,7 @@ private struct FileServiceViewWrapper: ViewModifier {
                     Task {
                         do {
                             let importedTrack = try await service.importFromFile(url: url)
-                            dependencies.routers[dependencies.tabRouter.selectedTab]?
-                                .push(.trackDetail(track: importedTrack, dependencies: dependencies))
+                            routing.openTrack(importedTrack)
                         } catch {
                             fileTransferUILogger.log("Importer failed",
                                                      message: "file: \(url.lastPathComponent), error: \(error.localizedDescription)",

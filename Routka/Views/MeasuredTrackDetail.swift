@@ -7,44 +7,104 @@
 import SwiftUI
 import CoreLocation
 import SimpleRouter
+import NeedleFoundation
 
-extension Route where Self == MeasuredTrackDetailView.RouteBuilder {
-    /// View of a detailed measured track view
-    static func measuredTrackDetail(track: MeasuredTrack,
-                            dependencies: DependencyManager) -> MeasuredTrackDetailView.RouteBuilder {
-        MeasuredTrackDetailView.RouteBuilder(track: track, dependencies: dependencies)
-    }
+// MARK: - list of dependencies
+protocol MeasuredTrackDetail: Dependency {
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
+    var tabRouter: any TabRouterProtocol { get }
+    var routers: [String: Router] { get }
 }
 
-struct MeasuredTrackDetailView: View {
+// MARK: - Main Component Creation
+nonisolated
+final class MeasuredTrackDetailComponent: Component<MeasuredTrackDetail> {
+    private let measuredTrack: MeasuredTrack
+    init(parent: any Scope,
+         measuredTrack: MeasuredTrack) {
+        self.measuredTrack = measuredTrack
+        super.init(parent: parent)
+    }
+    
+    @MainActor
+    var view: MeasuredTrackDetailView {
+        MeasuredTrackDetailView(measuredTrack: measuredTrack,
+                                mapSnippetComponent: mapSnippet,
+                                measuredTrackStorageService: dependency.measuredTrackStorageService,
+                                tabRouter: dependency.tabRouter,
+                                routers: dependency.routers,
+                                trackMapComponent: trackMapComponent)
+    }
+    
+    @MainActor
+    var mapSnippet: MapSnippetComponent {
+        MapSnippetComponent(parent: self, track: measuredTrack.track)
+    }
+    
+    @MainActor
+    var trackMapComponent: TrackMapComponent {
+        TrackMapComponent(parent: self, track: measuredTrack.track)
+    }
+    
+    @MainActor
+    var route: any Route {
+        RouteBuilder(component: self)
+    }
+    
+    @MainActor
     struct RouteBuilder: Route {
-        static func == (lhs: MeasuredTrackDetailView.RouteBuilder, rhs: MeasuredTrackDetailView.RouteBuilder) -> Bool {
-            lhs.track == rhs.track
+        static func == (lhs: RouteBuilder, rhs: RouteBuilder) -> Bool {
+            lhs.component.measuredTrack == rhs.component.measuredTrack
         }
         
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(track)
+            hasher.combine(component.measuredTrack)
         }
         
-        let track: MeasuredTrack
-        let dependencies: DependencyManager
-
+        let component: MeasuredTrackDetailComponent
+        
         func build() -> AnyView {
-            AnyView(MeasuredTrackDetailView(measuredTrack: track,
-                                    dependencies: dependencies))
+            AnyView(component.view)
         }
     }
-    
+}
+
+// MARK: - View
+struct MeasuredTrackDetailView: View {
+
     /// User preference stored for the speed unit (e.g., km/h or mph).
     @AppStorage("speedunit") var speedUnit: String = "km/h"
     private let measuredTrack: MeasuredTrack
-    private let dependencies: DependencyManager
-    
-    
+    private let mapSnippetComponent: MapSnippetComponent
+    private let measuredTrackStorageService: any MeasuredTrackStorageProtocol
+    private let tabRouter: any TabRouterProtocol
+    private let routers: [String: Router]
+    private let trackMapComponent: TrackMapComponent
     init(measuredTrack: MeasuredTrack,
-         dependencies: DependencyManager) {
-        self.dependencies = dependencies
+         mapSnippetComponent: MapSnippetComponent,
+         measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+         tabRouter: any TabRouterProtocol,
+         routers: [String: Router],
+         trackMapComponent: TrackMapComponent) {
         self.measuredTrack = measuredTrack
+        self.mapSnippetComponent = mapSnippetComponent
+        self.measuredTrackStorageService = measuredTrackStorageService
+        self.routers = routers
+        self.tabRouter = tabRouter
+        self.trackMapComponent = trackMapComponent
+    }
+    
+    func delete() {
+        Task {
+            await measuredTrackStorageService
+                .deleteMeasuredTrack(measuredTrack)
+            routers[tabRouter.selectedTab]?.pop()
+        }
+    }
+    
+    func openDetailMap() {
+        let route = self.trackMapComponent.route
+        routers[tabRouter.selectedTab]?.push(route)
     }
     
     var body: some View {
@@ -59,11 +119,7 @@ struct MeasuredTrackDetailView: View {
                 topSpeed
             }
             Button(role: .destructive) {
-                Task {
-                    await dependencies.measuredTrackStorageService
-                        .deleteMeasuredTrack(measuredTrack)
-                    dependencies.routers[dependencies.tabRouter.selectedTab]?.pop()
-                }
+                self.delete()
             } label: {
                 Label("Delete measurement", systemImage: "trash")
                     .foregroundStyle(.red)
@@ -82,12 +138,9 @@ struct MeasuredTrackDetailView: View {
     private var baseTrackInfo: some View {
         VStack(spacing: 8) {
             Button {
-                dependencies.routers[dependencies.tabRouter.selectedTab]?
-                    .push(.mapTrackDetail(track: measuredTrack.track, dependencies: dependencies))
+                self.openDetailMap()
             } label: {
-                MapSnippetView(mapSnippetCache: dependencies.mapSnippetCache,
-                               mapSnapshotGenerator: dependencies.mapSnapshotGenerator,
-                               track: measuredTrack.track)
+                mapSnippetComponent.view
                     .frame(height: 200)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 0)
@@ -163,10 +216,46 @@ struct MeasuredTrackDetailView: View {
     }
 }
 
+nonisolated
+class MockMeasuredTrackDetailComponent: BootstrapComponent {
+    @MainActor
+    public var locationService: any LocationServiceProtocol {
+        DependencyManager.MockLocationService()
+    }
+    @MainActor
+    public var measuredTrackStorageService: any MeasuredTrackStorageProtocol {
+        DependencyManager.MockMeasuredTrackStorageService()
+    }
+    @MainActor
+    public var tabRouter: any TabRouterProtocol {
+        DependencyManager.MockTabRouter()
+    }
+    @MainActor
+    public var routers: [String: Router] {
+        ["Tracks": Router()]
+    }
+    @MainActor
+    public var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        DependencyManager.MockTrackMapSnippetCache()
+    }
+    @MainActor
+    public var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        MapSnapshotGenerator()
+    }
+   
+   @MainActor
+    var measuredTrack: MeasuredTrackDetailComponent {
+        MeasuredTrackDetailComponent(parent: self,
+                                     measuredTrack: .init(id: "ee",
+                                                          measurement: .reachingDistance(30, name: "1/8 mile"),
+                                                          track: .filledTrack))
+    }
+}
 
 #Preview {
     NavigationView {
-        MeasuredTrackDetailView(measuredTrack: .init(id: "ee", measurement: .reachingDistance(30, name: "1/8 mile"), track: .filledTrack), dependencies: .mock())
+        let component = MockMeasuredTrackDetailComponent()
+        return component.measuredTrack.view
             .navigationBarTitleDisplayMode(.inline)
     }
 }

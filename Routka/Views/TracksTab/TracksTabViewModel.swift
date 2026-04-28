@@ -9,27 +9,64 @@ import Combine
 
 @Observable
 final class TracksTabViewModel: TracksTabViewModelProtocol {
+    func openTrack(_ track: Track) {
+        // Delegate navigation intent to parent-owned router implementation.
+        routing.openTrack(track)
+    }
+    
+    
+    func trackHistoryCellComponent(track: Track, unitSpeed: UnitSpeed) -> TrackHistoryCellComponent {
+        self.componentsFactory.trackHistoryCell(track: track, unitSpeed: unitSpeed)
+    }
+    
+    func openImportedTracks() {
+        routing.openImportedTracks()
+    }
+    func openMeasuredTracks() {
+        routing.openMeasuredTracks()
+    }
+    func openTrackHistory() {
+        routing.openTrackHistory()
+    }
+    func openMeasuredTrack(_ measure: MeasuredTrack) {
+        routing.openMeasuredTrack(measure)
+    }
+    func openMap() {
+        routing.openMap()
+    }
+    
+    func showImporter() {
+        trackFileService.showImporter()
+    }
+    
     let showLimit = 6
     
     var historyTracks: [Track] = []
     var measuredTracks: [MeasuredTrack] = []
     var importedTracks: [Track] = []
     
-    private let dependencies: DependencyManager
     private var cancellables: Set<AnyCancellable> = []
+    private let trackFileService: any TrackFileServiceProtocol
+    private let routing: any TracksTabRouting
+    private let componentsFactory: any TracksTabComponentsFactory
     
-    init(dependencies: DependencyManager) {
-        self.dependencies = dependencies
-        
+    init(storageService: any TrackStorageProtocol,
+         measuredTrackStorageService: any MeasuredTrackStorageProtocol,
+         trackFileService: any TrackFileServiceProtocol,
+         routing: any TracksTabRouting,
+         componentsFactory: any TracksTabComponentsFactory) {
+        self.trackFileService = trackFileService
+        self.routing = routing
+        self.componentsFactory = componentsFactory
         Task {
-            let historyTracks = await dependencies.storageService
+            let historyTracks = await storageService
                 .getAllTracks(ofType: .record, limit: showLimit)
             withAnimation {
                 self.historyTracks = historyTracks
             }
         }
         Task {
-            let importedTracks = await dependencies.storageService
+            let importedTracks = await storageService
                 .getAllTracks(ofType: .import, limit: showLimit)
             withAnimation {
                 self.importedTracks = importedTracks
@@ -37,20 +74,20 @@ final class TracksTabViewModel: TracksTabViewModelProtocol {
         }
         
         Task {
-            let measuredTracks = await dependencies.measuredTrackStorageService
+            let measuredTracks = await measuredTrackStorageService
                 .getMeasuredTracks(limit: showLimit)
             withAnimation {
                 self.measuredTracks = measuredTracks
             }
         }
         
-        self.dependencies.storageService
+        storageService
             .actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)
             }
             .store(in: &cancellables)
-        self.dependencies.measuredTrackStorageService
+        measuredTrackStorageService
             .actionPublisher
             .sink { [weak self] action in
                 self?.receiveAction(action)

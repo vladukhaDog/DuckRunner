@@ -6,7 +6,33 @@
 //
 
 import SwiftUI
+import NeedleFoundation
 
+// MARK: - List of Dependencies
+protocol MapSnippetDependency: Dependency {
+    var mapSnippetCache: any TrackMapSnippetCacheProtocol { get }
+    var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol { get }
+}
+
+// MARK: - Main Component
+nonisolated
+final class MapSnippetComponent: Component<MapSnippetDependency> {
+    private let track: Track
+    
+    init(parent: Scope, track: Track) {
+        self.track = track
+        super.init(parent: parent)
+    }
+    
+    @MainActor
+    var view: some View {
+        MapSnippetView(mapSnippetCache: dependency.mapSnippetCache,
+                       mapSnapshotGenerator: dependency.mapSnapshotGenerator,
+                       track: track)
+    }
+}
+
+// MARK: - View
 struct MapSnippetView: View {
     let mapSnippetCache: any TrackMapSnippetCacheProtocol
     let mapSnapshotGenerator: any MapSnapshotGeneratorProtocol
@@ -73,8 +99,28 @@ struct MapSnippetView: View {
     }
 }
 
+nonisolated
+class MockMapSnippetParentComponent: BootstrapComponent {
+    
+    @MainActor
+    public var mapSnippetCache: any TrackMapSnippetCacheProtocol {
+        DependencyManager.MockTrackMapSnippetCache()
+    }
+    @MainActor
+    public var mapSnapshotGenerator: any MapSnapshotGeneratorProtocol {
+        MapSnapshotGenerator()
+    }
+    
+    
+    @MainActor
+    var mapComponent: MapSnippetComponent {
+        MapSnippetComponent(parent: self, track: .filledTrack)
+    }
+}
+
 #Preview {
-    MapSnippetView(mapSnippetCache: DependencyManager.MockTrackMapSnippetCache(),
-                   mapSnapshotGenerator: MapSnapshotGenerator(),
-                   track: .filledTrack)
+    Group {
+        let component = MockMapSnippetParentComponent()
+        return component.mapComponent.view
+    }
 }

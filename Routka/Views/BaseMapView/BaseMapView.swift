@@ -7,7 +7,65 @@
 
 import SwiftUI
 import MapKit
+import NeedleFoundation
 
+// MARK: - List of dependencies
+protocol BaseMapDependency: Dependency {
+    var trackReplayCoordinator: any TrackReplayCoordinatorProtocol { get }
+    var locationService: any LocationServiceProtocol { get }
+    var storageService: any TrackStorageProtocol { get }
+    var measuredTrackStorageService: any MeasuredTrackStorageProtocol { get }
+}
+
+// MARK: - Main Component
+nonisolated
+final class BaseMapComponent: Component<BaseMapDependency> {
+    
+    @MainActor
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent {
+        TrackPresetsComponent(parent: self,
+                              startTrack: startTrack)
+    }
+    
+    @MainActor
+    var viewModel: any BaseMapViewModelProtocol{
+        BaseMapViewModel(trackReplayCoordinator: dependency.trackReplayCoordinator,
+                         locationService: dependency.locationService,
+                         storageService: dependency.storageService,
+                         measuredTrackStorageService: dependency.measuredTrackStorageService,
+                         componentsFactory: componentsFactory)
+    }
+    
+    @MainActor
+    var view: BaseMapView {
+        BaseMapView(vm: viewModel)
+    }
+    
+    @MainActor
+    var componentsFactory: BaseMapComponentsFactory {
+        BaseMapComponentsFactoryImpl(component: self)
+    }
+}
+
+protocol BaseMapComponentsFactory {
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent
+}
+
+nonisolated
+final class BaseMapComponentsFactoryImpl: BaseMapComponentsFactory {
+    private let component: BaseMapComponent
+    init(component: BaseMapComponent) {
+        self.component = component
+    }
+    
+    @MainActor
+    func presetsComponent(_ startTrack: @escaping (RecordingAutoStopPolicy) -> Void) -> TrackPresetsComponent {
+        component.presetsComponent(startTrack)
+    }
+}
+
+
+// MARK: - Base Map View
 /// View for displaying an interactive map and current tracking information, including speed and live track data.
 /// Hosts overlays for live speed and track info, and manages user tracking controls.
 struct BaseMapView: View {
@@ -20,11 +78,9 @@ struct BaseMapView: View {
     
     @Namespace var animationNamespace
     
-    private let dependencies: DependencyManager
+    
     /// Creates a new map view bound to the provided view model instance.
-    init(vm: any BaseMapViewModelProtocol,
-         dependencies: DependencyManager) {
-        self.dependencies = dependencies
+    init(vm: any BaseMapViewModelProtocol) {
         self._vm = State(wrappedValue: vm)
     }
     
@@ -32,7 +88,8 @@ struct BaseMapView: View {
     /// The main interface for map display, overlays, and controls.
     var body: some View {
         let unitSpeed = UnitSpeed.byName(speedUnit)
-        MapView(mode: vm.mapMode, dependencies: dependencies) {
+        MapView(vm: .init(mode: vm.mapMode,
+                          locationService: vm.locationService)) {
             UserAnnotation()
             if let replayTrack = vm.replayValidator?.track {
                 MapContents.replayTrack(replayTrack)
@@ -79,8 +136,8 @@ struct BaseMapView: View {
         .animation(.bouncy, value: vm.trackRecordingService.currentTrack != nil)
         .animation(.default, value: vm.replayValidator?.track != nil)
         .sheet(isPresented: $showMeasuredTracksSelector) {
-            TrackPresetsView(vm: TrackPresetsViewModel(baseMapVM: vm,
-                                                       dependencies: dependencies))
+            vm.presetsComponent?
+                .view
             .navigationTransition(.zoom(sourceID: "measure_presets_transition", in: animationNamespace))
         }
     }
